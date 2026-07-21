@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PeriodType {
+  Q1
+  Q2
+  Q3
+  FY
+}
+
+enum RecordStatus {
+  DRAFT
+  APPROVED
+}
+
+model Company {
+  id          String               @id @default(cuid())
+  ticker      String               @unique
+  name        String
+  sector      String?
+  currency    String               @default("IDR")
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  statements  FinancialStatement[]
+}
+
+model FinancialStatement {
+  id                   String       @id @default(cuid())
+  companyId            String
+  company              Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fiscalYear           Int
+  periodType           PeriodType
+  periodEndDate        DateTime
+  currency             String       @default("IDR")
+  unit                  String       @default("million")
+  sourceDocument       String?
+  status                RecordStatus @default(DRAFT)
+  revenue               Decimal?     @db.Decimal(20, 2)
+  costOfGoodsSold       Decimal?     @db.Decimal(20, 2)
+  grossProfit           Decimal?     @db.Decimal(20, 2)
+  operatingProfit       Decimal?     @db.Decimal(20, 2)
+  netProfit             Decimal?     @db.Decimal(20, 2)
+  cash                   Decimal?     @db.Decimal(20, 2)
+  receivables            Decimal?     @db.Decimal(20, 2)
+  inventory              Decimal?     @db.Decimal(20, 2)
+  totalAssets            Decimal?     @db.Decimal(20, 2)
+  totalDebt              Decimal?     @db.Decimal(20, 2)
+  equity                 Decimal?     @db.Decimal(20, 2)
+  operatingCashFlow      Decimal?     @db.Decimal(20, 2)
+  capitalExpenditure     Decimal?     @db.Decimal(20, 2)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  @@unique([companyId, fiscalYear, periodType])
+  @@index([companyId, fiscalYear])
+}
