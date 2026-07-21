@@ -1,19 +1,15 @@
-export const kpis = [
-  { label: "Revenue", value: "Rp20.1T", change: "+7.6% YoY" },
-  { label: "Net Profit", value: "Rp2.4T", change: "+2.1% YoY" },
-  { label: "Operating Cash Flow", value: "Rp3.0T", change: "1.25x profit" },
-  { label: "Debt to Equity", value: "0.78x", change: "Stable" }
-];
-
-export const trendData = [
-  { period: "Q1 2025", revenue: 18.7, netProfit: 2.35, ocf: 2.6 },
-  { period: "Q2 2025", revenue: 19.1, netProfit: 2.28, ocf: 2.7 },
-  { period: "Q3 2025", revenue: 19.6, netProfit: 2.31, ocf: 2.9 },
-  { period: "Q1 2026", revenue: 20.1, netProfit: 2.4, ocf: 3.0 }
-];
-
 export const companies = [
-  { ticker: "ICBP", name: "Indofood CBP Sukses Makmur", sector: "Consumer", status: "4 periods" },
-  { ticker: "BTPS", name: "Bank BTPN Syariah", sector: "Financials", status: "Needs data" },
-  { ticker: "SMRA", name: "Summarecon Agung", sector: "Property", status: "Needs data" }
+  { ticker: "ICBP", name: "Indofood CBP Sukses Makmur Tbk", sector: "Consumer", reports: 6, status: "Complete" },
+  { ticker: "BTPS", name: "Bank BTPN Syariah Tbk", sector: "Financials", reports: 5, status: "Needs Review" },
+  { ticker: "SMRA", name: "Summarecon Agung Tbk", sector: "Properties", reports: 5, status: "Complete" },
+  { ticker: "MEDC", name: "Medco Energi Internasional Tbk", sector: "Energy", reports: 4, status: "Needs Review" },
+  { ticker: "POWR", name: "Cikarang Listrindo Tbk", sector: "Utilities", reports: 5, status: "Complete" }
+];
+
+export const financialHistory = [
+  { year: 2022, revenue: 64200, netProfit: 5100, ocf: 7200, debt: 33400 },
+  { year: 2023, revenue: 67900, netProfit: 6900, ocf: 9100, debt: 32500 },
+  { year: 2024, revenue: 72100, netProfit: 7200, ocf: 10300, debt: 30100 },
+  { year: 2025, revenue: 76500, netProfit: 7800, ocf: 11100, debt: 28700 },
+  { year: 2026, revenue: 82300, netProfit: 8100, ocf: 11500, debt: 27400 }
 ];

@@ -7,56 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PeriodType {
-  Q1
-  Q2
-  Q3
-  FY
-}
-
-enum RecordStatus {
-  DRAFT
-  APPROVED
-}
+enum ReportPeriodType { Q1 H1 Q3 FY MONTHLY }
+enum ReviewStatus { DRAFT PENDING_REVIEW VERIFIED REJECTED }
+enum StatementType { INCOME_STATEMENT BALANCE_SHEET CASH_FLOW }
 
 model Company {
-  id          String               @id @default(cuid())
-  ticker      String               @unique
-  name        String
-  sector      String?
-  currency    String               @default("IDR")
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  statements  FinancialStatement[]
+  id             String               @id @default(cuid())
+  ticker         String               @unique
+  name           String
+  sector         String?
+  subsector      String?
+  ipoYear        Int?
+  currency       String               @default("IDR")
+  fiscalYearEnd  Int                  @default(12)
+  reports        FinancialReport[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 }
 
-model FinancialStatement {
-  id                   String       @id @default(cuid())
-  companyId            String
-  company              Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  fiscalYear           Int
-  periodType           PeriodType
-  periodEndDate        DateTime
-  currency             String       @default("IDR")
-  unit                  String       @default("million")
-  sourceDocument       String?
-  status                RecordStatus @default(DRAFT)
-  revenue               Decimal?     @db.Decimal(20, 2)
-  costOfGoodsSold       Decimal?     @db.Decimal(20, 2)
-  grossProfit           Decimal?     @db.Decimal(20, 2)
-  operatingProfit       Decimal?     @db.Decimal(20, 2)
-  netProfit             Decimal?     @db.Decimal(20, 2)
-  cash                   Decimal?     @db.Decimal(20, 2)
-  receivables            Decimal?     @db.Decimal(20, 2)
-  inventory              Decimal?     @db.Decimal(20, 2)
-  totalAssets            Decimal?     @db.Decimal(20, 2)
-  totalDebt              Decimal?     @db.Decimal(20, 2)
-  equity                 Decimal?     @db.Decimal(20, 2)
-  operatingCashFlow      Decimal?     @db.Decimal(20, 2)
-  capitalExpenditure     Decimal?     @db.Decimal(20, 2)
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
+model FinancialReport {
+  id          String           @id @default(cuid())
+  companyId   String
+  company     Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  year        Int
+  periodType  ReportPeriodType
+  periodEnd   DateTime
+  audited     Boolean          @default(false)
+  sourceFile  String?
+  status      ReviewStatus     @default(DRAFT)
+  entries     FinancialEntry[]
+  warnings    DataWarning[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  @@unique([companyId, year, periodType])
+  @@index([companyId, periodEnd])
+}
 
-  @@unique([companyId, fiscalYear, periodType])
-  @@index([companyId, fiscalYear])
+model CanonicalAccount {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  name          String
+  statementType StatementType
+  entries       FinancialEntry[]
+  mappings      AccountMapping[]
+}
+
+model FinancialEntry {
+  id                 String           @id @default(cuid())
+  reportId           String
+  report             FinancialReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  canonicalAccountId String
+  canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id])
+  reportedLabel      String?
+  value              Decimal          @db.Decimal(24, 4)
+  scale              Int              @default(1)
+  currency           String           @default("IDR")
+  isVerified         Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  @@unique([reportId, canonicalAccountId])
+}
+
+model AccountMapping {
+  id                 String           @id @default(cuid())
+  sourceLabel        String           @unique
+  canonicalAccountId String
+  canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id])
+  confidence         Float?
+  createdAt          DateTime         @default(now())
+}
+
+model DataWarning {
+  id         String          @id @default(cuid())
+  reportId   String
+  report     FinancialReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  code       String
+  message    String
+  severity   String
+  resolved   Boolean         @default(false)
+  createdAt  DateTime        @default(now())
 }

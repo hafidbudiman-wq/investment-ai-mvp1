@@ -1,0 +1,3 @@
+import Link from "next/link";
+const nav=[ ["Dashboard","/"],["Companies","/companies"],["Financial Statements","/financial-statements"],["Fundamental Analysis","/analysis"],["Data Management","/data-management"],["Settings","/settings"] ];
+export function Sidebar(){return <aside className="sidebar"><div className="brand">Invest<span>AI</span></div><div className="tagline">From Financial Statements<br/>to Investment Decisions</div><nav className="nav">{nav.map(([name,href])=><Link href={href} key={href}>{name}</Link>)}<span className="soon">Valuation <b className="badge">Soon</b></span><span className="soon">AI Assistant <b className="badge">Soon</b></span><span className="soon">Portfolio <b className="badge">Soon</b></span></nav></aside>}

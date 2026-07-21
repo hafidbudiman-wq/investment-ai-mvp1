@@ -1,55 +1,21 @@
-import { PrismaClient, PeriodType, RecordStatus } from "@prisma/client";
-
+import { PrismaClient, StatementType } from "@prisma/client";
 const prisma = new PrismaClient();
-
-async function main() {
-  const icbp = await prisma.company.upsert({
-    where: { ticker: "ICBP" },
-    update: {},
-    create: {
-      ticker: "ICBP",
-      name: "Indofood CBP Sukses Makmur Tbk",
-      sector: "Consumer Non-Cyclicals"
-    }
-  });
-
-  await prisma.financialStatement.upsert({
-    where: {
-      companyId_fiscalYear_periodType: {
-        companyId: icbp.id,
-        fiscalYear: 2026,
-        periodType: PeriodType.Q1
-      }
-    },
-    update: {},
-    create: {
-      companyId: icbp.id,
-      fiscalYear: 2026,
-      periodType: PeriodType.Q1,
-      periodEndDate: new Date("2026-03-31"),
-      status: RecordStatus.APPROVED,
-      unit: "million",
-      sourceDocument: "Sample seed data — replace with verified filing",
-      revenue: 20100000,
-      grossProfit: 6800000,
-      operatingProfit: 3500000,
-      netProfit: 2400000,
-      cash: 28500000,
-      receivables: 8200000,
-      inventory: 14800000,
-      totalAssets: 135000000,
-      totalDebt: 59000000,
-      equity: 76000000,
-      operatingCashFlow: 3000000,
-      capitalExpenditure: 1200000
-    }
-  });
+async function main(){
+  const accounts = [
+    ["REV","Revenue",StatementType.INCOME_STATEMENT], ["COGS","Cost of Goods Sold",StatementType.INCOME_STATEMENT],
+    ["NET_PROFIT","Net Profit",StatementType.INCOME_STATEMENT], ["CASH","Cash and Cash Equivalents",StatementType.BALANCE_SHEET],
+    ["AR","Accounts Receivable",StatementType.BALANCE_SHEET], ["INV","Inventory",StatementType.BALANCE_SHEET],
+    ["TOTAL_ASSETS","Total Assets",StatementType.BALANCE_SHEET], ["TOTAL_LIAB","Total Liabilities",StatementType.BALANCE_SHEET],
+    ["EQUITY","Equity",StatementType.BALANCE_SHEET], ["OCF","Operating Cash Flow",StatementType.CASH_FLOW],
+    ["CAPEX","Capital Expenditure",StatementType.CASH_FLOW]
+  ] as const;
+  for (const [code,name,statementType] of accounts) await prisma.canonicalAccount.upsert({where:{code},update:{name,statementType},create:{code,name,statementType}});
+  for (const c of [
+    {ticker:"ICBP",name:"Indofood CBP Sukses Makmur Tbk",sector:"Consumer Non-Cyclicals",subsector:"Processed Foods"},
+    {ticker:"BTPS",name:"Bank BTPN Syariah Tbk",sector:"Financials",subsector:"Banks"},
+    {ticker:"SMRA",name:"Summarecon Agung Tbk",sector:"Properties",subsector:"Real Estate"},
+    {ticker:"MEDC",name:"Medco Energi Internasional Tbk",sector:"Energy",subsector:"Oil & Gas",currency:"USD"},
+    {ticker:"POWR",name:"Cikarang Listrindo Tbk",sector:"Utilities",subsector:"Independent Power Producer"}
+  ]) await prisma.company.upsert({where:{ticker:c.ticker},update:c,create:c});
 }
-
-main()
-  .then(async () => prisma.$disconnect())
-  .catch(async (error) => {
-    console.error(error);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main().finally(()=>prisma.$disconnect());

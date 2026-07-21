@@ -1,13 +1,22 @@
-import { companies, kpis } from "@/lib/mock-data";
-import { TrendChart } from "@/components/trend-chart";
+import { companies } from "@/lib/mock-data";
 
-export default function DashboardPage() {
+export default function Dashboard() {
   return <>
-    <div className="header"><div><h1>Financial Dashboard</h1><p>Fondasi data laporan keuangan untuk analisis investasi jangka panjang.</p></div><span className="badge">MVP 1 • Database</span></div>
-    <section className="grid kpi-grid">{kpis.map(k => <article className="card" key={k.label}><div className="kpi-label">{k.label}</div><div className="kpi-value">{k.value}</div><div className="kpi-change">{k.change}</div></article>)}</section>
-    <section className="grid two-col">
-      <article className="card"><h3>Revenue & Net Profit Trend</h3><TrendChart /></article>
-      <article className="card"><h3>Companies</h3><table className="table"><tbody>{companies.map(c=><tr key={c.ticker}><td><span className="ticker">{c.ticker}</span><div className="note">{c.name}</div></td><td>{c.status}</td></tr>)}</tbody></table></article>
+    <section className="card hero">
+      <div className="kicker">MVP 1 · Financial Data Foundation</div>
+      <div className="header"><div><h1>Investment AI – Stock Analysis Platform</h1><p>Upload, verifikasi, simpan, bandingkan, dan analisis laporan keuangan secara terstruktur.</p></div><button className="btn">Upload Statement</button></div>
+    </section>
+    <div style={{height:16}}/>
+    <section className="grid cards">
+      <div className="card"><div className="metric-label">Total Companies</div><div className="metric">{companies.length}</div></div>
+      <div className="card"><div className="metric-label">Financial Reports</div><div className="metric">25</div></div>
+      <div className="card"><div className="metric-label">Pending Review</div><div className="metric warning">2</div></div>
+      <div className="card"><div className="metric-label">Data Warnings</div><div className="metric danger">4</div></div>
+    </section>
+    <div style={{height:16}}/>
+    <section className="grid two">
+      <div className="card"><h2>Companies</h2><div className="table-wrap"><table><thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th>Reports</th><th>Status</th></tr></thead><tbody>{companies.map(c=><tr key={c.ticker}><td><b>{c.ticker}</b></td><td>{c.name}</td><td>{c.sector}</td><td>{c.reports}</td><td><span className={`status ${c.status!=="Complete"?"review":""}`}>{c.status}</span></td></tr>)}</tbody></table></div></div>
+      <div className="card"><h2>Recent Activity</h2><p><b>ICBP</b> FY 2025 uploaded</p><p><b>BTPS</b> account mapping needs review</p><p><b>SMRA</b> financial report validated</p><p><b>MEDC</b> missing cash-flow values</p></div>
     </section>
   </>;
 }

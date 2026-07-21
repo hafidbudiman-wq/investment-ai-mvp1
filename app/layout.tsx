@@ -1,11 +1,12 @@
+import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/Sidebar";
 
-export const metadata = {
-  title: "Investment AI MVP 1",
-  description: "Financial database for Indonesian equities"
+export const metadata: Metadata = {
+  title: "InvestAI | Stock Analysis Platform",
+  description: "Financial statement database and fundamental analysis platform"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="id"><body><div className="shell"><Sidebar /><main className="main">{children}</main></div></body></html>;
+  return <html lang="id"><body><div className="shell"><Sidebar/><main className="main">{children}</main></div></body></html>;
 }
