@@ -1,1 +1,44 @@
-export default function StatementsPage(){return <><div className="header"><div><h1>Financial Statements</h1><p>Alur MVP: upload → extraction preview → verification → PostgreSQL.</p></div><button className="btn">Upload PDF / Excel</button></div><section className="grid two"><div className="card"><h2>Manual Financial Input</h2><div className="form-grid"><div className="field"><label>Company</label><select><option>ICBP</option><option>BTPS</option><option>SMRA</option></select></div><div className="field"><label>Period</label><select><option>FY 2025</option><option>Q1 2026</option></select></div>{["Revenue","Net Profit","Total Assets","Total Liabilities","Equity","Operating Cash Flow"].map(x=><div className="field" key={x}><label>{x}</label><input placeholder="0" type="number"/></div>)}</div><div style={{height:14}}/><button className="btn">Validate & Save</button></div><div className="card"><h2>Extraction Review</h2><p>File upload API is prepared as a next integration point. Extracted accounts must be mapped and verified before saving.</p><div className="callout">Required control: no AI-extracted number enters the canonical database without user approval.</div></div></section></>}
+import { ManualFinancialForm } from "@/components/ManualFinancialForm";
+
+export const dynamic = "force-dynamic";
+
+export default function StatementsPage() {
+  return (
+    <>
+      <div className="header">
+        <div>
+          <h1>Financial Statements</h1>
+          <p>Uji alur manual terlebih dahulu: input → validasi → simpan ke PostgreSQL → cek dashboard.</p>
+        </div>
+        <button className="btn secondary" type="button" disabled title="Upload PDF / Excel akan dibuat setelah manual input berhasil.">
+          Upload PDF / Excel — Next
+        </button>
+      </div>
+
+      <section className="grid two">
+        <div className="card">
+          <h2>Manual Financial Input</h2>
+          <p className="form-hint">Gunakan unit yang sama untuk seluruh angka, misalnya Rp miliar. Data dengan company, tahun, dan periode yang sama akan diperbarui.</p>
+          <ManualFinancialForm />
+        </div>
+
+        <div className="card">
+          <h2>Target Uji Pertama</h2>
+          <p>Gunakan data contoh yang seimbang agar status menjadi <b>VERIFIED</b>.</p>
+          <div className="test-data">
+            <div><span>Company</span><b>ICBP</b></div>
+            <div><span>Period</span><b>FY 2025</b></div>
+            <div><span>Revenue</span><b>250</b></div>
+            <div><span>Net Profit</span><b>100</b></div>
+            <div><span>Total Assets</span><b>500</b></div>
+            <div><span>Total Liabilities</span><b>200</b></div>
+            <div><span>Equity</span><b>300</b></div>
+            <div><span>Operating Cash Flow</span><b>120</b></div>
+          </div>
+          <div className="callout">Pemeriksaan utama: Total Assets harus sama dengan Total Liabilities + Equity.</div>
+          <p>Setelah berhasil, buka Dashboard. Financial Reports dan laporan ICBP harus berubah dari 0 menjadi 1.</p>
+        </div>
+      </section>
+    </>
+  );
+}
