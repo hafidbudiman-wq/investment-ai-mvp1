@@ -7,9 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ReportPeriodType { Q1 H1 Q3 FY MONTHLY }
-enum ReviewStatus { DRAFT PENDING_REVIEW VERIFIED REJECTED }
-enum StatementType { INCOME_STATEMENT BALANCE_SHEET CASH_FLOW }
+enum ReportPeriodType {
+  Q1
+  H1
+  Q3
+  FY
+  MONTHLY
+}
+
+enum ReviewStatus {
+  DRAFT
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum StatementType {
+  INCOME_STATEMENT
+  BALANCE_SHEET
+  CASH_FLOW
+}
 
 model Company {
   id             String               @id @default(cuid())
