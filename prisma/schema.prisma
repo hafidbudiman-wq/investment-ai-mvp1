@@ -167,7 +167,7 @@ model FinancialEntry {
 
 model AccountMapping {
   id                 String           @id @default(cuid())
-  sourceLabel        String
+  sourceLabel        String           @unique
   normalizedLabel    String?
   companyId          String?
   statementType      StatementType?
@@ -179,8 +179,8 @@ model AccountMapping {
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @default(now()) @updatedAt
 
-  @@unique([sourceLabel, companyId, statementType])
   @@index([normalizedLabel])
+  @@index([companyId, statementType])
 }
 
 model DataWarning {
