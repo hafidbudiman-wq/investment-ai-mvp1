@@ -1,40 +1,36 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { CanonicalAccountItem } from "@/components/CanonicalAccountManager";
 
-type Mapping = { reported: string; canonical: string };
+type Mapping = { id?: string; reported: string; canonical: string; canonicalAccountId: string };
 
-export function MappingManager({ initialMappings }: { initialMappings: Mapping[] }) {
+export function MappingManager({ initialMappings, accounts }: { initialMappings: Mapping[]; accounts: CanonicalAccountItem[] }) {
   const [mappings, setMappings] = useState(initialMappings);
   const [open, setOpen] = useState(false);
   const [reported, setReported] = useState("");
-  const [canonical, setCanonical] = useState("");
-  const canSave = useMemo(() => reported.trim() && canonical.trim(), [reported, canonical]);
+  const [canonicalAccountId, setCanonicalAccountId] = useState(accounts[0]?.id ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const canSave = useMemo(() => Boolean(reported.trim() && canonicalAccountId), [reported, canonicalAccountId]);
 
-  function addMapping() {
+  async function addMapping() {
     if (!canSave) return;
-    setMappings((items) => [...items, { reported: reported.trim(), canonical: canonical.trim() }]);
-    setReported("");
-    setCanonical("");
-    setOpen(false);
+    setSaving(true); setError("");
+    const account = accounts.find((item) => item.id === canonicalAccountId);
+    const response = await fetch("/api/account-mappings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sourceLabel: reported.trim(), canonicalAccountId, statementType: account?.statementType }) });
+    const result = await response.json();
+    setSaving(false);
+    if (!response.ok) { setError(result.error ?? "Gagal menyimpan mapping."); return; }
+    const saved = result.mapping;
+    setMappings((items) => [...items.filter((item) => item.reported !== saved.sourceLabel), { id: saved.id, reported: saved.sourceLabel, canonical: saved.canonicalAccount.name, canonicalAccountId: saved.canonicalAccount.id }]);
+    setReported(""); setOpen(false);
   }
 
   return <>
-    <button className="btn" type="button" onClick={() => setOpen(true)}>Add Mapping</button>
-    <div className="mapping-list">
-      <div className="mapping-row mapping-head"><span>Reported Account</span><span>Canonical Account</span></div>
-      {mappings.map((mapping, index) => <div className="mapping-row" key={`${mapping.reported}-${index}`}><span>{mapping.reported}</span><span>{mapping.canonical}</span></div>)}
-    </div>
-    {open && <div className="modal-backdrop" onClick={() => setOpen(false)}>
-      <div className="card modal" onClick={(event) => event.stopPropagation()}>
-        <div className="header"><div><h2>Add Account Mapping</h2><p>Hubungkan nama akun laporan ke akun canonical InvestAI.</p></div></div>
-        <div className="form-grid">
-          <div className="field"><label>Reported Account</label><input value={reported} onChange={(event) => setReported(event.target.value)} placeholder="Contoh: Penjualan Bersih" /></div>
-          <div className="field"><label>Canonical Account</label><input value={canonical} onChange={(event) => setCanonical(event.target.value)} placeholder="Contoh: Revenue" /></div>
-        </div>
-        <div className="modal-actions"><button className="btn secondary" type="button" onClick={() => setOpen(false)}>Cancel</button><button className="btn" type="button" disabled={!canSave} onClick={addMapping}>Add Mapping</button></div>
-        <p className="helper-text">Tahap ini mengaktifkan alur UI mapping. Penyimpanan permanen ke PostgreSQL akan menjadi langkah berikutnya bersama canonical account master.</p>
-      </div>
-    </div>}
+    <button className="btn" type="button" disabled={accounts.length === 0} onClick={() => setOpen(true)}>+ Add Mapping</button>
+    <p className="helper-text">Mapping menerjemahkan nama akun asli perusahaan ke Canonical Account InvestAI. Mapping yang disimpan sekarang permanen di PostgreSQL.</p>
+    <div className="mapping-list"><div className="mapping-row mapping-head"><span>Reported Account</span><span>Canonical Account</span></div>{mappings.map((mapping, index) => <div className="mapping-row" key={mapping.id ?? `${mapping.reported}-${index}`}><span>{mapping.reported}</span><span>{mapping.canonical}</span></div>)}{mappings.length === 0 && <p>Belum ada mapping tersimpan.</p>}</div>
+    {open && <div className="modal-backdrop" onClick={() => setOpen(false)}><div className="card modal" onClick={(event) => event.stopPropagation()}><div className="header"><div><h2>Add Account Mapping</h2><p>Hubungkan nama akun laporan perusahaan ke akun standar InvestAI.</p></div></div><div className="form-grid"><div className="field"><label>Reported Account</label><input value={reported} onChange={(event) => setReported(event.target.value)} placeholder="Contoh: Penjualan Neto" /></div><div className="field"><label>Canonical Account</label><select value={canonicalAccountId} onChange={(event) => setCanonicalAccountId(event.target.value)}>{accounts.map((account) => <option value={account.id} key={account.id}>{account.code} · {account.name}</option>)}</select></div></div>{error && <p className="danger">{error}</p>}<div className="modal-actions"><button className="btn secondary" type="button" onClick={() => setOpen(false)}>Cancel</button><button className="btn" type="button" disabled={!canSave || saving} onClick={addMapping}>{saving ? "Saving..." : "Save Mapping"}</button></div></div></div>}
   </>;
 }
