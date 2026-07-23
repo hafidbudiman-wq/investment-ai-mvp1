@@ -1,2 +1,31 @@
-const mappings=[["Penjualan Neto","Revenue"],["Pendapatan Bersih","Revenue"],["Beban Pokok Penjualan","Cost of Goods Sold"],["Kas dan Setara Kas","Cash"],["Piutang Usaha","Accounts Receivable"]];
-export default function DataPage(){return <><div className="header"><div><h1>Data Management</h1><p>Account mapping, quality checks, editing, and audit trail.</p></div><button className="btn">Add Mapping</button></div><section className="grid two"><div className="card"><h2>Account Mapping</h2><table><thead><tr><th>Reported Account</th><th>Canonical Account</th></tr></thead><tbody>{mappings.map(m=><tr key={m[0]}><td>{m[0]}</td><td>{m[1]}</td></tr>)}</tbody></table></div><div className="card"><h2>Validation Warnings</h2><p className="warning">⚠ BTPS: account mapping requires review.</p><p className="danger">⚠ MEDC: cash-flow statement is incomplete.</p><p>✓ ICBP: balance equation passed.</p><p>✓ SMRA: duplicate check passed.</p></div></section></>}
+import { MappingManager } from "@/components/MappingManager";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+const fallbackMappings = [
+  { reported: "Penjualan Neto", canonical: "Revenue" },
+  { reported: "Pendapatan Bersih", canonical: "Revenue" },
+  { reported: "Beban Pokok Penjualan", canonical: "Cost of Goods Sold" },
+  { reported: "Kas dan Setara Kas", canonical: "Cash" },
+  { reported: "Piutang Usaha", canonical: "Accounts Receivable" },
+];
+
+export default async function DataPage() {
+  const reports = await prisma.financialReport.findMany({
+    include: { company: true, warnings: { where: { resolved: false } } },
+    orderBy: [{ year: "desc" }, { company: { ticker: "asc" } }],
+    take: 20,
+  }).catch(() => []);
+
+  return <>
+    <div className="header"><div><h1>Data Management</h1><p>Account mapping, quality checks, editing, and audit trail.</p></div><MappingManager initialMappings={fallbackMappings} /></div>
+    <section className="grid two">
+      <div className="card"><h2>Account Mapping</h2><MappingManager initialMappings={fallbackMappings} /></div>
+      <div className="card"><h2>Validation Status</h2>
+        {reports.length === 0 && <p>Belum ada laporan keuangan tersimpan.</p>}
+        <div className="validation-list">{reports.map((report) => <div className="validation-item" key={report.id}><b>{report.company.ticker} · {report.period} {report.year}</b><span className={report.status === "VERIFIED" ? "positive" : "warning"}>{report.status === "VERIFIED" ? "✓ Verified" : "⚠ Review"}</span>{report.warnings.map((warning) => <small className="danger" key={warning.id}>⚠ {warning.message}</small>)}</div>)}</div>
+      </div>
+    </section>
+  </>;
+}
