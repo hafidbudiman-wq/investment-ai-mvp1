@@ -26,72 +26,161 @@ enum StatementType {
   INCOME_STATEMENT
   BALANCE_SHEET
   CASH_FLOW
+  OTHER
+}
+
+enum SourceType {
+  MANUAL
+  PDF
+  EXCEL
+  API
+}
+
+enum ValueNature {
+  FLOW
+  STOCK
+  PER_SHARE
+  RATIO
+  TEXT
+}
+
+enum MappingMethod {
+  MANUAL
+  RULE
+  AI
+}
+
+enum WarningSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
 model Company {
-  id             String               @id @default(cuid())
-  ticker         String               @unique
-  name           String
-  sector         String?
-  subsector      String?
-  ipoYear        Int?
-  currency       String               @default("IDR")
-  fiscalYearEnd  Int                  @default(12)
-  reports        FinancialReport[]
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  id            String              @id @default(cuid())
+  ticker        String              @unique
+  name          String
+  sector        String?
+  subsector     String?
+  country       String              @default("ID")
+  ipoYear       Int?
+  currency      String              @default("IDR")
+  fiscalYearEnd Int                 @default(12)
+  isActive      Boolean             @default(true)
+  reports       FinancialReport[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 }
 
 model FinancialReport {
-  id          String           @id @default(cuid())
-  companyId   String
-  company     Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  year        Int
-  periodType  ReportPeriodType
-  periodEnd   DateTime
-  audited     Boolean          @default(false)
-  sourceFile  String?
-  status      ReviewStatus     @default(DRAFT)
-  entries     FinancialEntry[]
-  warnings    DataWarning[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String               @id @default(cuid())
+  companyId     String
+  company       Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  year          Int
+  periodType    ReportPeriodType
+  periodStart   DateTime?
+  periodEnd     DateTime
+  audited       Boolean              @default(false)
+  consolidated  Boolean              @default(true)
+  sourceType    SourceType           @default(MANUAL)
+  sourceFile    String?
+  status        ReviewStatus         @default(DRAFT)
+  statements    FinancialStatement[]
+  entries       FinancialEntry[]
+  warnings      DataWarning[]
+  sourceFiles   SourceFile[]
+  auditLogs     AuditLog[]
+  createdBy     String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
   @@unique([companyId, year, periodType])
   @@index([companyId, periodEnd])
+  @@index([status])
+}
+
+model FinancialStatement {
+  id             String             @id @default(cuid())
+  reportId       String
+  report         FinancialReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  statementType  StatementType
+  currency       String
+  unitScale      Int                @default(1)
+  isConsolidated Boolean            @default(true)
+  entries        FinancialEntry[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([reportId, statementType])
 }
 
 model CanonicalAccount {
-  id            String            @id @default(cuid())
-  code          String            @unique
+  id            String             @id @default(cuid())
+  code          String             @unique
   name          String
+  description   String?
   statementType StatementType
+  valueNature   ValueNature        @default(FLOW)
+  normalBalance String?
+  parentId      String?
+  parent        CanonicalAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children      CanonicalAccount[] @relation("AccountHierarchy")
+  level         Int                @default(1)
+  sortOrder     Int                @default(0)
+  isCalculated  Boolean            @default(false)
+  formula       String?
+  isActive      Boolean            @default(true)
   entries       FinancialEntry[]
   mappings      AccountMapping[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([statementType, sortOrder])
+  @@index([parentId])
 }
 
 model FinancialEntry {
-  id                 String           @id @default(cuid())
+  id                 String              @id @default(cuid())
   reportId           String
-  report             FinancialReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  report             FinancialReport     @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  statementId        String?
+  statement          FinancialStatement? @relation(fields: [statementId], references: [id], onDelete: Cascade)
   canonicalAccountId String
-  canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id])
+  canonicalAccount   CanonicalAccount    @relation(fields: [canonicalAccountId], references: [id])
   reportedLabel      String?
-  value              Decimal          @db.Decimal(24, 4)
-  scale              Int              @default(1)
-  currency           String           @default("IDR")
-  isVerified         Boolean          @default(false)
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  rawText            String?
+  value              Decimal             @db.Decimal(28, 6)
+  scale              Int                 @default(1)
+  currency           String              @default("IDR")
+  isEstimated        Boolean             @default(false)
+  isVerified         Boolean             @default(false)
+  confidence         Float?
+  sourcePage         Int?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
   @@unique([reportId, canonicalAccountId])
+  @@index([canonicalAccountId])
+  @@index([statementId])
 }
 
 model AccountMapping {
   id                 String           @id @default(cuid())
-  sourceLabel        String           @unique
+  sourceLabel        String
+  normalizedLabel    String
+  companyId          String?
+  statementType      StatementType?
   canonicalAccountId String
   canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id])
+  method             MappingMethod    @default(MANUAL)
   confidence         Float?
+  isApproved         Boolean          @default(false)
   createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([sourceLabel, companyId, statementType])
+  @@index([normalizedLabel])
 }
 
 model DataWarning {
@@ -100,7 +189,44 @@ model DataWarning {
   report     FinancialReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
   code       String
   message    String
-  severity   String
+  severity   WarningSeverity
   resolved   Boolean         @default(false)
+  resolvedBy String?
+  resolvedAt DateTime?
   createdAt  DateTime        @default(now())
+
+  @@index([reportId, resolved])
+  @@index([severity])
+}
+
+model SourceFile {
+  id         String          @id @default(cuid())
+  reportId   String
+  report     FinancialReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sourceType SourceType
+  fileName   String
+  filePath   String?
+  mimeType   String?
+  fileSize   Int?
+  checksum   String?
+  uploadedAt DateTime        @default(now())
+
+  @@index([reportId])
+}
+
+model AuditLog {
+  id        String           @id @default(cuid())
+  reportId  String?
+  report    FinancialReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  action    String
+  actor     String?
+  entity    String?
+  entityId  String?
+  before    Json?
+  after     Json?
+  note      String?
+  createdAt DateTime         @default(now())
+
+  @@index([reportId, createdAt])
+  @@index([entity, entityId])
 }
