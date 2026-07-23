@@ -168,7 +168,7 @@ model FinancialEntry {
 model AccountMapping {
   id                 String           @id @default(cuid())
   sourceLabel        String
-  normalizedLabel    String
+  normalizedLabel    String?
   companyId          String?
   statementType      StatementType?
   canonicalAccountId String
@@ -189,7 +189,9 @@ model DataWarning {
   report     FinancialReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
   code       String
   message    String
-  severity   WarningSeverity
+  // Kept as String in MVP 1.2B to avoid a destructive VARCHAR -> PostgreSQL enum conversion on existing production rows.
+  // Application code only writes values from WarningSeverity.
+  severity   String
   resolved   Boolean         @default(false)
   resolvedBy String?
   resolvedAt DateTime?
