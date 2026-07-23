@@ -35,7 +35,10 @@ export default async function Dashboard() {
     </section>
     <div style={{height:16}}/>
     <section className="grid two">
-      <div className="card"><h2>Companies</h2><div className="table-wrap"><table><thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th>Reports</th><th>Status</th></tr></thead><tbody>{companies.map(c=><tr key={c.id}><td><b>{c.ticker}</b></td><td>{c.name}</td><td>{c.sector ?? "-"}</td><td>{c._count.reports}</td><td><span className="status">Active</span></td></tr>)}{connected && companies.length===0 && <tr><td colSpan={5}>Database kosong. Jalankan seed data.</td></tr>}</tbody></table></div></div>
+      <div className="card"><h2>Companies</h2>
+        <div className="desktop-table table-wrap"><table><thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th>Reports</th><th>Status</th></tr></thead><tbody>{companies.map(c=><tr key={c.id}><td><b>{c.ticker}</b></td><td>{c.name}</td><td>{c.sector ?? "-"}</td><td>{c._count.reports}</td><td><span className="status">Active</span></td></tr>)}{connected && companies.length===0 && <tr><td colSpan={5}>Database kosong. Jalankan seed data.</td></tr>}</tbody></table></div>
+        <div className="company-list">{companies.map(c=><article className="company-item" key={c.id}><div className="company-item-top"><strong>{c.ticker}</strong><span className="status">Active</span></div><div className="company-name">{c.name}</div><div className="company-meta"><span>{c.sector ?? "-"}</span><span>{c._count.reports} report{c._count.reports === 1 ? "" : "s"}</span></div></article>)}{connected && companies.length===0 && <p>Database kosong. Jalankan seed data.</p>}</div>
+      </div>
       <div className="card"><h2>Database Status</h2><p><b>{connected ? "PostgreSQL connected" : "PostgreSQL not connected"}</b></p><p>{connected ? "Dashboard sekarang membaca data asli dari database." : "Tambahkan DATABASE_URL dan jalankan Prisma db push serta seed."}</p></div>
     </section>
   </>;
