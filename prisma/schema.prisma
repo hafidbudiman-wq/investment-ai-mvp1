@@ -134,7 +134,7 @@ model CanonicalAccount {
   entries       FinancialEntry[]
   mappings      AccountMapping[]
   createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  updatedAt     DateTime           @default(now()) @updatedAt
 
   @@index([statementType, sortOrder])
   @@index([parentId])
@@ -177,7 +177,7 @@ model AccountMapping {
   confidence         Float?
   isApproved         Boolean          @default(false)
   createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  updatedAt          DateTime         @default(now()) @updatedAt
 
   @@unique([sourceLabel, companyId, statementType])
   @@index([normalizedLabel])
