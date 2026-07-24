@@ -1,4 +1,5 @@
 import { ManualFinancialForm } from "@/components/ManualFinancialForm";
+import { ExcelImportPanel } from "@/components/ExcelImportPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -8,12 +9,15 @@ export default function StatementsPage() {
       <div className="header">
         <div>
           <h1>Financial Statements</h1>
-          <p>Uji alur manual terlebih dahulu: input → validasi → simpan ke PostgreSQL → cek dashboard.</p>
+          <p>Manual input tetap tersedia. MVP 1.2C menambahkan Excel → preview → mapping review sebelum data masuk PostgreSQL.</p>
         </div>
-        <button className="btn secondary" type="button" disabled title="Upload PDF / Excel akan dibuat setelah manual input berhasil.">
-          Upload PDF / Excel — Next
-        </button>
       </div>
+
+      <section className="card" style={{ marginBottom: 20 }}>
+        <h2>Excel Import — MVP 1.2C</h2>
+        <p className="form-hint">Upload Excel tidak langsung menulis database. InvestAI membaca file, menampilkan hasil ekstraksi dan status mapping, lalu user review terlebih dahulu.</p>
+        <ExcelImportPanel />
+      </section>
 
       <section className="grid two">
         <div className="card">
@@ -23,20 +27,16 @@ export default function StatementsPage() {
         </div>
 
         <div className="card">
-          <h2>Target Uji Pertama</h2>
-          <p>Gunakan data contoh yang seimbang agar status menjadi <b>VERIFIED</b>.</p>
+          <h2>Acceptance Flow</h2>
+          <p>MVP 1.2C menggunakan safety gate sebelum save.</p>
           <div className="test-data">
-            <div><span>Company</span><b>ICBP</b></div>
-            <div><span>Period</span><b>FY 2025</b></div>
-            <div><span>Revenue</span><b>250</b></div>
-            <div><span>Net Profit</span><b>100</b></div>
-            <div><span>Total Assets</span><b>500</b></div>
-            <div><span>Total Liabilities</span><b>200</b></div>
-            <div><span>Equity</span><b>300</b></div>
-            <div><span>Operating Cash Flow</span><b>120</b></div>
+            <div><span>1</span><b>Upload .xlsx / .xls</b></div>
+            <div><span>2</span><b>Extract Account + Value</b></div>
+            <div><span>3</span><b>Match Account Mapping</b></div>
+            <div><span>4</span><b>Review mapped / unmapped</b></div>
+            <div><span>5</span><b>Confirm before PostgreSQL</b></div>
           </div>
-          <div className="callout">Pemeriksaan utama: Total Assets harus sama dengan Total Liabilities + Equity.</div>
-          <p>Setelah berhasil, buka Dashboard. Financial Reports dan laporan ICBP harus berubah dari 0 menjadi 1.</p>
+          <div className="callout">Pada PR pertama ini mode sengaja PREVIEW_ONLY. Tidak ada data Excel yang dapat merusak canonical database sebelum review flow kita uji.</div>
         </div>
       </section>
     </>
