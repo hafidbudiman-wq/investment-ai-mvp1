@@ -116,25 +116,34 @@ model FinancialStatement {
 }
 
 model CanonicalAccount {
-  id            String             @id @default(cuid())
-  code          String             @unique
-  name          String
-  description   String?
-  statementType StatementType
-  valueNature   ValueNature        @default(FLOW)
-  normalBalance String?
-  parentId      String?
-  parent        CanonicalAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
-  children      CanonicalAccount[] @relation("AccountHierarchy")
-  level         Int                @default(1)
-  sortOrder     Int                @default(0)
-  isCalculated  Boolean            @default(false)
-  formula       String?
-  isActive      Boolean            @default(true)
-  entries       FinancialEntry[]
-  mappings      AccountMapping[]
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @default(now()) @updatedAt
+  id              String             @id @default(cuid())
+  code            String             @unique
+  name            String
+  displayNameId   String?
+  description     String?
+  definition      String?
+  investorMeaning String?
+  aliases         Json?
+  relatedMetrics  Json?
+  positiveSignals Json?
+  redFlags        Json?
+  sectorNotes     Json?
+  sourceRefs      Json?
+  statementType   StatementType
+  valueNature     ValueNature        @default(FLOW)
+  normalBalance   String?
+  parentId        String?
+  parent          CanonicalAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children        CanonicalAccount[] @relation("AccountHierarchy")
+  level           Int                @default(1)
+  sortOrder       Int                @default(0)
+  isCalculated    Boolean            @default(false)
+  formula         String?
+  isActive        Boolean            @default(true)
+  entries         FinancialEntry[]
+  mappings        AccountMapping[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now()) @updatedAt
 
   @@index([statementType, sortOrder])
   @@index([parentId])
