@@ -1,85 +1,44 @@
 import { PrismaClient, StatementType, ValueNature } from "@prisma/client";
-
 const prisma = new PrismaClient();
-
 type AccountSeed = [string, string, StatementType, ValueNature, number];
-
 const accounts: AccountSeed[] = [
-  ["REV", "Revenue", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 100],
-  ["COGS", "Cost of Goods Sold", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 110],
-  ["GROSS_PROFIT", "Gross Profit", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 120],
-  ["SGA", "Selling, General and Administrative Expense", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 130],
-  ["OPERATING_PROFIT", "Operating Profit / EBIT", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 140],
-  ["EBITDA", "EBITDA", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 150],
-  ["FINANCE_INCOME", "Finance Income", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 160],
-  ["FINANCE_COST", "Finance Cost", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 170],
-  ["FX_GAIN_LOSS", "Foreign Exchange Gain / Loss", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 180],
-  ["PRETAX_PROFIT", "Profit Before Tax", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 190],
-  ["TAX_EXPENSE", "Income Tax Expense", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 200],
-  ["NET_PROFIT", "Net Profit", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 210],
-  ["NET_PROFIT_PARENT", "Net Profit Attributable to Owners of Parent", StatementType.INCOME_STATEMENT, ValueNature.FLOW, 220],
-  ["EPS_BASIC", "Basic Earnings per Share", StatementType.INCOME_STATEMENT, ValueNature.PER_SHARE, 230],
-  ["EPS_DILUTED", "Diluted Earnings per Share", StatementType.INCOME_STATEMENT, ValueNature.PER_SHARE, 240],
+["REV","Revenue",StatementType.INCOME_STATEMENT,ValueNature.FLOW,100],["COGS","Cost of Goods Sold",StatementType.INCOME_STATEMENT,ValueNature.FLOW,110],["GROSS_PROFIT","Gross Profit",StatementType.INCOME_STATEMENT,ValueNature.FLOW,120],["SGA","Selling, General and Administrative Expense",StatementType.INCOME_STATEMENT,ValueNature.FLOW,130],["OPERATING_PROFIT","Operating Profit / EBIT",StatementType.INCOME_STATEMENT,ValueNature.FLOW,140],["EBITDA","EBITDA",StatementType.INCOME_STATEMENT,ValueNature.FLOW,150],["FINANCE_INCOME","Finance Income",StatementType.INCOME_STATEMENT,ValueNature.FLOW,160],["FINANCE_COST","Finance Cost",StatementType.INCOME_STATEMENT,ValueNature.FLOW,170],["FX_GAIN_LOSS","Foreign Exchange Gain / Loss",StatementType.INCOME_STATEMENT,ValueNature.FLOW,180],["PRETAX_PROFIT","Profit Before Tax",StatementType.INCOME_STATEMENT,ValueNature.FLOW,190],["TAX_EXPENSE","Income Tax Expense",StatementType.INCOME_STATEMENT,ValueNature.FLOW,200],["NET_PROFIT","Net Profit",StatementType.INCOME_STATEMENT,ValueNature.FLOW,210],["NET_PROFIT_PARENT","Net Profit Attributable to Owners of Parent",StatementType.INCOME_STATEMENT,ValueNature.FLOW,220],["EPS_BASIC","Basic Earnings per Share",StatementType.INCOME_STATEMENT,ValueNature.PER_SHARE,230],["EPS_DILUTED","Diluted Earnings per Share",StatementType.INCOME_STATEMENT,ValueNature.PER_SHARE,240],
+["CASH","Cash and Cash Equivalents",StatementType.BALANCE_SHEET,ValueNature.STOCK,300],["SHORT_TERM_INVESTMENTS","Short-term Investments",StatementType.BALANCE_SHEET,ValueNature.STOCK,310],["AR","Accounts Receivable",StatementType.BALANCE_SHEET,ValueNature.STOCK,320],["OTHER_RECEIVABLES","Other Receivables",StatementType.BALANCE_SHEET,ValueNature.STOCK,330],["INV","Inventory",StatementType.BALANCE_SHEET,ValueNature.STOCK,340],["CURRENT_ASSETS","Total Current Assets",StatementType.BALANCE_SHEET,ValueNature.STOCK,350],["PPE","Property, Plant and Equipment",StatementType.BALANCE_SHEET,ValueNature.STOCK,360],["RIGHT_OF_USE_ASSETS","Right-of-use Assets",StatementType.BALANCE_SHEET,ValueNature.STOCK,370],["GOODWILL","Goodwill",StatementType.BALANCE_SHEET,ValueNature.STOCK,380],["INTANGIBLE_ASSETS","Intangible Assets",StatementType.BALANCE_SHEET,ValueNature.STOCK,390],["LONG_TERM_INVESTMENTS","Long-term Investments",StatementType.BALANCE_SHEET,ValueNature.STOCK,400],["TOTAL_ASSETS","Total Assets",StatementType.BALANCE_SHEET,ValueNature.STOCK,410],["AP","Accounts Payable",StatementType.BALANCE_SHEET,ValueNature.STOCK,420],["SHORT_TERM_DEBT","Short-term Debt",StatementType.BALANCE_SHEET,ValueNature.STOCK,430],["CURRENT_LIAB","Total Current Liabilities",StatementType.BALANCE_SHEET,ValueNature.STOCK,440],["LONG_TERM_DEBT","Long-term Debt",StatementType.BALANCE_SHEET,ValueNature.STOCK,450],["LEASE_LIABILITIES","Lease Liabilities",StatementType.BALANCE_SHEET,ValueNature.STOCK,460],["TOTAL_DEBT","Total Debt",StatementType.BALANCE_SHEET,ValueNature.STOCK,470],["TOTAL_LIAB","Total Liabilities",StatementType.BALANCE_SHEET,ValueNature.STOCK,480],["EQUITY","Total Equity",StatementType.BALANCE_SHEET,ValueNature.STOCK,490],["EQUITY_PARENT","Equity Attributable to Owners of Parent",StatementType.BALANCE_SHEET,ValueNature.STOCK,500],["RETAINED_EARNINGS","Retained Earnings",StatementType.BALANCE_SHEET,ValueNature.STOCK,510],
+["OCF","Operating Cash Flow",StatementType.CASH_FLOW,ValueNature.FLOW,600],["CAPEX","Capital Expenditure",StatementType.CASH_FLOW,ValueNature.FLOW,610],["ICF","Investing Cash Flow",StatementType.CASH_FLOW,ValueNature.FLOW,620],["CFF","Financing Cash Flow",StatementType.CASH_FLOW,ValueNature.FLOW,630],["DIVIDENDS_PAID","Dividends Paid",StatementType.CASH_FLOW,ValueNature.FLOW,640],["DEBT_ISSUED","Debt Issued",StatementType.CASH_FLOW,ValueNature.FLOW,650],["DEBT_REPAID","Debt Repaid",StatementType.CASH_FLOW,ValueNature.FLOW,660],["FCF","Free Cash Flow",StatementType.CASH_FLOW,ValueNature.FLOW,670],["NET_CHANGE_CASH","Net Change in Cash",StatementType.CASH_FLOW,ValueNature.FLOW,680]];
 
-  ["CASH", "Cash and Cash Equivalents", StatementType.BALANCE_SHEET, ValueNature.STOCK, 300],
-  ["SHORT_TERM_INVESTMENTS", "Short-term Investments", StatementType.BALANCE_SHEET, ValueNature.STOCK, 310],
-  ["AR", "Accounts Receivable", StatementType.BALANCE_SHEET, ValueNature.STOCK, 320],
-  ["OTHER_RECEIVABLES", "Other Receivables", StatementType.BALANCE_SHEET, ValueNature.STOCK, 330],
-  ["INV", "Inventory", StatementType.BALANCE_SHEET, ValueNature.STOCK, 340],
-  ["CURRENT_ASSETS", "Total Current Assets", StatementType.BALANCE_SHEET, ValueNature.STOCK, 350],
-  ["PPE", "Property, Plant and Equipment", StatementType.BALANCE_SHEET, ValueNature.STOCK, 360],
-  ["RIGHT_OF_USE_ASSETS", "Right-of-use Assets", StatementType.BALANCE_SHEET, ValueNature.STOCK, 370],
-  ["GOODWILL", "Goodwill", StatementType.BALANCE_SHEET, ValueNature.STOCK, 380],
-  ["INTANGIBLE_ASSETS", "Intangible Assets", StatementType.BALANCE_SHEET, ValueNature.STOCK, 390],
-  ["LONG_TERM_INVESTMENTS", "Long-term Investments", StatementType.BALANCE_SHEET, ValueNature.STOCK, 400],
-  ["TOTAL_ASSETS", "Total Assets", StatementType.BALANCE_SHEET, ValueNature.STOCK, 410],
-  ["AP", "Accounts Payable", StatementType.BALANCE_SHEET, ValueNature.STOCK, 420],
-  ["SHORT_TERM_DEBT", "Short-term Debt", StatementType.BALANCE_SHEET, ValueNature.STOCK, 430],
-  ["CURRENT_LIAB", "Total Current Liabilities", StatementType.BALANCE_SHEET, ValueNature.STOCK, 440],
-  ["LONG_TERM_DEBT", "Long-term Debt", StatementType.BALANCE_SHEET, ValueNature.STOCK, 450],
-  ["LEASE_LIABILITIES", "Lease Liabilities", StatementType.BALANCE_SHEET, ValueNature.STOCK, 460],
-  ["TOTAL_DEBT", "Total Debt", StatementType.BALANCE_SHEET, ValueNature.STOCK, 470],
-  ["TOTAL_LIAB", "Total Liabilities", StatementType.BALANCE_SHEET, ValueNature.STOCK, 480],
-  ["EQUITY", "Total Equity", StatementType.BALANCE_SHEET, ValueNature.STOCK, 490],
-  ["EQUITY_PARENT", "Equity Attributable to Owners of Parent", StatementType.BALANCE_SHEET, ValueNature.STOCK, 500],
-  ["RETAINED_EARNINGS", "Retained Earnings", StatementType.BALANCE_SHEET, ValueNature.STOCK, 510],
+const IFRS_PRESENTATION = { label: "IFRS Foundation — IAS 1 Presentation of Financial Statements", url: "https://www.ifrs.org/issued-standards/list-of-standards/ias-1-presentation-of-financial-statements/" };
+const IFRS_CASHFLOW = { label: "IFRS Foundation — IAS 7 Statement of Cash Flows", url: "https://www.ifrs.org/issued-standards/list-of-standards/ias-7-statement-of-cash-flows/" };
+const IFRS_INVENTORY = { label: "IFRS Foundation — IAS 2 Inventories", url: "https://www.ifrs.org/issued-standards/list-of-standards/ias-2-inventories/" };
+const IFRS_PPE = { label: "IFRS Foundation — IAS 16 Property, Plant and Equipment", url: "https://www.ifrs.org/issued-standards/list-of-standards/ias-16-property-plant-and-equipment/" };
+const IFRS_REVENUE = { label: "IFRS Foundation — IFRS 15 Revenue from Contracts with Customers", url: "https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/" };
+const IFRS_FINANCIAL = { label: "IFRS Foundation — IFRS 9 Financial Instruments", url: "https://www.ifrs.org/issued-standards/list-of-standards/ifrs-9-financial-instruments/" };
+const IFRS_LEASES = { label: "IFRS Foundation — IFRS 16 Leases", url: "https://www.ifrs.org/issued-standards/list-of-standards/ifrs-16-leases/" };
+const IFRS_INTANGIBLE = { label: "IFRS Foundation — IAS 38 Intangible Assets", url: "https://www.ifrs.org/issued-standards/list-of-standards/ias-38-intangible-assets/" };
+const IFRS_COMBINATIONS = { label: "IFRS Foundation — IFRS 3 Business Combinations", url: "https://www.ifrs.org/issued-standards/list-of-standards/ifrs-3-business-combinations/" };
 
-  ["OCF", "Operating Cash Flow", StatementType.CASH_FLOW, ValueNature.FLOW, 600],
-  ["CAPEX", "Capital Expenditure", StatementType.CASH_FLOW, ValueNature.FLOW, 610],
-  ["ICF", "Investing Cash Flow", StatementType.CASH_FLOW, ValueNature.FLOW, 620],
-  ["CFF", "Financing Cash Flow", StatementType.CASH_FLOW, ValueNature.FLOW, 630],
-  ["DIVIDENDS_PAID", "Dividends Paid", StatementType.CASH_FLOW, ValueNature.FLOW, 640],
-  ["DEBT_ISSUED", "Debt Issued", StatementType.CASH_FLOW, ValueNature.FLOW, 650],
-  ["DEBT_REPAID", "Debt Repaid", StatementType.CASH_FLOW, ValueNature.FLOW, 660],
-  ["FCF", "Free Cash Flow", StatementType.CASH_FLOW, ValueNature.FLOW, 670],
-  ["NET_CHANGE_CASH", "Net Change in Cash", StatementType.CASH_FLOW, ValueNature.FLOW, 680],
-];
+type Knowledge = { displayNameId:string; definition:string; investorMeaning:string; aliases:string[]; relatedMetrics:string[]; positiveSignals:string[]; redFlags:string[]; sourceRefs:{label:string;url:string}[] };
+const knowledge: Record<string, Knowledge> = {
+REV:{displayNameId:"Pendapatan / Penjualan",definition:"Pendapatan yang diakui dari penyerahan barang atau jasa kepada pelanggan sesuai aktivitas utama perusahaan.",investorMeaning:"Fondasi pertumbuhan bisnis. Investor perlu membedakan pertumbuhan revenue yang berasal dari volume, harga, akuisisi, atau faktor sementara.",aliases:["pendapatan","penjualan","penjualan neto","net sales","sales","revenue"],relatedMetrics:["Revenue Growth","Gross Margin","Receivable Days","CAGR"],positiveSignals:["Revenue tumbuh konsisten bersama arus kas operasi."],redFlags:["Revenue tumbuh tetapi piutang tumbuh jauh lebih cepat.","Pertumbuhan tinggi tidak diikuti gross profit atau cash flow."],sourceRefs:[IFRS_REVENUE]},
+COGS:{displayNameId:"Beban Pokok Penjualan",definition:"Biaya yang secara langsung berkaitan dengan barang atau jasa yang menghasilkan pendapatan pada periode tersebut.",investorMeaning:"Menunjukkan economics dasar produk. Perubahan COGS relatif terhadap revenue menentukan arah gross margin.",aliases:["beban pokok penjualan","harga pokok penjualan","cost of sales","cost of goods sold","HPP"],relatedMetrics:["Gross Profit","Gross Margin","Inventory Turnover"],positiveSignals:["COGS tumbuh lebih lambat dari revenue sehingga gross margin membaik."],redFlags:["COGS tumbuh lebih cepat daripada revenue secara persisten."],sourceRefs:[IFRS_INVENTORY,IFRS_PRESENTATION]},
+GROSS_PROFIT:{displayNameId:"Laba Kotor",definition:"Selisih antara pendapatan dan beban pokok penjualan.",investorMeaning:"Ukuran awal pricing power dan efisiensi produksi/pengadaan sebelum biaya operasi lainnya.",aliases:["laba bruto","laba kotor","gross profit"],relatedMetrics:["Gross Margin","Revenue Growth"],positiveSignals:["Gross margin stabil atau meningkat bersama pertumbuhan revenue."],redFlags:["Revenue tumbuh tetapi gross margin terus turun."],sourceRefs:[IFRS_PRESENTATION]},
+OPERATING_PROFIT:{displayNameId:"Laba Operasi / EBIT",definition:"Laba dari kegiatan operasi sebelum dampak pembiayaan dan pajak; penyajian detail dapat berbeda antar perusahaan.",investorMeaning:"Membantu menilai profitabilitas bisnis inti tanpa tercampur struktur utang dan pajak.",aliases:["laba usaha","laba operasi","operating profit","EBIT"],relatedMetrics:["Operating Margin","ROIC","Interest Coverage"],positiveSignals:["Operating profit tumbuh lebih cepat dari revenue secara sehat."],redFlags:["Margin operasi turun terus meski revenue meningkat."],sourceRefs:[IFRS_PRESENTATION]},
+NET_PROFIT:{displayNameId:"Laba Bersih",definition:"Laba setelah memperhitungkan seluruh pendapatan, beban, pembiayaan, dan pajak pada periode berjalan.",investorMeaning:"Penting, tetapi kualitas laba harus dikonfirmasi dengan arus kas dan item non-recurring.",aliases:["laba tahun berjalan","laba bersih","net income","profit for the year","net profit"],relatedMetrics:["Net Margin","ROE","EPS","OCF / Net Profit"],positiveSignals:["Laba tumbuh bersama operating cash flow."],redFlags:["Laba naik tetapi operating cash flow lemah atau negatif."],sourceRefs:[IFRS_PRESENTATION]},
+CASH:{displayNameId:"Kas dan Setara Kas",definition:"Kas dan investasi jangka sangat pendek yang sangat likuid dan mudah dikonversi menjadi jumlah kas yang diketahui dengan risiko perubahan nilai yang tidak signifikan.",investorMeaning:"Memberi bantalan likuiditas, tetapi kas besar harus dibandingkan dengan utang dan kebutuhan modal kerja.",aliases:["kas","kas dan setara kas","cash","cash equivalents"],relatedMetrics:["Net Debt","Current Ratio","Cash Runway"],positiveSignals:["Kas memadai dibanding kewajiban jangka pendek dan kebutuhan operasi."],redFlags:["Kas turun cepat sementara utang meningkat."],sourceRefs:[IFRS_CASHFLOW]},
+AR:{displayNameId:"Piutang Usaha",definition:"Hak kontraktual perusahaan untuk menerima kas dari pelanggan atas barang atau jasa yang telah diberikan.",investorMeaning:"Sangat berguna untuk menguji kualitas pertumbuhan penjualan dan kemampuan perusahaan menagih pelanggan.",aliases:["piutang usaha","piutang dagang","trade receivables","accounts receivable","receivables"],relatedMetrics:["Receivable Days / DSO","Cash Conversion Cycle","OCF vs Net Profit","Allowance / ECL"],positiveSignals:["Piutang tumbuh sejalan atau lebih lambat dari revenue.","DSO stabil atau membaik."],redFlags:["Piutang tumbuh jauh lebih cepat daripada revenue.","DSO meningkat terus atau allowance/ECL melonjak."],sourceRefs:[IFRS_FINANCIAL]},
+INV:{displayNameId:"Persediaan",definition:"Aset berupa barang untuk dijual, dalam proses produksi, atau bahan/perlengkapan yang akan digunakan dalam produksi atau pemberian jasa.",investorMeaning:"Menunjukkan modal yang tertahan dalam stok dan dapat memberi sinyal perubahan permintaan, produksi, atau risiko obsolete.",aliases:["persediaan","inventory","inventories","stok"],relatedMetrics:["Inventory Days","Inventory Turnover","Cash Conversion Cycle","Gross Margin"],positiveSignals:["Inventory tumbuh sejalan dengan penjualan dan turnover stabil."],redFlags:["Inventory naik jauh lebih cepat dari revenue.","Inventory days meningkat terus dan margin melemah."],sourceRefs:[IFRS_INVENTORY]},
+PPE:{displayNameId:"Aset Tetap / Properti, Pabrik dan Peralatan",definition:"Aset berwujud yang digunakan dalam produksi, penyediaan jasa, penyewaan, atau administrasi dan diharapkan digunakan lebih dari satu periode.",investorMeaning:"Penting untuk bisnis padat modal. Pertumbuhan PPE harus dinilai bersama kapasitas, revenue, ROIC, depreciation, dan capex.",aliases:["aset tetap","properti pabrik dan peralatan","property plant equipment","PPE","fixed assets"],relatedMetrics:["Asset Turnover","ROIC","CAPEX / Sales","Depreciation"],positiveSignals:["Investasi aset menghasilkan pertumbuhan kapasitas, revenue, dan return yang memadai."],redFlags:["Capex/PPE besar tetapi utilisasi, revenue atau ROIC tidak membaik."],sourceRefs:[IFRS_PPE]},
+GOODWILL:{displayNameId:"Goodwill",definition:"Aset yang timbul dalam kombinasi bisnis dan merepresentasikan manfaat ekonomi masa depan dari aset yang tidak dapat diidentifikasi secara individual dan diakui terpisah.",investorMeaning:"Sering mencerminkan premi akuisisi. Investor perlu menguji apakah akuisisi benar-benar menghasilkan return dan memperhatikan risiko impairment.",aliases:["goodwill","muhibah"],relatedMetrics:["Goodwill / Equity","ROIC","Acquisition Return","Impairment"],positiveSignals:["Bisnis hasil akuisisi menghasilkan cash flow dan return sesuai ekspektasi."],redFlags:["Goodwill sangat besar terhadap equity.","Akuisisi berulang diikuti impairment besar."],sourceRefs:[IFRS_COMBINATIONS]},
+RIGHT_OF_USE_ASSETS:{displayNameId:"Aset Hak Guna",definition:"Aset yang merepresentasikan hak lessee untuk menggunakan aset pendasar selama masa sewa.",investorMeaning:"Membantu memahami aset dan kewajiban ekonomi dari kontrak sewa yang sebelumnya bisa tidak terlihat seperti utang tradisional.",aliases:["aset hak guna","right of use asset","ROU asset"],relatedMetrics:["Lease Liabilities","Adjusted Debt","EBITDA"],positiveSignals:["Kewajiban sewa sejalan dengan kapasitas menghasilkan cash flow."],redFlags:["Komitmen sewa meningkat cepat tanpa pertumbuhan operasi yang sepadan."],sourceRefs:[IFRS_LEASES]},
+INTANGIBLE_ASSETS:{displayNameId:"Aset Takberwujud",definition:"Aset nonmoneter teridentifikasi tanpa wujud fisik, seperti hak tertentu, software, lisensi, atau aset teridentifikasi lainnya yang memenuhi kriteria pengakuan.",investorMeaning:"Perlu dibedakan antara aset yang benar-benar menghasilkan manfaat ekonomi dan kapitalisasi biaya yang dapat mempercantik laba jangka pendek.",aliases:["aset takberwujud","aset tidak berwujud","intangible assets","software","license"],relatedMetrics:["ROIC","Amortisation","Intangible Assets / Equity"],positiveSignals:["Aset intangible mendukung pertumbuhan cash flow dan return."],redFlags:["Kapitalisasi intangible meningkat cepat sementara cash flow lemah."],sourceRefs:[IFRS_INTANGIBLE]},
+TOTAL_DEBT:{displayNameId:"Total Utang Berbunga",definition:"Agregasi kewajiban pembiayaan berbunga jangka pendek dan jangka panjang yang digunakan InvestAI untuk analisis leverage.",investorMeaning:"Menentukan risiko finansial dan sensitivitas perusahaan terhadap suku bunga, refinancing, serta penurunan cash flow.",aliases:["total debt","utang berbunga","pinjaman","borrowings","bank loans"],relatedMetrics:["Net Debt","Debt / EBITDA","Debt / Equity","Interest Coverage"],positiveSignals:["Debt tumbuh lebih lambat dari cash flow dan leverage menurun."],redFlags:["Debt naik cepat saat operating cash flow melemah."],sourceRefs:[IFRS_FINANCIAL]},
+OCF:{displayNameId:"Arus Kas Operasi",definition:"Arus kas dari aktivitas penghasil pendapatan utama perusahaan dan aktivitas lain yang bukan investasi atau pendanaan.",investorMeaning:"Salah satu pemeriksaan terpenting atas kualitas laba karena menunjukkan kas yang benar-benar dihasilkan operasi.",aliases:["arus kas operasi","arus kas dari aktivitas operasi","cash flow from operations","operating cash flow","CFO","OCF"],relatedMetrics:["OCF / Net Profit","Cash Conversion","Free Cash Flow","Cash Conversion Cycle"],positiveSignals:["OCF konsisten positif dan sejalan atau lebih kuat daripada laba."],redFlags:["Net profit positif tetapi OCF terus lemah atau negatif."],sourceRefs:[IFRS_CASHFLOW]},
+CAPEX:{displayNameId:"Belanja Modal / Capital Expenditure",definition:"Pengeluaran untuk memperoleh atau meningkatkan aset jangka panjang; InvestAI menurunkannya terutama dari arus kas investasi terkait PPE/intangible.",investorMeaning:"Capex perlu dipisahkan secara konseptual antara maintenance dan growth capex untuk menilai kebutuhan reinvestasi dan free cash flow.",aliases:["belanja modal","capital expenditure","capex","purchase of fixed assets","acquisition of PPE"],relatedMetrics:["CAPEX / Sales","FCF","Asset Turnover","ROIC"],positiveSignals:["Capex menghasilkan pertumbuhan kapasitas dan return di atas cost of capital."],redFlags:["Capex tinggi berulang tetapi revenue, cash flow, atau ROIC stagnan."],sourceRefs:[IFRS_CASHFLOW,IFRS_PPE]},
+FCF:{displayNameId:"Arus Kas Bebas / Free Cash Flow",definition:"Metrik analitis InvestAI yang umumnya menghitung kas operasi setelah belanja modal; FCF bukan subtotal wajib IFRS dan formula harus ditampilkan secara transparan.",investorMeaning:"Menunjukkan kas yang tersisa setelah kebutuhan investasi utama dan dapat digunakan untuk mengurangi utang, dividen, buyback, akuisisi, atau ekspansi.",aliases:["free cash flow","arus kas bebas","FCF"],relatedMetrics:["FCF Margin","FCF Yield","OCF","CAPEX"],positiveSignals:["FCF positif dan bertumbuh secara berkelanjutan."],redFlags:["Laba meningkat tetapi FCF negatif berkepanjangan tanpa alasan ekspansi yang menghasilkan return."],sourceRefs:[IFRS_CASHFLOW]}
+};
 
-async function main() {
-  for (const [code, name, statementType, valueNature, sortOrder] of accounts) {
-    await prisma.canonicalAccount.upsert({
-      where: { code },
-      update: { name, statementType, valueNature, sortOrder, isActive: true },
-      create: { code, name, statementType, valueNature, sortOrder },
-    });
-  }
-
-  for (const company of [
-    { ticker: "ICBP", name: "Indofood CBP Sukses Makmur Tbk", sector: "Consumer Non-Cyclicals", subsector: "Processed Foods" },
-    { ticker: "BTPS", name: "Bank BTPN Syariah Tbk", sector: "Financials", subsector: "Banks" },
-    { ticker: "SMRA", name: "Summarecon Agung Tbk", sector: "Properties", subsector: "Real Estate" },
-    { ticker: "MEDC", name: "Medco Energi Internasional Tbk", sector: "Energy", subsector: "Oil & Gas", currency: "USD" },
-    { ticker: "POWR", name: "Cikarang Listrindo Tbk", sector: "Utilities", subsector: "Independent Power Producer" },
-  ]) {
-    await prisma.company.upsert({ where: { ticker: company.ticker }, update: company, create: company });
-  }
-
-  console.log(`Seeded ${accounts.length} canonical accounts and 5 companies.`);
+async function main(){
+ for(const [code,name,statementType,valueNature,sortOrder] of accounts){ const k=knowledge[code]; await prisma.canonicalAccount.upsert({where:{code},update:{name,statementType,valueNature,sortOrder,isActive:true,...(k??{})},create:{code,name,statementType,valueNature,sortOrder,...(k??{})}}); }
+ for(const company of [{ticker:"ICBP",name:"Indofood CBP Sukses Makmur Tbk",sector:"Consumer Non-Cyclicals",subsector:"Processed Foods"},{ticker:"BTPS",name:"Bank BTPN Syariah Tbk",sector:"Financials",subsector:"Banks"},{ticker:"SMRA",name:"Summarecon Agung Tbk",sector:"Properties",subsector:"Real Estate"},{ticker:"MEDC",name:"Medco Energi Internasional Tbk",sector:"Energy",subsector:"Oil & Gas",currency:"USD"},{ticker:"POWR",name:"Cikarang Listrindo Tbk",sector:"Utilities",subsector:"Independent Power Producer"}]) await prisma.company.upsert({where:{ticker:company.ticker},update:company,create:company});
+ console.log(`Seeded ${accounts.length} canonical accounts; ${Object.keys(knowledge).length} include investor dictionary knowledge.`);
 }
-
-main()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+main().catch((e)=>{console.error(e);process.exit(1)}).finally(()=>prisma.$disconnect());
