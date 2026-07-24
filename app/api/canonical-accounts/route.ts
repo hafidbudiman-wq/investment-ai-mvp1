@@ -11,11 +11,18 @@ const accountSchema = z.object({
   normalBalance: z.enum(["DEBIT", "CREDIT"]).optional(),
 });
 
+const accountSelect = {
+  id: true, code: true, name: true, displayNameId: true, description: true, definition: true,
+  investorMeaning: true, aliases: true, relatedMetrics: true, positiveSignals: true, redFlags: true,
+  sectorNotes: true, sourceRefs: true, statementType: true, valueNature: true, normalBalance: true,
+  isCalculated: true, formula: true,
+} as const;
+
 export async function GET() {
   const accounts = await prisma.canonicalAccount.findMany({
     where: { isActive: true },
     orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
-    select: { id: true, code: true, name: true, description: true, statementType: true, valueNature: true, normalBalance: true, isCalculated: true, formula: true },
+    select: accountSelect,
   });
   return NextResponse.json({ accounts });
 }
@@ -28,7 +35,7 @@ export async function POST(request: Request) {
     const existing = await prisma.canonicalAccount.findUnique({ where: { code: data.code } });
     if (existing) return NextResponse.json({ error: `Code ${data.code} sudah digunakan.` }, { status: 409 });
     const last = await prisma.canonicalAccount.findFirst({ where: { statementType: data.statementType }, orderBy: { sortOrder: "desc" }, select: { sortOrder: true } });
-    const account = await prisma.canonicalAccount.create({ data: { ...data, description: data.description || null, normalBalance: data.normalBalance || null, sortOrder: (last?.sortOrder ?? 0) + 10 } });
+    const account = await prisma.canonicalAccount.create({ data: { ...data, description: data.description || null, normalBalance: data.normalBalance || null, sortOrder: (last?.sortOrder ?? 0) + 10 }, select: accountSelect });
     return NextResponse.json({ ok: true, account }, { status: 201 });
   } catch (error) {
     console.error("canonical-account-create-failed", error);
