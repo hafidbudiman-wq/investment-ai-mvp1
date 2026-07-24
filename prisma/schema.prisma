@@ -57,20 +57,44 @@ enum WarningSeverity {
   CRITICAL
 }
 
+enum ExtractionRunStatus {
+  UPLOADED
+  PROCESSING
+  PENDING_REVIEW
+  READY_TO_COMMIT
+  COMMITTED
+  FAILED
+}
+
+enum ExtractionCandidateStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMMITTED
+}
+
+enum ExtractionChunkType {
+  SECTION
+  TABLE
+  PAGE
+  TOKEN_BLOCK
+}
+
 model Company {
-  id            String              @id @default(cuid())
-  ticker        String              @unique
-  name          String
-  sector        String?
-  subsector     String?
-  country       String              @default("ID")
-  ipoYear       Int?
-  currency      String              @default("IDR")
-  fiscalYearEnd Int                 @default(12)
-  isActive      Boolean             @default(true)
-  reports       FinancialReport[]
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  id             String              @id @default(cuid())
+  ticker         String              @unique
+  name           String
+  sector         String?
+  subsector      String?
+  country        String              @default("ID")
+  ipoYear        Int?
+  currency       String              @default("IDR")
+  fiscalYearEnd  Int                 @default(12)
+  isActive       Boolean             @default(true)
+  reports        FinancialReport[]
+  extractionRuns ExtractionRun[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 }
 
 model FinancialReport {
@@ -91,6 +115,7 @@ model FinancialReport {
   warnings      DataWarning[]
   sourceFiles   SourceFile[]
   auditLogs     AuditLog[]
+  extractionRuns ExtractionRun[]
   createdBy     String?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
@@ -142,6 +167,7 @@ model CanonicalAccount {
   isActive        Boolean            @default(true)
   entries         FinancialEntry[]
   mappings        AccountMapping[]
+  extractionCandidates ExtractionCandidate[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @default(now()) @updatedAt
 
@@ -240,4 +266,83 @@ model AuditLog {
 
   @@index([reportId, createdAt])
   @@index([entity, entityId])
+}
+
+model ExtractionRun {
+  id            String              @id @default(cuid())
+  companyId     String
+  company       Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  reportId      String?
+  report        FinancialReport?    @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  fileName      String
+  mimeType      String              @default("application/pdf")
+  fileSize      Int
+  checksum      String
+  year          Int?
+  periodType    ReportPeriodType?
+  currency      String?
+  unitScale     Int?
+  status        ExtractionRunStatus @default(UPLOADED)
+  parserVersion String              @default("mvp-1.2d-v1")
+  pageCount     Int?
+  errorMessage  String?
+  chunks        ExtractionChunk[]
+  candidates    ExtractionCandidate[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @default(now()) @updatedAt
+
+  @@unique([companyId, checksum])
+  @@index([companyId, createdAt])
+  @@index([status])
+}
+
+model ExtractionChunk {
+  id         String              @id @default(cuid())
+  runId      String
+  run        ExtractionRun       @relation(fields: [runId], references: [id], onDelete: Cascade)
+  ordinal    Int
+  chunkType  ExtractionChunkType
+  pageStart  Int?
+  pageEnd    Int?
+  section    String?
+  text       String
+  textHash   String?
+  metadata   Json?
+  candidates ExtractionCandidate[]
+  createdAt  DateTime            @default(now())
+
+  @@unique([runId, ordinal])
+  @@index([runId, pageStart])
+}
+
+model ExtractionCandidate {
+  id                 String                    @id @default(cuid())
+  runId              String
+  run                ExtractionRun             @relation(fields: [runId], references: [id], onDelete: Cascade)
+  chunkId            String?
+  chunk              ExtractionChunk?          @relation(fields: [chunkId], references: [id], onDelete: SetNull)
+  statementType      StatementType?
+  reportedLabel      String
+  normalizedLabel    String?
+  rawValue           String
+  numericValue       Decimal?                  @db.Decimal(28, 6)
+  currency           String?
+  scale              Int                       @default(1)
+  sourcePage         Int?
+  sourceText         String?
+  canonicalAccountId String?
+  canonicalAccount   CanonicalAccount?         @relation(fields: [canonicalAccountId], references: [id], onDelete: SetNull)
+  extractionConfidence Float?
+  mappingConfidence  Float?
+  mappingMethod      MappingMethod?
+  status             ExtractionCandidateStatus @default(PENDING)
+  reviewNote         String?
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @default(now()) @updatedAt
+
+  @@index([runId, status])
+  @@index([canonicalAccountId])
+  @@index([chunkId])
 }
