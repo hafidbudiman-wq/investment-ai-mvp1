@@ -4,24 +4,40 @@ on:
   push:
     branches:
       - mvp-1.2d-pdf-ai-extraction
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npx prisma validate
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Use the Node version already available on GitHub's ubuntu runner.
+      # This intentionally avoids setup-node, which was the infrastructure
+      # failure point before npm/prisma/build could even start.
+      - name: Show runtime
+        run: |
+          node --version
+          npm --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
-      - run: npx prisma generate
+
+      - name: Generate Prisma client
+        run: npx prisma generate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
-      - run: npm run build
+
+      - name: Build application
+        run: npm run build
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
