@@ -21,8 +21,6 @@ jobs:
           node --version
           npm --version
 
-      # Repository currently has no package-lock.json, so npm ci cannot run.
-      # Use deterministic pinned versions from package.json for this gate.
       - name: Install dependencies
         run: npm install --no-audit --no-fund --ignore-scripts
 
@@ -33,6 +31,11 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
+
+      - name: Typecheck
+        run: npx tsc --noEmit --pretty false
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
 
