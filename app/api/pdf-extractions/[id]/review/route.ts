@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const reviewSchema = z.object({
   candidateId: z.string().min(1),
-  decision: z.enum(["ACCEPTED", "REJECTED"]),
+  decision: z.enum(["PENDING", "ACCEPTED", "REJECTED"]),
   canonicalAccountId: z.string().min(1).nullable().optional(),
   reviewNote: z.string().max(1000).optional(),
 });
@@ -27,16 +27,16 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       data: {
         status: parsed.data.decision,
         canonicalAccountId: parsed.data.canonicalAccountId === undefined ? candidate.canonicalAccountId : parsed.data.canonicalAccountId,
-        reviewNote: parsed.data.reviewNote ?? null,
-        reviewedBy: "web-user",
-        reviewedAt: new Date(),
+        reviewNote: parsed.data.reviewNote ?? (parsed.data.decision === "PENDING" ? "Reopened for review." : null),
+        reviewedBy: parsed.data.decision === "PENDING" ? null : "web-user",
+        reviewedAt: parsed.data.decision === "PENDING" ? null : new Date(),
       },
     });
 
     const pending = await prisma.extractionCandidate.count({ where: { runId: id, status: "PENDING" } });
     await prisma.extractionRun.update({ where: { id }, data: { status: pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" } });
 
-    return NextResponse.json({ ok: true, candidate: updated });
+    return NextResponse.json({ ok: true, candidate: updated, pending });
   } catch (error) {
     console.error("pdf-candidate-review-failed", error);
     return NextResponse.json({ error: "Gagal menyimpan review." }, { status: 500 });
