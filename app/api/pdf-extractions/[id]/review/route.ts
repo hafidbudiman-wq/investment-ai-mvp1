@@ -15,6 +15,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const parsed = reviewSchema.safeParse(await request.json());
     if (!parsed.success) return NextResponse.json({ error: "Review candidate tidak valid." }, { status: 400 });
 
+    const run = await prisma.extractionRun.findUnique({ where: { id }, select: { status: true } });
+    if (!run) return NextResponse.json({ error: "Extraction run tidak ditemukan." }, { status: 404 });
+    if (run.status === "COMMITTED") {
+      return NextResponse.json({ error: "Data sudah FINAL COMMIT dan dikunci. Koreksi setelah commit harus melalui revision flow, bukan mengubah status review lama." }, { status: 409 });
+    }
+
     const candidate = await prisma.extractionCandidate.findFirst({ where: { id: parsed.data.candidateId, runId: id } });
     if (!candidate) return NextResponse.json({ error: "Candidate tidak ditemukan." }, { status: 404 });
 
@@ -27,7 +33,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       data: {
         status: parsed.data.decision,
         canonicalAccountId: parsed.data.canonicalAccountId === undefined ? candidate.canonicalAccountId : parsed.data.canonicalAccountId,
-        reviewNote: parsed.data.reviewNote ?? (parsed.data.decision === "PENDING" ? "Reopened for review." : null),
+        reviewNote: parsed.data.reviewNote ?? (parsed.data.decision === "PENDING" ? "Returned to pending for review." : null),
         reviewedBy: parsed.data.decision === "PENDING" ? null : "web-user",
         reviewedAt: parsed.data.decision === "PENDING" ? null : new Date(),
       },
