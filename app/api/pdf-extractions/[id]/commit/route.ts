@@ -15,6 +15,34 @@ function relationComponentKind(label: string) {
   return null;
 }
 
+function debtFlowComponentKind(label: string) {
+  const normalized = label.toLowerCase();
+  if (/jangka\s+pendek|short[-\s]?term|overdraft|trust\s+receipt/.test(normalized)) return "SHORT_TERM";
+  if (/jangka\s+panjang|long[-\s]?term/.test(normalized)) return "LONG_TERM";
+  return "OTHER_DEBT_FLOW";
+}
+
+function canSafelyAggregate(code: string | undefined, candidates: Array<{ reportedLabel: string }>) {
+  if (!code || candidates.length <= 1) return candidates.length <= 1;
+
+  if (code === "AR" || code === "AP") {
+    const kinds = candidates.map((candidate) => relationComponentKind(candidate.reportedLabel));
+    const uniqueKinds = new Set(kinds.filter(Boolean));
+    return kinds.every(Boolean) && uniqueKinds.has("THIRD_PARTY") && uniqueKinds.has("RELATED_PARTY");
+  }
+
+  if (code === "DEBT_ISSUED" || code === "DEBT_REPAID") {
+    // Cash-flow debt movements are one economic metric even when the filing
+    // splits them into short-term and long-term borrowing components.
+    // We preserve each reviewed source component in provenance, then store
+    // the summed canonical fact for the reporting period.
+    const kinds = candidates.map((candidate) => debtFlowComponentKind(candidate.reportedLabel));
+    return new Set(kinds).size === candidates.length;
+  }
+
+  return false;
+}
+
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
@@ -40,10 +68,8 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     for (const candidates of groupedAccepted.values()) {
       if (candidates.length <= 1) continue;
       const code = candidates[0].canonicalAccount?.code;
-      const componentKinds = new Set(candidates.map((candidate) => relationComponentKind(candidate.reportedLabel)).filter(Boolean));
-      const isSafeTradeAggregation = (code === "AR" || code === "AP") && candidates.every((candidate) => relationComponentKind(candidate.reportedLabel)) && componentKinds.has("THIRD_PARTY") && componentKinds.has("RELATED_PARTY");
-      if (!isSafeTradeAggregation) {
-        return NextResponse.json({ error: `Ada lebih dari satu candidate ACCEPTED untuk ${code ?? "canonical account yang sama"}. Aggregation otomatis hanya diizinkan untuk pasangan third-party + related-party pada AR/AP. Periksa mapping sebelum commit.` }, { status: 400 });
+      if (!canSafelyAggregate(code, candidates)) {
+        return NextResponse.json({ error: `Ada lebih dari satu candidate ACCEPTED untuk ${code ?? "canonical account yang sama"}. Aggregation otomatis belum aman untuk kombinasi ini. Periksa mapping sebelum commit.` }, { status: 400 });
       }
     }
 
@@ -95,7 +121,7 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
         }
       }
       await tx.sourceFile.create({ data: { reportId: report.id, sourceType: "PDF", fileName: run.fileName, mimeType: run.mimeType, fileSize: run.fileSize, checksum: run.checksum } });
-      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${accepted.length} reviewed PDF candidates committed into ${groupedAccepted.size} canonical financial facts after validation. AR/AP component aggregation is traceable in FinancialEntry.rawText.` } });
+      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${accepted.length} reviewed PDF candidates committed into ${groupedAccepted.size} canonical financial facts after validation. Safe aggregation supports AR/AP counterparties and DEBT_ISSUED/DEBT_REPAID maturity components; provenance is preserved in FinancialEntry.rawText.` } });
       await tx.extractionRun.update({ where: { id: run.id }, data: { status: "COMMITTED", reportId: report.id } });
       return report.id;
     });
