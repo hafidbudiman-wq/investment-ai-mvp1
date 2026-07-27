@@ -8,6 +8,13 @@ function periodEnd(year: number, period: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY") 
   return new Date(Date.UTC(year, 11, 31));
 }
 
+function relationComponentKind(label: string) {
+  const normalized = label.toLowerCase();
+  if (/pihak\s+ketiga|third\s+part/.test(normalized)) return "THIRD_PARTY";
+  if (/pihak\s+berelasi|pihak\s+berhubungan|related\s+part/.test(normalized)) return "RELATED_PARTY";
+  return null;
+}
+
 export async function POST(_request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
@@ -24,10 +31,28 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     const accepted = run.candidates.filter((c) => c.status === "ACCEPTED" && c.canonicalAccountId && c.numericValue !== null);
     if (!accepted.length) return NextResponse.json({ error: "Tidak ada candidate ACCEPTED untuk disimpan." }, { status: 400 });
 
-    const duplicateCodes = accepted.map((c) => c.canonicalAccountId!).filter((accountId, index, arr) => arr.indexOf(accountId) !== index);
-    if (duplicateCodes.length) return NextResponse.json({ error: "Ada lebih dari satu candidate ACCEPTED untuk canonical account yang sama. Reject salah satunya sebelum commit." }, { status: 400 });
+    const groupedAccepted = new Map<string, typeof accepted>();
+    for (const candidate of accepted) {
+      const accountId = candidate.canonicalAccountId!;
+      groupedAccepted.set(accountId, [...(groupedAccepted.get(accountId) ?? []), candidate]);
+    }
 
-    const valueByCode = new Map(accepted.filter((c) => c.canonicalAccount).map((c) => [c.canonicalAccount!.code, Number(c.numericValue) * Number(c.scale || 1)]));
+    for (const candidates of groupedAccepted.values()) {
+      if (candidates.length <= 1) continue;
+      const code = candidates[0].canonicalAccount?.code;
+      const componentKinds = new Set(candidates.map((candidate) => relationComponentKind(candidate.reportedLabel)).filter(Boolean));
+      const isSafeTradeAggregation = (code === "AR" || code === "AP") && candidates.every((candidate) => relationComponentKind(candidate.reportedLabel)) && componentKinds.has("THIRD_PARTY") && componentKinds.has("RELATED_PARTY");
+      if (!isSafeTradeAggregation) {
+        return NextResponse.json({ error: `Ada lebih dari satu candidate ACCEPTED untuk ${code ?? "canonical account yang sama"}. Aggregation otomatis hanya diizinkan untuk pasangan third-party + related-party pada AR/AP. Periksa mapping sebelum commit.` }, { status: 400 });
+      }
+    }
+
+    const valueByCode = new Map<string, number>();
+    for (const candidates of groupedAccepted.values()) {
+      const code = candidates[0].canonicalAccount?.code;
+      if (!code) continue;
+      valueByCode.set(code, candidates.reduce((sum, candidate) => sum + Number(candidate.numericValue) * Number(candidate.scale || 1), 0));
+    }
     const assets = valueByCode.get("TOTAL_ASSETS");
     const liabilities = valueByCode.get("TOTAL_LIAB");
     const equity = valueByCode.get("EQUITY");
@@ -50,17 +75,31 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
         const statement = await tx.financialStatement.upsert({ where: { reportId_statementType: { reportId: report.id, statementType: type } }, update: { currency: run.currency || run.company.currency, unitScale: run.unitScale || 1 }, create: { reportId: report.id, statementType: type, currency: run.currency || run.company.currency, unitScale: run.unitScale || 1 } });
         statements.set(type, statement.id);
       }
-      for (const candidate of accepted) {
-        const account = candidate.canonicalAccount!;
-        await tx.financialEntry.create({ data: { reportId: report.id, statementId: statements.get(account.statementType) ?? null, canonicalAccountId: candidate.canonicalAccountId!, reportedLabel: candidate.reportedLabel, rawText: candidate.sourceText || candidate.rawValue, value: candidate.numericValue!, scale: candidate.scale, currency: candidate.currency || run.currency || run.company.currency, isEstimated: true, isVerified: true, confidence: Math.min(candidate.extractionConfidence ?? 0, candidate.mappingConfidence ?? 0), sourcePage: candidate.sourcePage } });
-        await tx.extractionCandidate.update({ where: { id: candidate.id }, data: { status: "COMMITTED" } });
+
+      for (const candidates of groupedAccepted.values()) {
+        const first = candidates[0];
+        const account = first.canonicalAccount!;
+        const sameScale = candidates.every((candidate) => candidate.scale === first.scale);
+        const value = sameScale
+          ? candidates.reduce((sum, candidate) => sum + Number(candidate.numericValue), 0)
+          : candidates.reduce((sum, candidate) => sum + Number(candidate.numericValue) * Number(candidate.scale || 1), 0);
+        const scale = sameScale ? first.scale : 1;
+        const sourcePages = [...new Set(candidates.map((candidate) => candidate.sourcePage).filter((page): page is number => page !== null))];
+        const provenance = candidates.map((candidate) => `${candidate.reportedLabel}: ${candidate.rawValue}${candidate.sourcePage ? ` (page ${candidate.sourcePage})` : ""}`).join(" | ");
+        const reportedLabel = candidates.length > 1 ? `${account.name} — aggregated from ${candidates.length} reviewed components` : first.reportedLabel;
+        const confidence = Math.min(...candidates.map((candidate) => Math.min(candidate.extractionConfidence ?? 0, candidate.mappingConfidence ?? 0)));
+
+        await tx.financialEntry.create({ data: { reportId: report.id, statementId: statements.get(account.statementType) ?? null, canonicalAccountId: first.canonicalAccountId!, reportedLabel, rawText: provenance || first.sourceText || first.rawValue, value, scale, currency: first.currency || run.currency || run.company.currency, isEstimated: true, isVerified: true, confidence, sourcePage: sourcePages.length === 1 ? sourcePages[0] : null } });
+        for (const candidate of candidates) {
+          await tx.extractionCandidate.update({ where: { id: candidate.id }, data: { status: "COMMITTED", reviewNote: candidates.length > 1 ? `Aggregated into canonical ${account.code} with reviewed ${candidates.length} components.` : candidate.reviewNote } });
+        }
       }
       await tx.sourceFile.create({ data: { reportId: report.id, sourceType: "PDF", fileName: run.fileName, mimeType: run.mimeType, fileSize: run.fileSize, checksum: run.checksum } });
-      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${accepted.length} reviewed PDF candidates committed to canonical database after validation.` } });
+      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${accepted.length} reviewed PDF candidates committed into ${groupedAccepted.size} canonical financial facts after validation. AR/AP component aggregation is traceable in FinancialEntry.rawText.` } });
       await tx.extractionRun.update({ where: { id: run.id }, data: { status: "COMMITTED", reportId: report.id } });
       return report.id;
     });
-    return NextResponse.json({ ok: true, reportId, message: `${accepted.length} reviewed accounts berhasil masuk canonical PostgreSQL.` });
+    return NextResponse.json({ ok: true, reportId, message: `${groupedAccepted.size} canonical financial facts berhasil masuk PostgreSQL dari ${accepted.length} reviewed candidates.` });
   } catch (error) {
     console.error("pdf-extraction-commit-failed", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Commit gagal." }, { status: 500 });
