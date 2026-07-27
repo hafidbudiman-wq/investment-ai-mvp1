@@ -11,6 +11,13 @@ export type PdfPreflight = {
   reason: string;
 };
 
+export type UploadedPdfLike = {
+  name: string;
+  type: string;
+  size: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+};
+
 export function normalizeReportedLabel(value: string) {
   return value
     .toLowerCase()
@@ -23,8 +30,21 @@ export function sha256(buffer: Buffer) {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
-export function validatePdfUpload(file: File) {
-  if (!file.name.toLowerCase().endsWith(".pdf") || file.type !== "application/pdf") {
+export function isUploadedPdfLike(value: FormDataEntryValue | null): value is FormDataEntryValue & UploadedPdfLike {
+  if (!value || typeof value === "string") return false;
+  const candidate = value as unknown as Partial<UploadedPdfLike>;
+  return (
+    typeof candidate.name === "string" &&
+    typeof candidate.type === "string" &&
+    typeof candidate.size === "number" &&
+    typeof candidate.arrayBuffer === "function"
+  );
+}
+
+export function validatePdfUpload(file: UploadedPdfLike) {
+  const hasPdfExtension = file.name.toLowerCase().endsWith(".pdf");
+  const mimeLooksPdf = !file.type || file.type === "application/pdf" || file.type === "application/octet-stream";
+  if (!hasPdfExtension || !mimeLooksPdf) {
     throw new Error("File harus berupa PDF.");
   }
   if (file.size <= 0) throw new Error("File PDF kosong.");
