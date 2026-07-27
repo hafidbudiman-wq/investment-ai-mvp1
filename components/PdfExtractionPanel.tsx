@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type Company = { id: string; ticker: string; name: string };
 type Run = { id: string; fileName: string; status: string; year: number | null; periodType: string | null; createdAt: string; company: { ticker: string; name: string }; _count: { chunks: number; candidates: number } };
 type Account = { id: string; code: string; name: string; statementType: string };
 type Candidate = { id: string; statementType: string | null; reportedLabel: string; rawValue: string; numericValue: string | number | null; currency: string | null; scale: number; sourcePage: number | null; sourceText: string | null; extractionConfidence: number | null; mappingConfidence: number | null; status: string; canonicalAccountId: string | null; canonicalAccount: Account | null };
@@ -19,11 +18,7 @@ const groupMeta: Record<GroupKey, { label: string; description: string }> = {
 };
 
 export function PdfExtractionPanel() {
-  const [companies, setCompanies] = useState<Company[]>([]);
   const [runs, setRuns] = useState<Run[]>([]);
-  const [companyId, setCompanyId] = useState("");
-  const [year, setYear] = useState("2025");
-  const [periodType, setPeriodType] = useState("FY");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -49,22 +44,18 @@ export function PdfExtractionPanel() {
   }
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/companies", { cache: "no-store" }).then((response) => response.json()),
-      fetch("/api/pdf-extractions", { cache: "no-store" }).then((response) => response.json()),
-    ]).then(([companyData, runData]) => {
-      if (companyData.ok) { setCompanies(companyData.companies); if (companyData.companies[0]) setCompanyId(companyData.companies[0].id); }
+    fetch("/api/pdf-extractions", { cache: "no-store" }).then((response) => response.json()).then((runData) => {
       if (runData.ok) setRuns(runData.runs);
     });
   }, []);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!file || !companyId) return;
+    if (!file) return;
     setLoading(true); setMessage(""); setSelected(null);
     try {
       const form = new FormData();
-      form.set("file", file); form.set("companyId", companyId); form.set("year", year); form.set("periodType", periodType);
+      form.set("file", file);
       const response = await fetch("/api/pdf-extractions", { method: "POST", body: form });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Upload gagal.");
@@ -137,21 +128,20 @@ export function PdfExtractionPanel() {
 
   return <>
     <section className="card" style={{ marginBottom: 18 }}>
-      <div className="header"><div><h2>PDF + AI Extraction — MVP 1.2D</h2><p>Upload LK PDF → AI membaca dokumen → review kandidat → baru commit ke canonical PostgreSQL.</p></div><span className="badge warning">HUMAN REVIEW GATE</span></div>
-      <form onSubmit={submit}><div className="form-grid">
-        <div className="field"><select aria-label="Pilih emiten" value={companyId} onChange={(e) => setCompanyId(e.target.value)} required>{companies.map((c) => <option value={c.id} key={c.id}>{c.ticker} — {c.name}</option>)}</select></div>
-        <div className="field"><label>Period</label><select value={periodType} onChange={(e) => setPeriodType(e.target.value)}><option>FY</option><option>Q1</option><option>H1</option><option>Q3</option></select></div>
-        <div className="field"><label>Year</label><input type="number" min="2000" max="2100" value={year} onChange={(e) => setYear(e.target.value)} required /></div>
+      <div className="header"><div><h2>PDF + AI Extraction — MVP 1.2D</h2><p>Cukup upload laporan keuangan. AI akan membaca perusahaan, periode, tahun, dan 3 laporan utama secara otomatis.</p></div><span className="badge warning">HUMAN REVIEW GATE</span></div>
+      <form onSubmit={submit}>
         <div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required /></div>
-      </div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file || !companyId}>{loading ? "AI is reading PDF..." : "Upload & Extract PDF"}</button></form>
+        <div style={{ height: 14 }} />
+        <button className="btn" type="submit" disabled={loading || !file}>{loading ? "AI is reading company, period & statements..." : "Upload & Extract PDF"}</button>
+      </form>
       {message && <div className="callout" style={{ marginTop: 14 }}>{message}</div>}
       <div style={{ height: 18 }} /><h3>Recent extraction runs</h3>
       {runs.length === 0 ? <p>Belum ada PDF di staging.</p> : <div style={{ display: "grid", gap: 10 }}>{runs.map((run) => <button type="button" className="account-master-row" key={run.id} onClick={() => openRun(run.id)}><div><strong>{run.company.ticker} · {run.fileName}</strong><small>{run.periodType ?? "?"} {run.year ?? "?"} · {run._count.chunks} chunks · {run._count.candidates} candidates</small></div><span className="badge">{run.status}</span></button>)}</div>}
     </section>
 
     {selected && <section className="card">
-      <div className="section-title"><div><h2>Review Extraction — {selected.company.ticker}</h2><p>{selected.fileName} · {selected.periodType} {selected.year} · {selected.pageCount ?? "?"} pages</p></div><div><span className="badge">Pending {pending}</span> <span className="badge">Accepted {accepted}</span></div></div>
-      <div className="callout"><b>Golden Rule:</b> AI hanya mengusulkan. Review per laporan terlebih dahulu; jangan commit sebelum Neraca, Laba Rugi, dan Arus Kas lolos QC.</div>
+      <div className="section-title"><div><h2>{selected.company.ticker} — {selected.company.name}</h2><p>{selected.periodType} {selected.year} · {selected.fileName} · {selected.pageCount ?? "?"} pages</p></div><div><span className="badge">Pending {pending}</span> <span className="badge">Accepted {accepted}</span></div></div>
+      <div className="callout"><b>AI detected:</b> {selected.company.ticker} · {selected.periodType} {selected.year}. Review Neraca, Laba Rugi, dan Arus Kas sebelum commit.</div>
       <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
         {(["BALANCE_SHEET", "INCOME_STATEMENT", "CASH_FLOW", "OTHER"] as GroupKey[]).map((key) => {
           const items = grouped[key];
