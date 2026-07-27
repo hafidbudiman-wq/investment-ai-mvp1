@@ -10,7 +10,10 @@ export async function GET() {
   try {
     const runs = await prisma.extractionRun.findMany({ orderBy: { createdAt: "desc" }, take: 20, include: { company: { select: { ticker: true, name: true } }, _count: { select: { chunks: true, candidates: true } } } });
     return NextResponse.json({ ok: true, runs });
-  } catch (error) { console.error("pdf-extraction-list-failed", error); return NextResponse.json({ error: "Gagal membaca staging PDF." }, { status: 500 }); }
+  } catch (error) {
+    console.error("pdf-extraction-list-failed", error);
+    return NextResponse.json({ error: "Gagal membaca staging PDF." }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -24,8 +27,28 @@ export async function POST(request: Request) {
 
     const bytes = Buffer.from(await file.arrayBuffer());
     const checksum = sha256(bytes);
-    const preflight = inspectPdfForOcr(bytes);
 
+    // Fast duplicate guard BEFORE any OpenAI call. This prevents the same PDF from
+    // re-running a potentially long/expensive extraction and avoids proxy timeouts.
+    const existingByChecksum = await prisma.extractionRun.findFirst({
+      where: { checksum },
+      orderBy: { createdAt: "desc" },
+      include: {
+        company: { select: { ticker: true, name: true } },
+        _count: { select: { chunks: true, candidates: true } },
+      },
+    });
+    if (existingByChecksum && !confirmedCompanyId) {
+      return NextResponse.json({
+        ok: true,
+        duplicate: true,
+        runId: existingByChecksum.id,
+        run: existingByChecksum,
+        message: `PDF ini sudah pernah diproses sebagai ${existingByChecksum.company.ticker} · ${existingByChecksum.periodType ?? "?"} ${existingByChecksum.year ?? "?"}. Hasil staging lama dibuka kembali tanpa mengulang AI extraction.`,
+      });
+    }
+
+    const preflight = inspectPdfForOcr(bytes);
     const [companies, accounts] = await Promise.all([
       prisma.company.findMany({ where: { isActive: true }, select: { id: true, ticker: true, name: true, currency: true } }),
       prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true, aliases: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
@@ -50,24 +73,16 @@ export async function POST(request: Request) {
     const confirmedCompany = confirmedCompanyId ? companies.find((item) => item.id === confirmedCompanyId) : undefined;
 
     const companyConfidence = Math.max(0, Math.min(1, extracted.detectedCompanyConfidence ?? 0));
-    let company = confirmedCompany ?? (companyConfidence >= 0.95 ? exactCompany : undefined);
+    const company = confirmedCompany ?? (companyConfidence >= 0.95 ? exactCompany : undefined);
 
     if (!company) {
       const needsConfirmation = Boolean(fuzzyCompany && companyConfidence >= 0.75);
       return NextResponse.json({
         ok: false,
         code: needsConfirmation ? "COMPANY_CONFIRMATION_REQUIRED" : "COMPANY_NOT_FOUND",
-        detectedCompany: {
-          ticker: extracted.detectedCompanyTicker,
-          name: extracted.detectedCompanyName,
-          confidence: companyConfidence,
-        },
+        detectedCompany: { ticker: extracted.detectedCompanyTicker, name: extracted.detectedCompanyName, confidence: companyConfidence },
         suggestedCompany: fuzzyCompany ? { id: fuzzyCompany.id, ticker: fuzzyCompany.ticker, name: fuzzyCompany.name } : null,
-        detectedPeriod: {
-          periodType: extracted.detectedPeriodType,
-          year: extracted.detectedYear,
-          confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)),
-        },
+        detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)) },
         detectedCurrency: extracted.detectedCurrency,
         message: needsConfirmation
           ? `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi kecocokan Company Master perlu konfirmasi.`
