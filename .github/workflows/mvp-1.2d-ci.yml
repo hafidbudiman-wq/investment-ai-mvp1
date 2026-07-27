@@ -34,10 +34,32 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
 
-      - name: Typecheck
-        run: npx tsc --noEmit --pretty false
+      - name: Capture TypeScript errors
+        id: typecheck
+        shell: bash
+        run: |
+          set +e
+          npx tsc --noEmit --pretty false > tsc-errors.txt 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "TypeScript errors captured in artifact."
+          fi
+          exit 0
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
+
+      - name: Upload TypeScript diagnostics
+        if: steps.typecheck.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-diagnostics
+          path: tsc-errors.txt
+          if-no-files-found: error
+
+      - name: Fail on TypeScript errors
+        if: steps.typecheck.outputs.exit_code != '0'
+        run: exit 1
 
       - name: Build application
         run: npm run build
