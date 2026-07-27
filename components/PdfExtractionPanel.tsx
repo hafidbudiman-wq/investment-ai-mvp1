@@ -7,14 +7,7 @@ type Account = { id: string; code: string; name: string; statementType: string }
 type Candidate = { id: string; statementType: string | null; reportedLabel: string; rawValue: string; numericValue: string | number | null; currency: string | null; scale: number; sourcePage: number | null; sourceText: string | null; extractionConfidence: number | null; mappingConfidence: number | null; status: string; canonicalAccountId: string | null; canonicalAccount: Account | null };
 type RunDetail = Run & { candidates: Candidate[]; chunks: unknown[]; pageCount: number | null; currency: string | null; unitScale: number | null };
 type GroupKey = "BALANCE_SHEET" | "INCOME_STATEMENT" | "CASH_FLOW" | "OTHER";
-type MetadataGate = {
-  code: "COMPANY_CONFIRMATION_REQUIRED" | "COMPANY_NOT_FOUND" | "PERIOD_CONFIRMATION_REQUIRED";
-  message: string;
-  detectedCompany?: { ticker: string | null; name: string | null; confidence: number };
-  suggestedCompany?: { id: string; ticker: string; name: string } | null;
-  detectedPeriod?: { periodType: string | null; year: number | null; confidence: number };
-  detectedCurrency?: string | null;
-};
+type MetadataGate = { code: "COMPANY_CONFIRMATION_REQUIRED" | "COMPANY_NOT_FOUND" | "PERIOD_CONFIRMATION_REQUIRED"; message: string; detectedCompany?: { ticker: string | null; name: string | null; confidence: number }; suggestedCompany?: { id: string; ticker: string; name: string } | null; detectedPeriod?: { periodType: string | null; year: number | null; confidence: number }; detectedCurrency?: string | null };
 type CompanyDraft = { ticker: string; name: string; sector: string; subsector: string; country: string; currency: string; fiscalYearEnd: string };
 
 function pct(value: number | null | undefined) { return value == null ? "—" : `${Math.round(value * 100)}%`; }
@@ -50,9 +43,7 @@ export function PdfExtractionPanel() {
     const response = await fetch(`/api/pdf-extractions/${id}`, { cache: "no-store" });
     const data = await response.json();
     if (!response.ok) return setMessage(data.error || "Gagal membuka hasil extraction.");
-    setSelected(data.run);
-    setAccounts(data.accounts);
-    setMetadataGate(null);
+    setSelected(data.run); setAccounts(data.accounts); setMetadataGate(null);
     if (resetPanels) {
       setOpenGroups({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
       setShowReviewed({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
@@ -65,24 +56,18 @@ export function PdfExtractionPanel() {
     if (!file) return;
     setLoading(true); setMessage(""); setSelected(null);
     try {
-      const form = new FormData();
-      form.set("file", file);
-      if (confirmedCompanyId) form.set("confirmedCompanyId", confirmedCompanyId);
+      const form = new FormData(); form.set("file", file); if (confirmedCompanyId) form.set("confirmedCompanyId", confirmedCompanyId);
       const response = await fetch("/api/pdf-extractions", { method: "POST", body: form });
       const data = await response.json();
       if (!response.ok) {
         if (response.status === 422 && data.code) {
-          const gate = data as MetadataGate;
-          setMetadataGate(gate);
+          const gate = data as MetadataGate; setMetadataGate(gate);
           setCompanyDraft({ ticker: gate.detectedCompany?.ticker ?? "", name: gate.detectedCompany?.name ?? "", sector: "", subsector: "", country: "ID", currency: gate.detectedCurrency || "IDR", fiscalYearEnd: "12" });
-          setMessage(gate.message);
-          return;
+          setMessage(gate.message); return;
         }
         throw new Error(data.error ?? data.message ?? "Upload gagal.");
       }
-      setMetadataGate(null);
-      setMessage(data.message); await refreshRuns();
-      if (data.runId) await openRun(data.runId);
+      setMetadataGate(null); setMessage(data.message); await refreshRuns(); if (data.runId) await openRun(data.runId);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Upload gagal."); }
     finally { setLoading(false); }
   }
@@ -95,38 +80,30 @@ export function PdfExtractionPanel() {
       const response = await fetch("/api/companies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...companyDraft, fiscalYearEnd: Number(companyDraft.fiscalYearEnd) }) });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "Gagal menambahkan emiten ke Company Master.");
-      setMessage(`${data.company.ticker} ditambahkan ke Company Master. AI melanjutkan extraction...`);
-      setMetadataGate(null);
-      await uploadFile(data.company.id);
+      setMessage(`${data.company.ticker} ditambahkan ke Company Master. AI melanjutkan extraction...`); setMetadataGate(null); await uploadFile(data.company.id);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Gagal menambahkan emiten."); setLoading(false); }
   }
 
   async function review(candidate: Candidate, decision: "PENDING" | "ACCEPTED" | "REJECTED", canonicalAccountId?: string | null) {
-    if (!selected) return;
+    if (!selected || selected.status === "COMMITTED") return;
     setBusyCandidate(candidate.id); setMessage("");
     try {
       const targetAccountId = canonicalAccountId === undefined ? candidate.canonicalAccountId : canonicalAccountId;
       const response = await fetch(`/api/pdf-extractions/${selected.id}/review`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candidateId: candidate.id, decision, canonicalAccountId: targetAccountId }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Review gagal.");
-
+      const data = await response.json(); if (!response.ok) throw new Error(data.error || "Review gagal.");
       const mappedAccount = targetAccountId ? accounts.find((account) => account.id === targetAccountId) ?? candidate.canonicalAccount : candidate.canonicalAccount;
-      setSelected((current) => current ? {
-        ...current,
-        status: data.pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW",
-        candidates: current.candidates.map((item) => item.id === candidate.id ? { ...item, status: decision, canonicalAccountId: targetAccountId ?? null, canonicalAccount: mappedAccount ?? null } : item),
-      } : current);
+      setSelected((current) => current ? { ...current, status: data.pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW", candidates: current.candidates.map((item) => item.id === candidate.id ? { ...item, status: decision, canonicalAccountId: targetAccountId ?? null, canonicalAccount: mappedAccount ?? null } : item) } : current);
       void refreshRuns();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Review gagal."); }
     finally { setBusyCandidate(""); }
   }
 
   async function commitRun() {
-    if (!selected || !confirm("Commit semua candidate ACCEPTED ke canonical PostgreSQL? Data existing untuk periode yang sama tidak akan ditimpa.")) return;
+    if (!selected || selected.status === "COMMITTED") return;
+    if (!confirm(`FINAL COMMIT ${selected.company.ticker} ${selected.periodType} ${selected.year}?\n\nAccepted: ${accepted}\nRejected: ${rejected}\nPending: ${pending}\n\nCandidate ACCEPTED akan menjadi canonical financial data di PostgreSQL. Setelah commit, review ini dikunci dan koreksi harus melalui revision flow.`)) return;
     setLoading(true); setMessage("");
     try {
-      const response = await fetch(`/api/pdf-extractions/${selected.id}/commit`, { method: "POST" });
-      const data = await response.json();
+      const response = await fetch(`/api/pdf-extractions/${selected.id}/commit`, { method: "POST" }); const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Commit gagal.");
       setMessage(data.message); await openRun(selected.id, false); await refreshRuns();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Commit gagal."); }
@@ -136,6 +113,7 @@ export function PdfExtractionPanel() {
   const pending = selected?.candidates.filter((c) => c.status === "PENDING").length ?? 0;
   const accepted = selected?.candidates.filter((c) => c.status === "ACCEPTED").length ?? 0;
   const rejected = selected?.candidates.filter((c) => c.status === "REJECTED").length ?? 0;
+  const committed = selected?.status === "COMMITTED";
   const grouped = useMemo(() => {
     const result: Record<GroupKey, Candidate[]> = { BALANCE_SHEET: [], INCOME_STATEMENT: [], CASH_FLOW: [], OTHER: [] };
     for (const candidate of selected?.candidates ?? []) {
@@ -146,11 +124,12 @@ export function PdfExtractionPanel() {
   }, [selected]);
 
   function renderCandidate(candidate: Candidate, reviewed = false) {
-    return <div className="extraction-candidate" key={candidate.id} style={reviewed ? { opacity: 0.72 } : undefined}>
+    const locked = committed || candidate.status === "COMMITTED";
+    return <div className="extraction-candidate" key={candidate.id} style={reviewed || locked ? { opacity: 0.78 } : undefined}>
       <div className="extraction-main"><strong>{candidate.reportedLabel}</strong><span className="metric-value">{candidate.rawValue}</span><small>Page {candidate.sourcePage ?? "?"} · Read {pct(candidate.extractionConfidence)} · Map {pct(candidate.mappingConfidence)}</small>{candidate.sourceText && <small className="evidence">Evidence: {candidate.sourceText}</small>}</div>
       <div className="extraction-actions">
-        <select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id || reviewed}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
-        {reviewed ? <div><span className={`badge ${candidate.status === "ACCEPTED" ? "" : "warning"}`}>{candidate.status === "ACCEPTED" ? "ACCEPTED ✓" : "REJECTED"}</span>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "PENDING")}>Reopen</button></div> : <div><button className="btn" type="button" disabled={!candidate.canonicalAccountId || busyCandidate === candidate.id} onClick={() => review(candidate, "ACCEPTED")}>Accept</button>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "REJECTED")}>Reject</button></div>}
+        <select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id || reviewed || locked}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
+        {locked ? <div><span className="badge">COMMITTED 🔒</span></div> : reviewed ? <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}><span className={`badge ${candidate.status === "REJECTED" ? "warning" : ""}`}>{candidate.status === "ACCEPTED" ? "ACCEPTED ✓" : "REJECTED"}</span><button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "PENDING")}>Make Pending</button></div> : <div><button className="btn" type="button" disabled={!candidate.canonicalAccountId || busyCandidate === candidate.id} onClick={() => review(candidate, "ACCEPTED")}>Accept</button>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "REJECTED")}>Reject</button></div>}
       </div>
     </div>;
   }
@@ -160,35 +139,14 @@ export function PdfExtractionPanel() {
       <div className="header"><div><h2>PDF + AI Extraction — MVP 1.2D</h2><p>Cukup upload laporan keuangan. AI membaca emiten, periode, tahun, unit, dan 3 laporan utama secara otomatis.</p></div><span className="badge warning">HUMAN REVIEW GATE</span></div>
       <form onSubmit={submit}><div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setMetadataGate(null); setMessage(""); }} required /></div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file}>{loading ? "AI is reading company, period & statements..." : "Upload & Extract PDF"}</button></form>
       {message && <div className="callout" style={{ marginTop: 14 }}>{message}</div>}
-
-      {metadataGate && <div className="card" style={{ marginTop: 16 }}>
-        <h3>Review Metadata AI</h3>
-        <p><b>Detected issuer:</b> {metadataGate.detectedCompany?.ticker || "?"} — {metadataGate.detectedCompany?.name || "?"} · confidence {pct(metadataGate.detectedCompany?.confidence)}</p>
-        <p><b>Detected period:</b> {metadataGate.detectedPeriod?.periodType || "?"} {metadataGate.detectedPeriod?.year || "?"} · confidence {pct(metadataGate.detectedPeriod?.confidence)}</p>
-        {metadataGate.code === "COMPANY_CONFIRMATION_REQUIRED" && metadataGate.suggestedCompany && <><p>Company Master terdekat: <b>{metadataGate.suggestedCompany.ticker} — {metadataGate.suggestedCompany.name}</b></p><button className="btn" type="button" disabled={loading} onClick={() => uploadFile(metadataGate.suggestedCompany!.id)}>Confirm Company & Continue</button></>}
-        {metadataGate.code === "COMPANY_NOT_FOUND" && <div style={{ display: "grid", gap: 10 }}>
-          <div className="callout"><b>Emiten belum ada di Company Master.</b> AI hanya membuat draft. Periksa terutama ticker sebelum menambahkan.</div>
-          <div className="form-grid">
-            <div className="field"><label>Ticker</label><input value={companyDraft.ticker} onChange={(e) => setCompanyDraft((v) => ({ ...v, ticker: e.target.value.toUpperCase() }))} placeholder="Contoh: ICBP" /></div>
-            <div className="field"><label>Legal Company Name</label><input value={companyDraft.name} onChange={(e) => setCompanyDraft((v) => ({ ...v, name: e.target.value }))} /></div>
-            <div className="field"><label>Sector</label><input value={companyDraft.sector} onChange={(e) => setCompanyDraft((v) => ({ ...v, sector: e.target.value }))} placeholder="Optional" /></div>
-            <div className="field"><label>Subsector</label><input value={companyDraft.subsector} onChange={(e) => setCompanyDraft((v) => ({ ...v, subsector: e.target.value }))} placeholder="Optional" /></div>
-            <div className="field"><label>Country</label><input value={companyDraft.country} maxLength={2} onChange={(e) => setCompanyDraft((v) => ({ ...v, country: e.target.value.toUpperCase() }))} /></div>
-            <div className="field"><label>Currency</label><input value={companyDraft.currency} maxLength={3} onChange={(e) => setCompanyDraft((v) => ({ ...v, currency: e.target.value.toUpperCase() }))} /></div>
-            <div className="field"><label>Fiscal Year End Month</label><input type="number" min="1" max="12" value={companyDraft.fiscalYearEnd} onChange={(e) => setCompanyDraft((v) => ({ ...v, fiscalYearEnd: e.target.value }))} /></div>
-          </div>
-          <button className="btn" type="button" disabled={loading || !companyDraft.ticker || !companyDraft.name} onClick={addCompanyAndRetry}>Confirm & Add Company, Then Continue</button>
-        </div>}
-        {metadataGate.code === "PERIOD_CONFIRMATION_REQUIRED" && <div className="callout">Periode belum cukup yakin untuk dilanjutkan. Untuk safety MVP 1.2D, jangan commit laporan sampai periode dapat dikenali dengan jelas.</div>}
-      </div>}
-
+      {metadataGate && <div className="card" style={{ marginTop: 16 }}><h3>Review Metadata AI</h3><p><b>Detected issuer:</b> {metadataGate.detectedCompany?.ticker || "?"} — {metadataGate.detectedCompany?.name || "?"} · confidence {pct(metadataGate.detectedCompany?.confidence)}</p><p><b>Detected period:</b> {metadataGate.detectedPeriod?.periodType || "?"} {metadataGate.detectedPeriod?.year || "?"} · confidence {pct(metadataGate.detectedPeriod?.confidence)}</p>{metadataGate.code === "COMPANY_CONFIRMATION_REQUIRED" && metadataGate.suggestedCompany && <><p>Company Master terdekat: <b>{metadataGate.suggestedCompany.ticker} — {metadataGate.suggestedCompany.name}</b></p><button className="btn" type="button" disabled={loading} onClick={() => uploadFile(metadataGate.suggestedCompany!.id)}>Confirm Company & Continue</button></>}{metadataGate.code === "COMPANY_NOT_FOUND" && <div style={{ display: "grid", gap: 10 }}><div className="callout"><b>Emiten belum ada di Company Master.</b> AI hanya membuat draft. Periksa terutama ticker sebelum menambahkan.</div><div className="form-grid"><div className="field"><label>Ticker</label><input value={companyDraft.ticker} onChange={(e) => setCompanyDraft((v) => ({ ...v, ticker: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Legal Company Name</label><input value={companyDraft.name} onChange={(e) => setCompanyDraft((v) => ({ ...v, name: e.target.value }))} /></div><div className="field"><label>Sector</label><input value={companyDraft.sector} onChange={(e) => setCompanyDraft((v) => ({ ...v, sector: e.target.value }))} /></div><div className="field"><label>Subsector</label><input value={companyDraft.subsector} onChange={(e) => setCompanyDraft((v) => ({ ...v, subsector: e.target.value }))} /></div><div className="field"><label>Country</label><input value={companyDraft.country} maxLength={2} onChange={(e) => setCompanyDraft((v) => ({ ...v, country: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Currency</label><input value={companyDraft.currency} maxLength={3} onChange={(e) => setCompanyDraft((v) => ({ ...v, currency: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Fiscal Year End Month</label><input type="number" min="1" max="12" value={companyDraft.fiscalYearEnd} onChange={(e) => setCompanyDraft((v) => ({ ...v, fiscalYearEnd: e.target.value }))} /></div></div><button className="btn" type="button" disabled={loading || !companyDraft.ticker || !companyDraft.name} onClick={addCompanyAndRetry}>Confirm & Add Company, Then Continue</button></div>}{metadataGate.code === "PERIOD_CONFIRMATION_REQUIRED" && <div className="callout">Periode belum cukup yakin untuk dilanjutkan. Jangan commit sampai periode dikenali jelas.</div>}</div>}
       <div style={{ height: 18 }} /><h3>Recent extraction runs</h3>
       {runs.length === 0 ? <p>Belum ada PDF di staging.</p> : <div style={{ display: "grid", gap: 10 }}>{runs.map((run) => <button type="button" className="account-master-row" key={run.id} onClick={() => openRun(run.id)}><div><strong>{run.company.ticker} · {run.fileName}</strong><small>{run.periodType ?? "?"} {run.year ?? "?"} · {run._count.chunks} chunks · {run._count.candidates} candidates</small></div><span className="badge">{run.status}</span></button>)}</div>}
     </section>
 
     {selected && <section className="card">
       <div className="section-title"><div><h2>{selected.company.ticker} — {selected.company.name}</h2><p>{selected.periodType} {selected.year} · {selected.fileName} · {selected.pageCount ?? "?"} pages</p></div><div><span className="badge">Pending {pending}</span> <span className="badge">Accepted {accepted}</span> <span className="badge">Rejected {rejected}</span></div></div>
-      <div className="callout"><b>AI detected:</b> {selected.company.ticker} · {selected.periodType} {selected.year}. Setelah Accept/Reject, kandidat hilang dari working list dan section tetap terbuka. Gunakan Show reviewed untuk audit ulang.</div>
+      <div className="callout">{committed ? <><b>FINAL COMMIT selesai 🔒</b> Data review ini dikunci. Koreksi berikutnya harus melalui revision flow.</> : <><b>Review workflow:</b> Pending → Accept / Reject. Sebelum final commit, item reviewed dapat dikembalikan dengan <b>Make Pending</b>. Setelah final commit, data dikunci.</>}</div>
       <div style={{ display: "grid", gap: 12, marginTop: 16 }}>{(["BALANCE_SHEET", "INCOME_STATEMENT", "CASH_FLOW", "OTHER"] as GroupKey[]).map((key) => {
         const items = grouped[key]; if (items.length === 0) return null;
         const pendingItems = items.filter((item) => item.status === "PENDING");
@@ -201,7 +159,8 @@ export function PdfExtractionPanel() {
           </div>}
         </div>;
       })}</div>
-      <div style={{ height: 16 }} /><button className="btn" type="button" onClick={commitRun} disabled={loading || pending > 0 || accepted === 0 || selected.status === "COMMITTED"}>{selected.status === "COMMITTED" ? "Committed to PostgreSQL ✓" : pending > 0 ? `Review ${pending} remaining candidates` : "Commit Reviewed Data to PostgreSQL"}</button>
+
+      <div className="card" style={{ marginTop: 16 }}><h3>Review Summary</h3><p><b>Accepted:</b> {accepted} · <b>Rejected:</b> {rejected} · <b>Pending:</b> {pending}</p>{!committed && pending > 0 && <div className="callout">Final commit akan aktif setelah semua kandidat selesai direview.</div>}{!committed && pending === 0 && <div className="callout"><b>READY TO COMMIT.</b> Periksa summary terakhir sebelum memasukkan data ACCEPTED ke canonical PostgreSQL.</div>}<div style={{ height: 12 }} /><button className="btn" type="button" onClick={commitRun} disabled={loading || pending > 0 || accepted === 0 || committed}>{committed ? "FINAL COMMITTED TO POSTGRESQL 🔒" : pending > 0 ? `FINAL COMMIT locked — ${pending} pending` : "FINALIZE & COMMIT TO CANONICAL DATABASE"}</button></div>
     </section>}
   </>;
 }
