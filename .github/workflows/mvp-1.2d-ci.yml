@@ -1,0 +1,67 @@
+name: MVP 1.2D CI
+
+on:
+  push:
+    branches:
+      - mvp-1.2d-pdf-ai-extraction
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show runtime
+        run: |
+          node --version
+          npm --version
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --ignore-scripts
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
+
+      - name: Capture TypeScript errors
+        id: typecheck
+        shell: bash
+        run: |
+          set +e
+          npx tsc --noEmit --pretty false > tsc-errors.txt 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "TypeScript errors captured in artifact."
+          fi
+          exit 0
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
+
+      - name: Upload TypeScript diagnostics
+        if: steps.typecheck.outputs.exit_code != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-diagnostics
+          path: tsc-errors.txt
+          if-no-files-found: error
+
+      - name: Fail on TypeScript errors
+        if: steps.typecheck.outputs.exit_code != '0'
+        run: exit 1
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public

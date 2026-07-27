@@ -1,0 +1,34 @@
+import type { PdfPreflight } from "@/lib/pdf-extraction";
+
+type CanonicalAccountPrompt = { id: string; code: string; name: string; statementType: string; aliases: unknown };
+type AiChunk = { section: string; chunkType: "SECTION" | "TABLE" | "PAGE" | "TOKEN_BLOCK"; pageStart: number | null; pageEnd: number | null; textSummary: string };
+type AiCandidate = { statementType: "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW" | "OTHER" | null; reportedLabel: string; rawValue: string; numericValue: number | null; currency: string | null; scale: number; sourcePage: number | null; sourceText: string | null; canonicalCode: string | null; extractionConfidence: number; mappingConfidence: number };
+export type AiFinancialExtraction = { detectedYear: number | null; detectedPeriodType: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY" | null; detectedCurrency: string | null; detectedUnitScale: number | null; pageCount: number | null; chunks: AiChunk[]; candidates: AiCandidate[] };
+
+function outputText(response: any): string {
+  if (typeof response?.output_text === "string") return response.output_text;
+  for (const item of response?.output ?? []) for (const content of item?.content ?? []) if (content?.type === "output_text" && typeof content?.text === "string") return content.text;
+  throw new Error("OpenAI tidak mengembalikan output teks yang dapat dibaca.");
+}
+
+export async function extractFinancialPdfWithOpenAI(params: { bytes: Buffer; fileName: string; companyTicker: string; companyName: string; expectedYear: number | null; expectedPeriodType: string | null; accounts: CanonicalAccountPrompt[]; preflight: PdfPreflight }): Promise<AiFinancialExtraction> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OPENAI_API_KEY belum dikonfigurasi di Railway Variables.");
+  const model = process.env.OPENAI_FINANCIAL_MODEL || "gpt-5";
+  const accountDictionary = params.accounts.map((a) => ({ code: a.code, name: a.name, statementType: a.statementType, aliases: a.aliases }));
+  const schema = { type: "object", additionalProperties: false, required: ["detectedYear","detectedPeriodType","detectedCurrency","detectedUnitScale","pageCount","chunks","candidates"], properties: { detectedYear:{anyOf:[{type:"integer"},{type:"null"}]}, detectedPeriodType:{anyOf:[{type:"string",enum:["Q1","H1","Q3","FY","MONTHLY"]},{type:"null"}]}, detectedCurrency:{anyOf:[{type:"string"},{type:"null"}]}, detectedUnitScale:{anyOf:[{type:"integer"},{type:"null"}]}, pageCount:{anyOf:[{type:"integer"},{type:"null"}]}, chunks:{type:"array",maxItems:80,items:{type:"object",additionalProperties:false,required:["section","chunkType","pageStart","pageEnd","textSummary"],properties:{section:{type:"string"},chunkType:{type:"string",enum:["SECTION","TABLE","PAGE","TOKEN_BLOCK"]},pageStart:{anyOf:[{type:"integer"},{type:"null"}]},pageEnd:{anyOf:[{type:"integer"},{type:"null"}]},textSummary:{type:"string"}}}}, candidates:{type:"array",maxItems:250,items:{type:"object",additionalProperties:false,required:["statementType","reportedLabel","rawValue","numericValue","currency","scale","sourcePage","sourceText","canonicalCode","extractionConfidence","mappingConfidence"],properties:{statementType:{anyOf:[{type:"string",enum:["INCOME_STATEMENT","BALANCE_SHEET","CASH_FLOW","OTHER"]},{type:"null"}]},reportedLabel:{type:"string"},rawValue:{type:"string"},numericValue:{anyOf:[{type:"number"},{type:"null"}]},currency:{anyOf:[{type:"string"},{type:"null"}]},scale:{type:"integer"},sourcePage:{anyOf:[{type:"integer"},{type:"null"}]},sourceText:{anyOf:[{type:"string"},{type:"null"}]},canonicalCode:{anyOf:[{type:"string"},{type:"null"}]},extractionConfidence:{type:"number",minimum:0,maximum:1},mappingConfidence:{type:"number",minimum:0,maximum:1}}}} } };
+
+  const modeInstruction = params.preflight.processingMode === "VISION_OCR_FALLBACK"
+    ? "Preflight indicates a scanned/image PDF. Perform visual/OCR reading page by page. Do not assume selectable text exists."
+    : params.preflight.processingMode === "HYBRID"
+      ? "Preflight indicates a hybrid PDF. Reconcile native text with visual/OCR reading, especially tables and pages whose text layer is incomplete."
+      : "Preflight indicates native text. Prefer the embedded text layer but visually verify financial tables, column alignment, signs and units.";
+
+  const prompt = `You are the financial-statement extraction engine for InvestAI.\nCompany: ${params.companyTicker} — ${params.companyName}\nExpected period: ${params.expectedPeriodType ?? "unknown"} ${params.expectedYear ?? "unknown"}.\nPreflight mode: ${params.preflight.processingMode}. ${modeInstruction}\n\nPipeline rules:\n1. Inspect the entire PDF before extracting values. OCR/vision is a fallback or verification layer, not a reason to discard good native text.\n2. Detect document structure first: primary consolidated Income Statement, Balance Sheet / Statement of Financial Position, Cash Flow Statement, then relevant notes.\n3. Build structure-aware chunks by statement, section and table. A table spanning pages is ONE logical TABLE chunk; do not create arbitrary page/token chunks unless structure cannot be recovered.\n4. Extract the requested reporting-period column only. Never mix comparative prior-period values.\n5. Preserve labels, raw values, signs/parentheses, currency and displayed unit. numericValue is before scale multiplication.\n6. sourcePage and sourceText must identify evidence. If OCR is uncertain, lower extractionConfidence; never invent digits.\n7. Suggest a canonicalCode only from the dictionary and only when semantically supported; otherwise null. mappingConfidence is separate from reading confidence.\n8. Prefer primary-statement totals for canonical metrics. Notes can support evidence/detail but must not silently replace a primary-statement total.\n9. Return chunks in document order and candidates tied conceptually to those chunks.\n\nCanonical account dictionary:\n${JSON.stringify(accountDictionary)}\n\nReturn only the requested structured JSON.`;
+  const response = await fetch("https://api.openai.com/v1/responses", { method:"POST", headers:{Authorization:`Bearer ${apiKey}`,"Content-Type":"application/json"}, body:JSON.stringify({model,input:[{role:"user",content:[{type:"input_text",text:prompt},{type:"input_file",filename:params.fileName,file_data:`data:application/pdf;base64,${params.bytes.toString("base64")}`}]}],text:{format:{type:"json_schema",name:"financial_statement_extraction",strict:true,schema}}}) });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload?.error?.message || `OpenAI request gagal (${response.status}).`);
+  const parsed = JSON.parse(outputText(payload)) as AiFinancialExtraction;
+  if (!Array.isArray(parsed.candidates) || !Array.isArray(parsed.chunks)) throw new Error("Format hasil AI tidak valid.");
+  return parsed;
+}
