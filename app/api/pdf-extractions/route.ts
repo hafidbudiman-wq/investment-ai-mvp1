@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { inspectPdfForOcr, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
+import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
 import { extractFinancialPdfWithOpenAI } from "@/lib/openai-financial-extraction";
 
 export const runtime = "nodejs";
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const form = await request.formData();
     const file = form.get("file"); const companyId = String(form.get("companyId") ?? ""); const yearValue = String(form.get("year") ?? ""); const periodType = String(form.get("periodType") ?? "");
-    if (!(file instanceof File)) return NextResponse.json({ error: "PDF belum dipilih." }, { status: 400 });
+    if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     if (!companyId) return NextResponse.json({ error: "Company wajib dipilih." }, { status: 400 });
     validatePdfUpload(file);
     const company = await prisma.company.findUnique({ where: { id: companyId }, select: { id: true, ticker: true, name: true, currency: true } });
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId, checksum } }, include: { _count: { select: { chunks: true, candidates: true } } } });
     if (existing) return NextResponse.json({ ok: true, duplicate: true, run: existing, runId: existing.id, message: "PDF yang sama sudah pernah diproses. Tidak dibuat duplikat." });
     const year = /^\d{4}$/.test(yearValue) ? Number(yearValue) : null; const allowedPeriods = ["Q1", "H1", "Q3", "FY", "MONTHLY"] as const; const safePeriod = allowedPeriods.includes(periodType as any) ? (periodType as (typeof allowedPeriods)[number]) : null;
-    const run = await prisma.extractionRun.create({ data: { companyId, fileName: file.name, mimeType: file.type, fileSize: file.size, checksum, year, periodType: safePeriod, currency: company.currency, status: "PROCESSING", parserVersion: "mvp-1.2d-v2-ocr-smart-chunk" } }); runId = run.id;
+    const run = await prisma.extractionRun.create({ data: { companyId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, year, periodType: safePeriod, currency: company.currency, status: "PROCESSING", parserVersion: "mvp-1.2d-v2-ocr-smart-chunk" } }); runId = run.id;
     const accounts = await prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true, aliases: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] });
     const extracted = await extractFinancialPdfWithOpenAI({ bytes, fileName: file.name, companyTicker: company.ticker, companyName: company.name, expectedYear: year, expectedPeriodType: safePeriod, accounts, preflight });
     const accountByCode = new Map(accounts.map((account) => [account.code.toUpperCase(), account]));
