@@ -18,6 +18,7 @@ export async function POST(request: Request) {
   try {
     const form = await request.formData();
     const file = form.get("file");
+    const confirmedCompanyId = String(form.get("confirmedCompanyId") ?? "");
     if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     validatePdfUpload(file);
 
@@ -41,25 +42,53 @@ export async function POST(request: Request) {
     const normalize = (value: string | null | undefined) => (value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
     const detectedTicker = normalize(extracted.detectedCompanyTicker);
     const detectedName = normalize(extracted.detectedCompanyName);
-    const company = companies.find((item) => normalize(item.ticker) === detectedTicker)
-      ?? companies.find((item) => normalize(item.name) === detectedName)
-      ?? companies.find((item) => detectedName && normalize(item.name).includes(detectedName))
+    const exactCompany = companies.find((item) => normalize(item.ticker) === detectedTicker)
+      ?? companies.find((item) => normalize(item.name) === detectedName);
+    const fuzzyCompany = exactCompany
+      ?? companies.find((item) => detectedName && (normalize(item.name).includes(detectedName) || detectedName.includes(normalize(item.name))))
       ?? companies.find((item) => detectedTicker && normalize(item.ticker).includes(detectedTicker));
+    const confirmedCompany = confirmedCompanyId ? companies.find((item) => item.id === confirmedCompanyId) : undefined;
+
+    const companyConfidence = Math.max(0, Math.min(1, extracted.detectedCompanyConfidence ?? 0));
+    let company = confirmedCompany ?? (companyConfidence >= 0.95 ? exactCompany : undefined);
 
     if (!company) {
+      const needsConfirmation = Boolean(fuzzyCompany && companyConfidence >= 0.75);
       return NextResponse.json({
-        error: `AI membaca perusahaan sebagai ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi belum ada Company Master yang cocok. Tambahkan emiten ke Company Master sebelum commit.`,
+        ok: false,
+        code: needsConfirmation ? "COMPANY_CONFIRMATION_REQUIRED" : "COMPANY_NOT_FOUND",
+        detectedCompany: {
+          ticker: extracted.detectedCompanyTicker,
+          name: extracted.detectedCompanyName,
+          confidence: companyConfidence,
+        },
+        suggestedCompany: fuzzyCompany ? { id: fuzzyCompany.id, ticker: fuzzyCompany.ticker, name: fuzzyCompany.name } : null,
+        detectedPeriod: {
+          periodType: extracted.detectedPeriodType,
+          year: extracted.detectedYear,
+          confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)),
+        },
+        detectedCurrency: extracted.detectedCurrency,
+        message: needsConfirmation
+          ? `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi kecocokan Company Master perlu konfirmasi.`
+          : `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi emiten belum ada di Company Master. Review lalu tambahkan emiten untuk melanjutkan.`,
       }, { status: 422 });
     }
 
-    if (!extracted.detectedYear || !extracted.detectedPeriodType) {
-      return NextResponse.json({ error: "AI belum dapat menentukan periode laporan dengan cukup jelas. Jangan lanjutkan sebelum periode terdeteksi." }, { status: 422 });
+    if (!extracted.detectedYear || !extracted.detectedPeriodType || (extracted.detectedPeriodConfidence ?? 0) < 0.75) {
+      return NextResponse.json({
+        ok: false,
+        code: "PERIOD_CONFIRMATION_REQUIRED",
+        detectedCompany: { ticker: company.ticker, name: company.name, confidence: companyConfidence },
+        detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)) },
+        message: "AI belum cukup yakin menentukan periode laporan. Periode harus dikonfirmasi sebelum data masuk staging.",
+      }, { status: 422 });
     }
 
     const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId: company.id, checksum } }, include: { _count: { select: { chunks: true, candidates: true } } } });
     if (existing) return NextResponse.json({ ok: true, duplicate: true, run: existing, runId: existing.id, message: "PDF yang sama sudah pernah diproses. Tidak dibuat duplikat." });
 
-    const run = await prisma.extractionRun.create({ data: { companyId: company.id, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, year: extracted.detectedYear, periodType: extracted.detectedPeriodType, currency: extracted.detectedCurrency || company.currency, unitScale: extracted.detectedUnitScale || null, pageCount: extracted.pageCount, status: "PROCESSING", parserVersion: "mvp-1.2d-v3-auto-metadata" } });
+    const run = await prisma.extractionRun.create({ data: { companyId: company.id, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, year: extracted.detectedYear, periodType: extracted.detectedPeriodType, currency: extracted.detectedCurrency || company.currency, unitScale: extracted.detectedUnitScale || null, pageCount: extracted.pageCount, status: "PROCESSING", parserVersion: "mvp-1.2d-v4-company-review" } });
     runId = run.id;
 
     const accountByCode = new Map(accounts.map((account) => [account.code.toUpperCase(), account]));
@@ -86,8 +115,8 @@ export async function POST(request: Request) {
       runId: run.id,
       candidateCount: extracted.candidates.length,
       chunkCount: chunks.length,
-      detectedCompany: { ticker: company.ticker, name: company.name },
-      detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear },
+      detectedCompany: { ticker: company.ticker, name: company.name, confidence: companyConfidence },
+      detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: extracted.detectedPeriodConfidence },
       processingMode: preflight.processingMode,
       message: `AI mendeteksi ${company.ticker} · ${extracted.detectedPeriodType} ${extracted.detectedYear}. ${extracted.candidates.length} kandidat masuk staging dan menunggu review.`,
     });
