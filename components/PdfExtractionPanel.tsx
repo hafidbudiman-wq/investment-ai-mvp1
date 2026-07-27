@@ -15,7 +15,6 @@ type MetadataGate = {
   detectedPeriod?: { periodType: string | null; year: number | null; confidence: number };
   detectedCurrency?: string | null;
 };
-
 type CompanyDraft = { ticker: string; name: string; sector: string; subsector: string; country: string; currency: string; fiscalYearEnd: string };
 
 function pct(value: number | null | undefined) { return value == null ? "—" : `${Math.round(value * 100)}%`; }
@@ -38,6 +37,7 @@ export function PdfExtractionPanel() {
   const [metadataGate, setMetadataGate] = useState<MetadataGate | null>(null);
   const [companyDraft, setCompanyDraft] = useState<CompanyDraft>({ ticker: "", name: "", sector: "", subsector: "", country: "ID", currency: "IDR", fiscalYearEnd: "12" });
   const [openGroups, setOpenGroups] = useState<Record<GroupKey, boolean>>({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
+  const [showReviewed, setShowReviewed] = useState<Record<GroupKey, boolean>>({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
 
   async function refreshRuns() {
     const response = await fetch("/api/pdf-extractions", { cache: "no-store" });
@@ -45,7 +45,7 @@ export function PdfExtractionPanel() {
     if (response.ok && data.ok) setRuns(data.runs);
   }
 
-  async function openRun(id: string) {
+  async function openRun(id: string, resetPanels = true) {
     setMessage("");
     const response = await fetch(`/api/pdf-extractions/${id}`, { cache: "no-store" });
     const data = await response.json();
@@ -53,7 +53,10 @@ export function PdfExtractionPanel() {
     setSelected(data.run);
     setAccounts(data.accounts);
     setMetadataGate(null);
-    setOpenGroups({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
+    if (resetPanels) {
+      setOpenGroups({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
+      setShowReviewed({ BALANCE_SHEET: false, INCOME_STATEMENT: false, CASH_FLOW: false, OTHER: false });
+    }
   }
 
   useEffect(() => { void refreshRuns(); }, []);
@@ -71,15 +74,7 @@ export function PdfExtractionPanel() {
         if (response.status === 422 && data.code) {
           const gate = data as MetadataGate;
           setMetadataGate(gate);
-          setCompanyDraft({
-            ticker: gate.detectedCompany?.ticker ?? "",
-            name: gate.detectedCompany?.name ?? "",
-            sector: "",
-            subsector: "",
-            country: "ID",
-            currency: gate.detectedCurrency || "IDR",
-            fiscalYearEnd: "12",
-          });
+          setCompanyDraft({ ticker: gate.detectedCompany?.ticker ?? "", name: gate.detectedCompany?.name ?? "", sector: "", subsector: "", country: "ID", currency: gate.detectedCurrency || "IDR", fiscalYearEnd: "12" });
           setMessage(gate.message);
           return;
         }
@@ -97,11 +92,7 @@ export function PdfExtractionPanel() {
   async function addCompanyAndRetry() {
     setLoading(true); setMessage("");
     try {
-      const response = await fetch("/api/companies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...companyDraft, fiscalYearEnd: Number(companyDraft.fiscalYearEnd) }),
-      });
+      const response = await fetch("/api/companies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...companyDraft, fiscalYearEnd: Number(companyDraft.fiscalYearEnd) }) });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "Gagal menambahkan emiten ke Company Master.");
       setMessage(`${data.company.ticker} ditambahkan ke Company Master. AI melanjutkan extraction...`);
@@ -110,14 +101,22 @@ export function PdfExtractionPanel() {
     } catch (error) { setMessage(error instanceof Error ? error.message : "Gagal menambahkan emiten."); setLoading(false); }
   }
 
-  async function review(candidate: Candidate, decision: "ACCEPTED" | "REJECTED", canonicalAccountId?: string | null) {
+  async function review(candidate: Candidate, decision: "PENDING" | "ACCEPTED" | "REJECTED", canonicalAccountId?: string | null) {
     if (!selected) return;
     setBusyCandidate(candidate.id); setMessage("");
     try {
-      const response = await fetch(`/api/pdf-extractions/${selected.id}/review`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candidateId: candidate.id, decision, canonicalAccountId: canonicalAccountId ?? candidate.canonicalAccountId }) });
+      const targetAccountId = canonicalAccountId === undefined ? candidate.canonicalAccountId : canonicalAccountId;
+      const response = await fetch(`/api/pdf-extractions/${selected.id}/review`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candidateId: candidate.id, decision, canonicalAccountId: targetAccountId }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Review gagal.");
-      await openRun(selected.id); await refreshRuns();
+
+      const mappedAccount = targetAccountId ? accounts.find((account) => account.id === targetAccountId) ?? candidate.canonicalAccount : candidate.canonicalAccount;
+      setSelected((current) => current ? {
+        ...current,
+        status: data.pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW",
+        candidates: current.candidates.map((item) => item.id === candidate.id ? { ...item, status: decision, canonicalAccountId: targetAccountId ?? null, canonicalAccount: mappedAccount ?? null } : item),
+      } : current);
+      void refreshRuns();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Review gagal."); }
     finally { setBusyCandidate(""); }
   }
@@ -129,13 +128,14 @@ export function PdfExtractionPanel() {
       const response = await fetch(`/api/pdf-extractions/${selected.id}/commit`, { method: "POST" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Commit gagal.");
-      setMessage(data.message); await openRun(selected.id); await refreshRuns();
+      setMessage(data.message); await openRun(selected.id, false); await refreshRuns();
     } catch (error) { setMessage(error instanceof Error ? error.message : "Commit gagal."); }
     finally { setLoading(false); }
   }
 
   const pending = selected?.candidates.filter((c) => c.status === "PENDING").length ?? 0;
   const accepted = selected?.candidates.filter((c) => c.status === "ACCEPTED").length ?? 0;
+  const rejected = selected?.candidates.filter((c) => c.status === "REJECTED").length ?? 0;
   const grouped = useMemo(() => {
     const result: Record<GroupKey, Candidate[]> = { BALANCE_SHEET: [], INCOME_STATEMENT: [], CASH_FLOW: [], OTHER: [] };
     for (const candidate of selected?.candidates ?? []) {
@@ -145,12 +145,13 @@ export function PdfExtractionPanel() {
     return result;
   }, [selected]);
 
-  function toggleGroup(key: GroupKey) { setOpenGroups((current) => ({ ...current, [key]: !current[key] })); }
-
-  function renderCandidate(candidate: Candidate) {
-    return <div className="extraction-candidate" key={candidate.id}>
+  function renderCandidate(candidate: Candidate, reviewed = false) {
+    return <div className="extraction-candidate" key={candidate.id} style={reviewed ? { opacity: 0.72 } : undefined}>
       <div className="extraction-main"><strong>{candidate.reportedLabel}</strong><span className="metric-value">{candidate.rawValue}</span><small>Page {candidate.sourcePage ?? "?"} · Read {pct(candidate.extractionConfidence)} · Map {pct(candidate.mappingConfidence)}</small>{candidate.sourceText && <small className="evidence">Evidence: {candidate.sourceText}</small>}</div>
-      <div className="extraction-actions"><select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select><div><button className="btn" type="button" disabled={!candidate.canonicalAccountId || busyCandidate === candidate.id} onClick={() => review(candidate, "ACCEPTED")}>Accept</button>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "REJECTED")}>Reject</button></div><span className={`badge ${candidate.status === "PENDING" ? "warning" : ""}`}>{candidate.status}</span></div>
+      <div className="extraction-actions">
+        <select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id || reviewed}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
+        {reviewed ? <div><span className={`badge ${candidate.status === "ACCEPTED" ? "" : "warning"}`}>{candidate.status === "ACCEPTED" ? "ACCEPTED ✓" : "REJECTED"}</span>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "PENDING")}>Reopen</button></div> : <div><button className="btn" type="button" disabled={!candidate.canonicalAccountId || busyCandidate === candidate.id} onClick={() => review(candidate, "ACCEPTED")}>Accept</button>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "REJECTED")}>Reject</button></div>}
+      </div>
     </div>;
   }
 
@@ -186,9 +187,20 @@ export function PdfExtractionPanel() {
     </section>
 
     {selected && <section className="card">
-      <div className="section-title"><div><h2>{selected.company.ticker} — {selected.company.name}</h2><p>{selected.periodType} {selected.year} · {selected.fileName} · {selected.pageCount ?? "?"} pages</p></div><div><span className="badge">Pending {pending}</span> <span className="badge">Accepted {accepted}</span></div></div>
-      <div className="callout"><b>AI detected:</b> {selected.company.ticker} · {selected.periodType} {selected.year}. Review Neraca, Laba Rugi, dan Arus Kas sebelum commit.</div>
-      <div style={{ display: "grid", gap: 12, marginTop: 16 }}>{(["BALANCE_SHEET", "INCOME_STATEMENT", "CASH_FLOW", "OTHER"] as GroupKey[]).map((key) => { const items = grouped[key]; if (items.length === 0) return null; const groupPending = items.filter((item) => item.status === "PENDING").length; return <div className="card" key={key} style={{ padding: 0, overflow: "hidden" }}><button type="button" onClick={() => toggleGroup(key)} style={{ width: "100%", background: "transparent", border: 0, color: "inherit", textAlign: "left", padding: 16, cursor: "pointer", display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}><div><strong style={{ fontSize: 18 }}>{groupMeta[key].label}</strong><div className="form-hint">{groupMeta[key].description} · {items.length} kandidat · {groupPending} pending</div></div><span style={{ fontSize: 24, lineHeight: 1 }}>{openGroups[key] ? "−" : "+"}</span></button>{openGroups[key] && <div className="extraction-list" style={{ padding: 16, paddingTop: 0 }}>{items.map(renderCandidate)}</div>}</div>; })}</div>
+      <div className="section-title"><div><h2>{selected.company.ticker} — {selected.company.name}</h2><p>{selected.periodType} {selected.year} · {selected.fileName} · {selected.pageCount ?? "?"} pages</p></div><div><span className="badge">Pending {pending}</span> <span className="badge">Accepted {accepted}</span> <span className="badge">Rejected {rejected}</span></div></div>
+      <div className="callout"><b>AI detected:</b> {selected.company.ticker} · {selected.periodType} {selected.year}. Setelah Accept/Reject, kandidat hilang dari working list dan section tetap terbuka. Gunakan Show reviewed untuk audit ulang.</div>
+      <div style={{ display: "grid", gap: 12, marginTop: 16 }}>{(["BALANCE_SHEET", "INCOME_STATEMENT", "CASH_FLOW", "OTHER"] as GroupKey[]).map((key) => {
+        const items = grouped[key]; if (items.length === 0) return null;
+        const pendingItems = items.filter((item) => item.status === "PENDING");
+        const reviewedItems = items.filter((item) => item.status !== "PENDING");
+        return <div className="card" key={key} style={{ padding: 0, overflow: "hidden" }}>
+          <button type="button" onClick={() => setOpenGroups((current) => ({ ...current, [key]: !current[key] }))} style={{ width: "100%", background: "transparent", border: 0, color: "inherit", textAlign: "left", padding: 16, cursor: "pointer", display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}><div><strong style={{ fontSize: 18 }}>{groupMeta[key].label}</strong><div className="form-hint">{groupMeta[key].description} · {pendingItems.length} pending · {reviewedItems.length} reviewed</div></div><span style={{ fontSize: 24, lineHeight: 1 }}>{openGroups[key] ? "−" : "+"}</span></button>
+          {openGroups[key] && <div className="extraction-list" style={{ padding: 16, paddingTop: 0 }}>
+            {pendingItems.length ? pendingItems.map((candidate) => renderCandidate(candidate)) : <div className="callout">Semua kandidat di bagian ini sudah direview ✓</div>}
+            {reviewedItems.length > 0 && <><div style={{ height: 10 }} /><button className="btn secondary" type="button" onClick={() => setShowReviewed((current) => ({ ...current, [key]: !current[key] }))}>{showReviewed[key] ? "Hide reviewed" : `Show reviewed (${reviewedItems.length})`}</button>{showReviewed[key] && <div style={{ display: "grid", gap: 10, marginTop: 12 }}>{reviewedItems.map((candidate) => renderCandidate(candidate, true))}</div>}</>}
+          </div>}
+        </div>;
+      })}</div>
       <div style={{ height: 16 }} /><button className="btn" type="button" onClick={commitRun} disabled={loading || pending > 0 || accepted === 0 || selected.status === "COMMITTED"}>{selected.status === "COMMITTED" ? "Committed to PostgreSQL ✓" : pending > 0 ? `Review ${pending} remaining candidates` : "Commit Reviewed Data to PostgreSQL"}</button>
     </section>}
   </>;
