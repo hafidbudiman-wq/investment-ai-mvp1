@@ -7,7 +7,9 @@ const companySchema = z.object({
   name: z.string().trim().min(2),
   sector: z.string().trim().optional(),
   subsector: z.string().trim().optional(),
-  currency: z.string().trim().length(3).default("IDR"),
+  country: z.string().trim().min(2).max(2).default("ID").transform((v) => v.toUpperCase()),
+  currency: z.string().trim().length(3).default("IDR").transform((v) => v.toUpperCase()),
+  fiscalYearEnd: z.coerce.number().int().min(1).max(12).default(12),
 });
 
 export async function GET() {
