@@ -26,8 +26,6 @@ type AsyncJob = {
   updatedAt: Date;
 };
 
-const submittingJobs = new Set<string>();
-
 export async function ensureAsyncExtractionTable() {
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "AsyncExtractionJob" (
@@ -54,16 +52,25 @@ export async function ensureAsyncExtractionTable() {
   await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "AsyncExtractionJob_status_idx" ON "AsyncExtractionJob" ("status")`);
 }
 
+const publicColumns = `"id","fileName","mimeType","fileSize","checksum","status","openAiResponseId","runId","detectedTicker","detectedCompanyName","detectedYear","detectedPeriodType","errorMessage","preflight","createdAt","updatedAt"`;
+
 export async function findAsyncJobByChecksum(checksum: string) {
   await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "checksum" = $1 LIMIT 1`, checksum);
+  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT ${publicColumns} FROM "AsyncExtractionJob" WHERE "checksum" = $1 LIMIT 1`, checksum);
   return rows[0] ?? null;
 }
 
 export async function createAsyncJob(input: { id: string; fileName: string; mimeType: string; fileSize: number; checksum: string; preflight: unknown; bytes: Buffer }) {
   await ensureAsyncExtractionTable();
   await prisma.$executeRawUnsafe(
-    `INSERT INTO "AsyncExtractionJob" ("id","fileName","mimeType","fileSize","checksum","status","preflight","fileData") VALUES ($1,$2,$3,$4,$5,'UPLOADED',$6::jsonb,$7)`,
+    `INSERT INTO "AsyncExtractionJob" ("id","fileName","mimeType","fileSize","checksum","status","preflight","fileData")
+     VALUES ($1,$2,$3,$4,$5,'UPLOADED',$6::jsonb,$7)
+     ON CONFLICT ("checksum") DO UPDATE SET
+       "fileName"=EXCLUDED."fileName", "mimeType"=EXCLUDED."mimeType", "fileSize"=EXCLUDED."fileSize",
+       "status"='UPLOADED', "preflight"=EXCLUDED."preflight", "fileData"=EXCLUDED."fileData",
+       "openAiResponseId"=NULL, "runId"=NULL, "detectedTicker"=NULL, "detectedCompanyName"=NULL,
+       "detectedYear"=NULL, "detectedPeriodType"=NULL, "errorMessage"=NULL, "updatedAt"=CURRENT_TIMESTAMP
+     WHERE "AsyncExtractionJob"."status"='FAILED'`,
     input.id,
     input.fileName,
     input.mimeType,
@@ -95,7 +102,7 @@ export async function markAsyncJobFailed(id: string, message: string) {
 
 export async function listAsyncJobs() {
   await ensureAsyncExtractionTable();
-  return prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT "id","fileName","mimeType","fileSize","checksum","status","openAiResponseId","runId","detectedTicker","detectedCompanyName","detectedYear","detectedPeriodType","errorMessage","preflight","createdAt","updatedAt" FROM "AsyncExtractionJob" WHERE "runId" IS NULL ORDER BY "updatedAt" DESC LIMIT 100`);
+  return prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT ${publicColumns} FROM "AsyncExtractionJob" WHERE "runId" IS NULL ORDER BY "updatedAt" DESC LIMIT 100`);
 }
 
 async function getAsyncJobWithFile(id: string) {
@@ -105,12 +112,16 @@ async function getAsyncJobWithFile(id: string) {
 }
 
 export async function submitQueuedAsyncJob(id: string) {
-  if (submittingJobs.has(id)) return;
-  submittingJobs.add(id);
+  await ensureAsyncExtractionTable();
+  const claimed = await prisma.$executeRawUnsafe(
+    `UPDATE "AsyncExtractionJob" SET "status"='SUBMITTING',"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1 AND "status"='UPLOADED' AND "openAiResponseId" IS NULL AND "fileData" IS NOT NULL`,
+    id,
+  );
+  if (!claimed) return;
+
   try {
     const job = await getAsyncJobWithFile(id);
-    if (!job || job.status !== "UPLOADED" || job.openAiResponseId) return;
-    if (!job.fileData?.length) throw new Error("PDF sementara tidak tersedia untuk dikirim ke OpenAI.");
+    if (!job?.fileData?.length) throw new Error("PDF sementara tidak tersedia untuk dikirim ke OpenAI.");
 
     const [companies, accounts] = await Promise.all([
       prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
@@ -131,13 +142,15 @@ export async function submitQueuedAsyncJob(id: string) {
     await markAsyncJobSubmitted(job.id, background.id, background.status);
   } catch (error) {
     await markAsyncJobFailed(id, error instanceof Error ? error.message : "Gagal mengirim PDF ke OpenAI background extraction.");
-  } finally {
-    submittingJobs.delete(id);
   }
 }
 
 export async function kickQueuedAsyncExtractionJobs(limit = 2) {
   await ensureAsyncExtractionTable();
+  await prisma.$executeRawUnsafe(
+    `UPDATE "AsyncExtractionJob" SET "status"='UPLOADED',"updatedAt"=CURRENT_TIMESTAMP
+     WHERE "status"='SUBMITTING' AND "openAiResponseId" IS NULL AND "fileData" IS NOT NULL AND "updatedAt" < CURRENT_TIMESTAMP - INTERVAL '5 minutes'`,
+  );
   const queued = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
     `SELECT "id" FROM "AsyncExtractionJob" WHERE "status"='UPLOADED' AND "openAiResponseId" IS NULL ORDER BY "createdAt" ASC LIMIT $1`,
     limit,
