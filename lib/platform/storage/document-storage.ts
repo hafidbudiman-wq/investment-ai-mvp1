@@ -40,6 +40,11 @@ export type MultipartPartInstruction = {
 export type CompletedPart = {
   partNumber: number;
   etag: string;
+  size?: number;
+};
+
+export type StorageCallOptions = {
+  signal?: AbortSignal;
 };
 
 export interface DocumentStorage {
@@ -51,36 +56,45 @@ export interface DocumentStorage {
     contentLength: number;
     expiresInSeconds: number;
     metadata?: Record<string, string>;
-  }): Promise<SingleUploadInstruction>;
+  }, options?: StorageCallOptions): Promise<SingleUploadInstruction>;
 
   initiateMultipartUpload(input: {
     objectKey: string;
     contentType: string;
     expiresInSeconds: number;
     metadata?: Record<string, string>;
-  }): Promise<MultipartUpload>;
+  }, options?: StorageCallOptions): Promise<MultipartUpload>;
 
   presignMultipartPart(input: {
     objectKey: string;
     providerUploadId: string;
     partNumber: number;
     expiresInSeconds: number;
-  }): Promise<MultipartPartInstruction>;
+  }, options?: StorageCallOptions): Promise<MultipartPartInstruction>;
+
+  listMultipartParts(input: {
+    objectKey: string;
+    providerUploadId: string;
+  }, options?: StorageCallOptions): Promise<CompletedPart[]>;
 
   completeMultipartUpload(input: {
     objectKey: string;
     providerUploadId: string;
     parts: CompletedPart[];
-  }): Promise<ObjectHead>;
+  }, options?: StorageCallOptions): Promise<ObjectHead>;
 
   abortMultipartUpload(input: {
     objectKey: string;
     providerUploadId: string;
-  }): Promise<void>;
+  }, options?: StorageCallOptions): Promise<void>;
 
-  headObject(location: Pick<ObjectLocation, "objectKey">): Promise<ObjectHead>;
+  headObject(location: Pick<ObjectLocation, "objectKey">, options?: StorageCallOptions): Promise<ObjectHead>;
 
-  openReadStream(location: Pick<ObjectLocation, "objectKey">, range?: { start: number; end?: number }): Promise<Readable>;
+  openReadStream(
+    location: Pick<ObjectLocation, "objectKey">,
+    range?: { start: number; end?: number },
+    options?: StorageCallOptions,
+  ): Promise<Readable>;
 
-  deleteObject(location: Pick<ObjectLocation, "objectKey">): Promise<void>;
+  deleteObject(location: Pick<ObjectLocation, "objectKey">, options?: StorageCallOptions): Promise<void>;
 }
