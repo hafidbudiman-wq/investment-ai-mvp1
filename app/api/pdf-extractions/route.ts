@@ -6,13 +6,86 @@ import { extractFinancialPdfWithOpenAI } from "@/lib/openai-financial-extraction
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-export async function GET() {
+const PIPELINE_FILTERS: Record<string, string[]> = {
+  ALL: [],
+  NEED_REVIEW: ["UPLOADED", "PROCESSING", "PENDING_REVIEW"],
+  READY_TO_COMMIT: ["READY_TO_COMMIT"],
+  COMMITTED: ["COMMITTED"],
+  FAILED: ["FAILED"],
+};
+
+export async function GET(request: Request) {
   try {
-    const runs = await prisma.extractionRun.findMany({ orderBy: { createdAt: "desc" }, take: 20, include: { company: { select: { ticker: true, name: true } }, _count: { select: { chunks: true, candidates: true } } } });
-    return NextResponse.json({ ok: true, runs });
+    const url = new URL(request.url);
+    const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
+    const pageSize = Math.min(50, Math.max(5, Number(url.searchParams.get("pageSize") || 20) || 20));
+    const filter = (url.searchParams.get("filter") || "ALL").toUpperCase();
+    const search = (url.searchParams.get("search") || "").trim();
+    const statuses = PIPELINE_FILTERS[filter] ?? [];
+
+    const where = {
+      ...(statuses.length ? { status: { in: statuses as ("UPLOADED" | "PROCESSING" | "PENDING_REVIEW" | "READY_TO_COMMIT" | "COMMITTED" | "FAILED")[] } } : {}),
+      ...(search ? {
+        OR: [
+          { fileName: { contains: search, mode: "insensitive" as const } },
+          { company: { ticker: { contains: search, mode: "insensitive" as const } } },
+          { company: { name: { contains: search, mode: "insensitive" as const } } },
+        ],
+      } : {}),
+    };
+
+    const [runs, total, allRuns] = await Promise.all([
+      prisma.extractionRun.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          company: { select: { ticker: true, name: true } },
+          candidates: { select: { status: true } },
+          _count: { select: { chunks: true, candidates: true } },
+        },
+      }),
+      prisma.extractionRun.count({ where }),
+      prisma.extractionRun.findMany({ select: { companyId: true, status: true } }),
+    ]);
+
+    const withProgress = runs.map((run) => {
+      const review = run.candidates.reduce((acc, candidate) => {
+        if (candidate.status === "PENDING") acc.pending += 1;
+        else if (candidate.status === "ACCEPTED") acc.accepted += 1;
+        else if (candidate.status === "REJECTED") acc.rejected += 1;
+        else if (candidate.status === "COMMITTED") acc.committed += 1;
+        return acc;
+      }, { pending: 0, accepted: 0, rejected: 0, committed: 0 });
+      const { candidates: _candidates, ...rest } = run;
+      return { ...rest, review };
+    });
+
+    const summarize = (wanted: string[]) => {
+      const matched = allRuns.filter((run) => wanted.includes(run.status));
+      return { reports: matched.length, companies: new Set(matched.map((run) => run.companyId)).size };
+    };
+
+    const summary = {
+      all: { reports: allRuns.length, companies: new Set(allRuns.map((run) => run.companyId)).size },
+      needReview: summarize(PIPELINE_FILTERS.NEED_REVIEW),
+      readyToCommit: summarize(PIPELINE_FILTERS.READY_TO_COMMIT),
+      committed: summarize(PIPELINE_FILTERS.COMMITTED),
+      failed: summarize(PIPELINE_FILTERS.FAILED),
+    };
+
+    return NextResponse.json({
+      ok: true,
+      runs: withProgress,
+      summary,
+      pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
+      filter,
+      search,
+    });
   } catch (error) {
     console.error("pdf-extraction-list-failed", error);
-    return NextResponse.json({ error: "Gagal membaca staging PDF." }, { status: 500 });
+    return NextResponse.json({ error: "Gagal membaca Financial Report Pipeline." }, { status: 500 });
   }
 }
 
@@ -28,8 +101,6 @@ export async function POST(request: Request) {
     const bytes = Buffer.from(await file.arrayBuffer());
     const checksum = sha256(bytes);
 
-    // Fast duplicate guard BEFORE any OpenAI call. This prevents the same PDF from
-    // re-running a potentially long/expensive extraction and avoids proxy timeouts.
     const existingByChecksum = await prisma.extractionRun.findFirst({
       where: { checksum },
       orderBy: { createdAt: "desc" },
