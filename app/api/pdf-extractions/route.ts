@@ -1,12 +1,12 @@
 import { randomUUID } from "crypto";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
 import { submitFinancialPdfBackground } from "@/lib/openai-financial-extraction";
 import { createAsyncJob, findAsyncJobByChecksum, listAsyncJobs, markAsyncJobFailed, markAsyncJobSubmitted, pollAsyncExtractionJobs } from "@/lib/async-pdf-extraction";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const FILTERS: Record<string, string[]> = {
   ALL: [],
@@ -115,13 +115,22 @@ export async function POST(request: Request) {
 
     jobId = randomUUID();
     await createAsyncJob({ id: jobId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, preflight });
-    const background = await submitFinancialPdfBackground({ bytes, fileName: file.name, knownCompanies: companies, accounts, preflight });
-    await markAsyncJobSubmitted(jobId, background.id, background.status);
+    const acceptedJobId = jobId;
 
-    return NextResponse.json({ ok: true, accepted: true, jobId, status: "PROCESSING", message: "Upload diterima. AI memproses PDF di background; job sudah muncul di Financial Report Pipeline." }, { status: 202 });
+    after(async () => {
+      try {
+        const background = await submitFinancialPdfBackground({ bytes, fileName: file.name, knownCompanies: companies, accounts, preflight });
+        await markAsyncJobSubmitted(acceptedJobId, background.id, background.status);
+      } catch (error) {
+        console.error("pdf-extraction-background-submit-after-response-failed", error);
+        await markAsyncJobFailed(acceptedJobId, error instanceof Error ? error.message : "Gagal memulai background extraction.").catch(() => undefined);
+      }
+    });
+
+    return NextResponse.json({ ok: true, accepted: true, jobId, status: "UPLOADED", message: "Upload diterima dan sudah tercatat. AI akan memproses PDF di background; halaman boleh ditutup." }, { status: 202 });
   } catch (error) {
     console.error("pdf-extraction-background-submit-failed", error);
-    if (jobId) await markAsyncJobFailed(jobId, error instanceof Error ? error.message : "Gagal memulai background extraction.").catch(() => undefined);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal memulai background extraction." }, { status: 500 });
+    if (jobId) await markAsyncJobFailed(jobId, error instanceof Error ? error.message : "Gagal mencatat upload PDF.").catch(() => undefined);
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal mencatat upload PDF." }, { status: 500 });
   }
 }
