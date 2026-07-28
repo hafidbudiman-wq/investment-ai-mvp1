@@ -1,12 +1,14 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
-import { extractFinancialPdfWithOpenAI } from "@/lib/openai-financial-extraction";
+import { submitFinancialPdfBackground } from "@/lib/openai-financial-extraction";
+import { createAsyncJob, findAsyncJobByChecksum, listAsyncJobs, markAsyncJobFailed, markAsyncJobSubmitted, pollAsyncExtractionJobs } from "@/lib/async-pdf-extraction";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
-const PIPELINE_FILTERS: Record<string, string[]> = {
+const FILTERS: Record<string, string[]> = {
   ALL: [],
   NEED_REVIEW: ["UPLOADED", "PROCESSING", "PENDING_REVIEW"],
   READY_TO_COMMIT: ["READY_TO_COMMIT"],
@@ -16,41 +18,27 @@ const PIPELINE_FILTERS: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   try {
+    await pollAsyncExtractionJobs();
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
     const pageSize = Math.min(50, Math.max(5, Number(url.searchParams.get("pageSize") || 20) || 20));
     const filter = (url.searchParams.get("filter") || "ALL").toUpperCase();
-    const search = (url.searchParams.get("search") || "").trim();
-    const statuses = PIPELINE_FILTERS[filter] ?? [];
+    const search = (url.searchParams.get("search") || "").trim().toLowerCase();
 
-    const where = {
-      ...(statuses.length ? { status: { in: statuses as ("UPLOADED" | "PROCESSING" | "PENDING_REVIEW" | "READY_TO_COMMIT" | "COMMITTED" | "FAILED")[] } } : {}),
-      ...(search ? {
-        OR: [
-          { fileName: { contains: search, mode: "insensitive" as const } },
-          { company: { ticker: { contains: search, mode: "insensitive" as const } } },
-          { company: { name: { contains: search, mode: "insensitive" as const } } },
-        ],
-      } : {}),
-    };
-
-    const [runs, total, allRuns] = await Promise.all([
+    const [runs, jobs] = await Promise.all([
       prisma.extractionRun.findMany({
-        where,
         orderBy: { updatedAt: "desc" },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
+        take: 300,
         include: {
           company: { select: { ticker: true, name: true } },
           candidates: { select: { status: true } },
           _count: { select: { chunks: true, candidates: true } },
         },
       }),
-      prisma.extractionRun.count({ where }),
-      prisma.extractionRun.findMany({ select: { companyId: true, status: true } }),
+      listAsyncJobs(),
     ]);
 
-    const withProgress = runs.map((run) => {
+    const runRows = runs.map((run) => {
       const review = run.candidates.reduce((acc, candidate) => {
         if (candidate.status === "PENDING") acc.pending += 1;
         else if (candidate.status === "ACCEPTED") acc.accepted += 1;
@@ -59,156 +47,81 @@ export async function GET(request: Request) {
         return acc;
       }, { pending: 0, accepted: 0, rejected: 0, committed: 0 });
       const { candidates: _candidates, ...rest } = run;
-      return { ...rest, review };
+      return { ...rest, kind: "RUN" as const, review };
     });
 
-    const summarize = (wanted: string[]) => {
-      const matched = allRuns.filter((run) => wanted.includes(run.status));
-      return { reports: matched.length, companies: new Set(matched.map((run) => run.companyId)).size };
-    };
+    const jobRows = jobs.map((job) => ({
+      id: job.id,
+      kind: "JOB" as const,
+      fileName: job.fileName,
+      status: job.status,
+      year: job.detectedYear,
+      periodType: job.detectedPeriodType,
+      updatedAt: job.updatedAt,
+      company: { ticker: job.detectedTicker || "AI DETECTING", name: job.detectedCompanyName || "Background extraction in progress" },
+      review: { pending: 0, accepted: 0, rejected: 0, committed: 0 },
+      _count: { chunks: 0, candidates: 0 },
+      errorMessage: job.errorMessage,
+    }));
 
+    const allRows = [...jobRows, ...runRows].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    const wanted = FILTERS[filter] ?? [];
+    const filtered = allRows.filter((row) => {
+      const statusMatch = wanted.length === 0 || wanted.includes(row.status);
+      const haystack = `${row.company.ticker} ${row.company.name} ${row.fileName}`.toLowerCase();
+      return statusMatch && (!search || haystack.includes(search));
+    });
+    const total = filtered.length;
+    const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
+    const count = (statuses: string[]) => {
+      const rows = allRows.filter((row) => statuses.includes(row.status));
+      return { reports: rows.length, companies: new Set(rows.map((row) => row.company.ticker).filter((ticker) => ticker !== "AI DETECTING")).size };
+    };
     const summary = {
-      all: { reports: allRuns.length, companies: new Set(allRuns.map((run) => run.companyId)).size },
-      needReview: summarize(PIPELINE_FILTERS.NEED_REVIEW),
-      readyToCommit: summarize(PIPELINE_FILTERS.READY_TO_COMMIT),
-      committed: summarize(PIPELINE_FILTERS.COMMITTED),
-      failed: summarize(PIPELINE_FILTERS.FAILED),
+      all: { reports: allRows.length, companies: new Set(allRows.map((row) => row.company.ticker).filter((ticker) => ticker !== "AI DETECTING")).size },
+      needReview: count(FILTERS.NEED_REVIEW),
+      readyToCommit: count(FILTERS.READY_TO_COMMIT),
+      committed: count(FILTERS.COMMITTED),
+      failed: count(FILTERS.FAILED),
     };
 
-    return NextResponse.json({
-      ok: true,
-      runs: withProgress,
-      summary,
-      pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
-      filter,
-      search,
-    });
+    return NextResponse.json({ ok: true, runs: paged, summary, pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) }, filter, search });
   } catch (error) {
     console.error("pdf-extraction-list-failed", error);
-    return NextResponse.json({ error: "Gagal membaca Financial Report Pipeline." }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal membaca Financial Report Pipeline." }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
-  let runId: string | null = null;
+  let jobId: string | null = null;
   try {
     const form = await request.formData();
     const file = form.get("file");
-    const confirmedCompanyId = String(form.get("confirmedCompanyId") ?? "");
     if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     validatePdfUpload(file);
-
     const bytes = Buffer.from(await file.arrayBuffer());
     const checksum = sha256(bytes);
 
-    const existingByChecksum = await prisma.extractionRun.findFirst({
-      where: { checksum },
-      orderBy: { createdAt: "desc" },
-      include: {
-        company: { select: { ticker: true, name: true } },
-        _count: { select: { chunks: true, candidates: true } },
-      },
-    });
-    if (existingByChecksum && !confirmedCompanyId) {
-      return NextResponse.json({
-        ok: true,
-        duplicate: true,
-        runId: existingByChecksum.id,
-        run: existingByChecksum,
-        message: `PDF ini sudah pernah diproses sebagai ${existingByChecksum.company.ticker} · ${existingByChecksum.periodType ?? "?"} ${existingByChecksum.year ?? "?"}. Hasil staging lama dibuka kembali tanpa mengulang AI extraction.`,
-      });
-    }
+    const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
+    if (existingRun) return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+    const existingJob = await findAsyncJobByChecksum(checksum);
+    if (existingJob) return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
 
     const preflight = inspectPdfForOcr(bytes);
     const [companies, accounts] = await Promise.all([
-      prisma.company.findMany({ where: { isActive: true }, select: { id: true, ticker: true, name: true, currency: true } }),
+      prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
       prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true, aliases: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
     ]);
 
-    const extracted = await extractFinancialPdfWithOpenAI({
-      bytes,
-      fileName: file.name,
-      knownCompanies: companies.map((company) => ({ ticker: company.ticker, name: company.name })),
-      accounts,
-      preflight,
-    });
+    jobId = randomUUID();
+    await createAsyncJob({ id: jobId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, preflight });
+    const background = await submitFinancialPdfBackground({ bytes, fileName: file.name, knownCompanies: companies, accounts, preflight });
+    await markAsyncJobSubmitted(jobId, background.id, background.status);
 
-    const normalize = (value: string | null | undefined) => (value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-    const detectedTicker = normalize(extracted.detectedCompanyTicker);
-    const detectedName = normalize(extracted.detectedCompanyName);
-    const exactCompany = companies.find((item) => normalize(item.ticker) === detectedTicker)
-      ?? companies.find((item) => normalize(item.name) === detectedName);
-    const fuzzyCompany = exactCompany
-      ?? companies.find((item) => detectedName && (normalize(item.name).includes(detectedName) || detectedName.includes(normalize(item.name))))
-      ?? companies.find((item) => detectedTicker && normalize(item.ticker).includes(detectedTicker));
-    const confirmedCompany = confirmedCompanyId ? companies.find((item) => item.id === confirmedCompanyId) : undefined;
-
-    const companyConfidence = Math.max(0, Math.min(1, extracted.detectedCompanyConfidence ?? 0));
-    const company = confirmedCompany ?? (companyConfidence >= 0.95 ? exactCompany : undefined);
-
-    if (!company) {
-      const needsConfirmation = Boolean(fuzzyCompany && companyConfidence >= 0.75);
-      return NextResponse.json({
-        ok: false,
-        code: needsConfirmation ? "COMPANY_CONFIRMATION_REQUIRED" : "COMPANY_NOT_FOUND",
-        detectedCompany: { ticker: extracted.detectedCompanyTicker, name: extracted.detectedCompanyName, confidence: companyConfidence },
-        suggestedCompany: fuzzyCompany ? { id: fuzzyCompany.id, ticker: fuzzyCompany.ticker, name: fuzzyCompany.name } : null,
-        detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)) },
-        detectedCurrency: extracted.detectedCurrency,
-        message: needsConfirmation
-          ? `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi kecocokan Company Master perlu konfirmasi.`
-          : `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi emiten belum ada di Company Master. Review lalu tambahkan emiten untuk melanjutkan.`,
-      }, { status: 422 });
-    }
-
-    if (!extracted.detectedYear || !extracted.detectedPeriodType || (extracted.detectedPeriodConfidence ?? 0) < 0.75) {
-      return NextResponse.json({
-        ok: false,
-        code: "PERIOD_CONFIRMATION_REQUIRED",
-        detectedCompany: { ticker: company.ticker, name: company.name, confidence: companyConfidence },
-        detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: Math.max(0, Math.min(1, extracted.detectedPeriodConfidence ?? 0)) },
-        message: "AI belum cukup yakin menentukan periode laporan. Periode harus dikonfirmasi sebelum data masuk staging.",
-      }, { status: 422 });
-    }
-
-    const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId: company.id, checksum } }, include: { _count: { select: { chunks: true, candidates: true } } } });
-    if (existing) return NextResponse.json({ ok: true, duplicate: true, run: existing, runId: existing.id, message: "PDF yang sama sudah pernah diproses. Tidak dibuat duplikat." });
-
-    const run = await prisma.extractionRun.create({ data: { companyId: company.id, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, year: extracted.detectedYear, periodType: extracted.detectedPeriodType, currency: extracted.detectedCurrency || company.currency, unitScale: extracted.detectedUnitScale || null, pageCount: extracted.pageCount, status: "PROCESSING", parserVersion: "mvp-1.2d-v4-company-review" } });
-    runId = run.id;
-
-    const accountByCode = new Map(accounts.map((account) => [account.code.toUpperCase(), account]));
-    const chunks = extracted.chunks.length ? extracted.chunks : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
-
-    await prisma.$transaction(async (tx) => {
-      for (let index = 0; index < chunks.length; index++) {
-        const chunk = chunks[index];
-        await tx.extractionChunk.create({ data: { runId: run.id, ordinal: index + 1, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, section: chunk.section, text: chunk.textSummary.slice(0, 12000), textHash: sha256(Buffer.from(chunk.textSummary)), metadata: { processingMode: preflight.processingMode, preflightConfidence: preflight.confidence, preflightReason: preflight.reason } } });
-      }
-      for (const candidate of extracted.candidates) {
-        if (candidate.numericValue === null || !Number.isFinite(candidate.numericValue)) continue;
-        const canonical = candidate.canonicalCode ? accountByCode.get(candidate.canonicalCode.toUpperCase()) : undefined;
-        const matchingChunk = chunks.findIndex((chunk) => candidate.sourcePage != null && chunk.pageStart != null && chunk.pageEnd != null && candidate.sourcePage >= chunk.pageStart && candidate.sourcePage <= chunk.pageEnd);
-        const storedChunk = matchingChunk >= 0 ? await tx.extractionChunk.findUnique({ where: { runId_ordinal: { runId: run.id, ordinal: matchingChunk + 1 } }, select: { id: true } }) : null;
-        await tx.extractionCandidate.create({ data: { runId: run.id, chunkId: storedChunk?.id ?? null, statementType: candidate.statementType, reportedLabel: candidate.reportedLabel.slice(0, 500), normalizedLabel: candidate.reportedLabel.trim().toLowerCase().slice(0, 500), rawValue: candidate.rawValue.slice(0, 250), numericValue: candidate.numericValue, currency: candidate.currency || extracted.detectedCurrency || company.currency, scale: candidate.scale || extracted.detectedUnitScale || 1, sourcePage: candidate.sourcePage, sourceText: candidate.sourceText?.slice(0, 2000) ?? null, canonicalAccountId: canonical?.id ?? null, extractionConfidence: Math.max(0, Math.min(1, candidate.extractionConfidence)), mappingConfidence: canonical ? Math.max(0, Math.min(1, candidate.mappingConfidence)) : 0, mappingMethod: canonical ? "AI" : null, status: "PENDING" } });
-      }
-      await tx.extractionRun.update({ where: { id: run.id }, data: { status: "PENDING_REVIEW" } });
-    });
-
-    return NextResponse.json({
-      ok: true,
-      duplicate: false,
-      runId: run.id,
-      candidateCount: extracted.candidates.length,
-      chunkCount: chunks.length,
-      detectedCompany: { ticker: company.ticker, name: company.name, confidence: companyConfidence },
-      detectedPeriod: { periodType: extracted.detectedPeriodType, year: extracted.detectedYear, confidence: extracted.detectedPeriodConfidence },
-      processingMode: preflight.processingMode,
-      message: `AI mendeteksi ${company.ticker} · ${extracted.detectedPeriodType} ${extracted.detectedYear}. ${extracted.candidates.length} kandidat masuk staging dan menunggu review.`,
-    });
+    return NextResponse.json({ ok: true, accepted: true, jobId, status: "PROCESSING", message: "Upload diterima. AI memproses PDF di background; job sudah muncul di Financial Report Pipeline." }, { status: 202 });
   } catch (error) {
-    console.error("pdf-extraction-upload-failed", error);
-    if (runId) await prisma.extractionRun.update({ where: { id: runId }, data: { status: "FAILED", errorMessage: error instanceof Error ? error.message.slice(0, 2000) : "Extraction failed" } }).catch(() => undefined);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal memproses PDF." }, { status: 500 });
+    console.error("pdf-extraction-background-submit-failed", error);
+    if (jobId) await markAsyncJobFailed(jobId, error instanceof Error ? error.message : "Gagal memulai background extraction.").catch(() => undefined);
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal memulai background extraction." }, { status: 500 });
   }
 }
