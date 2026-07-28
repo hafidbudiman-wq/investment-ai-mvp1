@@ -60,9 +60,10 @@ export async function createAsyncJob(input: { id: string; fileName: string; mime
 }
 
 export async function markAsyncJobSubmitted(id: string, responseId: string, status: string) {
+  const normalizedStatus = status === "queued" || status === "in_progress" ? "PROCESSING" : status.toUpperCase();
   await prisma.$executeRawUnsafe(
     `UPDATE "AsyncExtractionJob" SET "openAiResponseId"=$2,"status"=$3,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    id, responseId, status === "queued" ? "PROCESSING" : status.toUpperCase(),
+    id, responseId, normalizedStatus,
   );
 }
 
