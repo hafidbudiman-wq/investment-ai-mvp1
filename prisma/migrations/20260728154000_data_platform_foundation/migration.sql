@@ -25,12 +25,33 @@ CREATE TABLE "UploadSession" (
   CONSTRAINT "UploadSession_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "UploadSession_mode_check" CHECK ("uploadMode" IN ('SINGLE_PUT','MULTIPART')),
   CONSTRAINT "UploadSession_status_check" CHECK ("status" IN ('INITIATED','UPLOADING','UPLOADED','VERIFYING','VERIFIED','ABORTED','FAILED')),
-  CONSTRAINT "UploadSession_size_check" CHECK ("expectedSize" > 0)
+  CONSTRAINT "UploadSession_size_check" CHECK ("expectedSize" > 0),
+  CONSTRAINT "UploadSession_part_size_check" CHECK (
+    ("uploadMode" = 'SINGLE_PUT' AND "partSize" IS NULL)
+    OR ("uploadMode" = 'MULTIPART' AND "partSize" IS NOT NULL AND "partSize" >= 5242880)
+  )
 );
 
 CREATE UNIQUE INDEX "UploadSession_correlationId_key" ON "UploadSession"("correlationId");
 CREATE UNIQUE INDEX "UploadSession_objectKey_key" ON "UploadSession"("objectKey");
 CREATE INDEX "UploadSession_status_expiresAt_idx" ON "UploadSession"("status", "expiresAt");
+
+CREATE TABLE "UploadPart" (
+  "id" TEXT NOT NULL,
+  "uploadSessionId" TEXT NOT NULL,
+  "partNumber" INTEGER NOT NULL,
+  "etag" TEXT NOT NULL,
+  "size" INTEGER NOT NULL,
+  "completedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "UploadPart_pkey" PRIMARY KEY ("id"),
+  CONSTRAINT "UploadPart_uploadSessionId_fkey" FOREIGN KEY ("uploadSessionId") REFERENCES "UploadSession"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "UploadPart_number_check" CHECK ("partNumber" > 0),
+  CONSTRAINT "UploadPart_size_check" CHECK ("size" > 0)
+);
+
+CREATE UNIQUE INDEX "UploadPart_uploadSessionId_partNumber_key" ON "UploadPart"("uploadSessionId", "partNumber");
+CREATE INDEX "UploadPart_uploadSessionId_completedAt_idx" ON "UploadPart"("uploadSessionId", "completedAt");
 
 CREATE TABLE "FinancialDocument" (
   "id" TEXT NOT NULL,
@@ -85,10 +106,11 @@ CREATE TABLE "Job" (
   CONSTRAINT "Job_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "Job_documentId_fkey" FOREIGN KEY ("documentId") REFERENCES "FinancialDocument"("id") ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT "Job_status_check" CHECK ("status" IN ('QUEUED','CLAIMED','RUNNING','RETRY_WAIT','NEEDS_INPUT','SUCCEEDED','FAILED','CANCELLED')),
-  CONSTRAINT "Job_attempt_check" CHECK ("attemptCount" >= 0 AND "maxAttempts" > 0)
+  CONSTRAINT "Job_attempt_check" CHECK ("attemptCount" >= 0 AND "maxAttempts" > 0),
+  CONSTRAINT "Job_priority_check" CHECK ("priority" >= 0)
 );
 
-CREATE UNIQUE INDEX "Job_correlationId_key" ON "Job"("correlationId");
+CREATE INDEX "Job_correlationId_idx" ON "Job"("correlationId");
 CREATE INDEX "Job_claim_idx" ON "Job"("status", "availableAt", "priority", "createdAt");
 CREATE INDEX "Job_lease_idx" ON "Job"("status", "leaseExpiresAt");
 CREATE INDEX "Job_documentId_idx" ON "Job"("documentId");
@@ -114,7 +136,9 @@ CREATE TABLE "JobAttempt" (
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "JobAttempt_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "JobAttempt_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT "JobAttempt_number_check" CHECK ("attemptNumber" > 0)
+  CONSTRAINT "JobAttempt_number_check" CHECK ("attemptNumber" > 0),
+  CONSTRAINT "JobAttempt_status_check" CHECK ("status" IN ('CLAIMED','RUNNING','SUCCEEDED','FAILED','LEASE_EXPIRED','CANCELLED')),
+  CONSTRAINT "JobAttempt_duration_check" CHECK ("durationMs" IS NULL OR "durationMs" >= 0)
 );
 
 CREATE UNIQUE INDEX "JobAttempt_jobId_attemptNumber_key" ON "JobAttempt"("jobId", "attemptNumber");
@@ -156,7 +180,8 @@ CREATE TABLE "MetadataAssertion" (
   CONSTRAINT "MetadataAssertion_pkey" PRIMARY KEY ("id"),
   CONSTRAINT "MetadataAssertion_documentId_fkey" FOREIGN KEY ("documentId") REFERENCES "FinancialDocument"("id") ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT "MetadataAssertion_status_check" CHECK ("status" IN ('PROPOSED','CONFIRMED','REJECTED')),
-  CONSTRAINT "MetadataAssertion_confidence_check" CHECK ("confidence" IS NULL OR ("confidence" >= 0 AND "confidence" <= 1))
+  CONSTRAINT "MetadataAssertion_confidence_check" CHECK ("confidence" IS NULL OR ("confidence" >= 0 AND "confidence" <= 1)),
+  CONSTRAINT "MetadataAssertion_page_check" CHECK ("sourcePage" IS NULL OR "sourcePage" > 0)
 );
 
 CREATE INDEX "MetadataAssertion_documentId_field_idx" ON "MetadataAssertion"("documentId", "field");
