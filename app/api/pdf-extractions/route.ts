@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
 import {
@@ -16,7 +16,7 @@ export const maxDuration = 60;
 
 const FILTERS: Record<string, string[]> = {
   ALL: [],
-  NEED_REVIEW: ["UPLOADED", "PROCESSING", "PENDING_REVIEW"],
+  NEED_REVIEW: ["UPLOADED", "SUBMITTING", "PROCESSING", "PENDING_REVIEW"],
   READY_TO_COMMIT: ["READY_TO_COMMIT"],
   COMMITTED: ["COMMITTED"],
   FAILED: ["FAILED"],
@@ -110,11 +110,14 @@ export async function POST(request: Request) {
 
     const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
     if (existingRun) return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+
     const existingJob = await findAsyncJobByChecksum(checksum);
-    if (existingJob) return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
+    if (existingJob && existingJob.status !== "FAILED") {
+      return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
+    }
 
     const preflight = inspectPdfForOcr(bytes);
-    const jobId = randomUUID();
+    const jobId = existingJob?.id ?? randomUUID();
     await createAsyncJob({
       id: jobId,
       fileName: file.name,
@@ -125,14 +128,19 @@ export async function POST(request: Request) {
       bytes,
     });
 
-    void submitQueuedAsyncJob(jobId);
+    after(async () => {
+      await submitQueuedAsyncJob(jobId);
+    });
 
     return NextResponse.json({
       ok: true,
       accepted: true,
+      retried: Boolean(existingJob),
       jobId,
       status: "UPLOADED",
-      message: "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
+      message: existingJob
+        ? "Upload ulang diterima. Job gagal sebelumnya di-reset dan akan diproses kembali tanpa menunggu browser."
+        : "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
     }, { status: 202 });
   } catch (error) {
     console.error("pdf-extraction-upload-ack-failed", error);
