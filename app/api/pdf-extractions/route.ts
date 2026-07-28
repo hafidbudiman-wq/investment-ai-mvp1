@@ -2,15 +2,14 @@ import { randomUUID } from "crypto";
 import { after, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
-import { submitFinancialPdfBackground } from "@/lib/openai-financial-extraction";
-import { createAsyncJob, findAsyncJobByChecksum, listAsyncJobs, markAsyncJobFailed, markAsyncJobSubmitted, pollAsyncExtractionJobs } from "@/lib/async-pdf-extraction";
+import { createAsyncJob, findAsyncJobByChecksum, kickQueuedAsyncExtractionJobs, listAsyncJobs, pollAsyncExtractionJobs, submitQueuedAsyncJob } from "@/lib/async-pdf-extraction";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 const FILTERS: Record<string, string[]> = {
   ALL: [],
-  NEED_REVIEW: ["UPLOADED", "PROCESSING", "PENDING_REVIEW"],
+  NEED_REVIEW: ["UPLOADED", "SUBMITTING", "PROCESSING", "PENDING_REVIEW"],
   READY_TO_COMMIT: ["READY_TO_COMMIT"],
   COMMITTED: ["COMMITTED"],
   FAILED: ["FAILED"],
@@ -18,26 +17,17 @@ const FILTERS: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   try {
+    await kickQueuedAsyncExtractionJobs();
     await pollAsyncExtractionJobs();
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
     const pageSize = Math.min(50, Math.max(5, Number(url.searchParams.get("pageSize") || 20) || 20));
     const filter = (url.searchParams.get("filter") || "ALL").toUpperCase();
     const search = (url.searchParams.get("search") || "").trim().toLowerCase();
-
     const [runs, jobs] = await Promise.all([
-      prisma.extractionRun.findMany({
-        orderBy: { updatedAt: "desc" },
-        take: 300,
-        include: {
-          company: { select: { ticker: true, name: true } },
-          candidates: { select: { status: true } },
-          _count: { select: { chunks: true, candidates: true } },
-        },
-      }),
+      prisma.extractionRun.findMany({ orderBy: { updatedAt: "desc" }, take: 300, include: { company: { select: { ticker: true, name: true } }, candidates: { select: { status: true } }, _count: { select: { chunks: true, candidates: true } } } }),
       listAsyncJobs(),
     ]);
-
     const runRows = runs.map((run) => {
       const review = run.candidates.reduce((acc, candidate) => {
         if (candidate.status === "PENDING") acc.pending += 1;
@@ -49,21 +39,7 @@ export async function GET(request: Request) {
       const { candidates: _candidates, ...rest } = run;
       return { ...rest, kind: "RUN" as const, review };
     });
-
-    const jobRows = jobs.map((job) => ({
-      id: job.id,
-      kind: "JOB" as const,
-      fileName: job.fileName,
-      status: job.status,
-      year: job.detectedYear,
-      periodType: job.detectedPeriodType,
-      updatedAt: job.updatedAt,
-      company: { ticker: job.detectedTicker || "AI DETECTING", name: job.detectedCompanyName || "Background extraction in progress" },
-      review: { pending: 0, accepted: 0, rejected: 0, committed: 0 },
-      _count: { chunks: 0, candidates: 0 },
-      errorMessage: job.errorMessage,
-    }));
-
+    const jobRows = jobs.map((job) => ({ id: job.id, kind: "JOB" as const, fileName: job.fileName, status: job.status, year: job.detectedYear, periodType: job.detectedPeriodType, updatedAt: job.updatedAt, company: { ticker: job.detectedTicker || "AI DETECTING", name: job.detectedCompanyName || "Background extraction in progress" }, review: { pending: 0, accepted: 0, rejected: 0, committed: 0 }, _count: { chunks: 0, candidates: 0 }, errorMessage: job.errorMessage }));
     const allRows = [...jobRows, ...runRows].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     const wanted = FILTERS[filter] ?? [];
     const filtered = allRows.filter((row) => {
@@ -77,14 +53,7 @@ export async function GET(request: Request) {
       const rows = allRows.filter((row) => statuses.includes(row.status));
       return { reports: rows.length, companies: new Set(rows.map((row) => row.company.ticker).filter((ticker) => ticker !== "AI DETECTING")).size };
     };
-    const summary = {
-      all: { reports: allRows.length, companies: new Set(allRows.map((row) => row.company.ticker).filter((ticker) => ticker !== "AI DETECTING")).size },
-      needReview: count(FILTERS.NEED_REVIEW),
-      readyToCommit: count(FILTERS.READY_TO_COMMIT),
-      committed: count(FILTERS.COMMITTED),
-      failed: count(FILTERS.FAILED),
-    };
-
+    const summary = { all: { reports: allRows.length, companies: new Set(allRows.map((row) => row.company.ticker).filter((ticker) => ticker !== "AI DETECTING")).size }, needReview: count(FILTERS.NEED_REVIEW), readyToCommit: count(FILTERS.READY_TO_COMMIT), committed: count(FILTERS.COMMITTED), failed: count(FILTERS.FAILED) };
     return NextResponse.json({ ok: true, runs: paged, summary, pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) }, filter, search });
   } catch (error) {
     console.error("pdf-extraction-list-failed", error);
@@ -93,7 +62,6 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let jobId: string | null = null;
   try {
     const form = await request.formData();
     const file = form.get("file");
@@ -101,36 +69,17 @@ export async function POST(request: Request) {
     validatePdfUpload(file);
     const bytes = Buffer.from(await file.arrayBuffer());
     const checksum = sha256(bytes);
-
     const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
     if (existingRun) return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
     const existingJob = await findAsyncJobByChecksum(checksum);
-    if (existingJob) return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
-
+    if (existingJob && existingJob.status !== "FAILED") return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
     const preflight = inspectPdfForOcr(bytes);
-    const [companies, accounts] = await Promise.all([
-      prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
-      prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true, aliases: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
-    ]);
-
-    jobId = randomUUID();
-    await createAsyncJob({ id: jobId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, preflight });
-    const acceptedJobId = jobId;
-
-    after(async () => {
-      try {
-        const background = await submitFinancialPdfBackground({ bytes, fileName: file.name, knownCompanies: companies, accounts, preflight });
-        await markAsyncJobSubmitted(acceptedJobId, background.id, background.status);
-      } catch (error) {
-        console.error("pdf-extraction-background-submit-after-response-failed", error);
-        await markAsyncJobFailed(acceptedJobId, error instanceof Error ? error.message : "Gagal memulai background extraction.").catch(() => undefined);
-      }
-    });
-
-    return NextResponse.json({ ok: true, accepted: true, jobId, status: "UPLOADED", message: "Upload diterima dan sudah tercatat. AI akan memproses PDF di background; halaman boleh ditutup." }, { status: 202 });
+    const jobId = existingJob?.id ?? randomUUID();
+    await createAsyncJob({ id: jobId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, preflight, bytes });
+    after(async () => { await submitQueuedAsyncJob(jobId); });
+    return NextResponse.json({ ok: true, accepted: true, retried: Boolean(existingJob), jobId, status: "UPLOADED", message: existingJob ? "Upload ulang diterima. Job gagal sebelumnya di-reset dan akan diproses kembali tanpa menunggu browser." : "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup." }, { status: 202 });
   } catch (error) {
-    console.error("pdf-extraction-background-submit-failed", error);
-    if (jobId) await markAsyncJobFailed(jobId, error instanceof Error ? error.message : "Gagal mencatat upload PDF.").catch(() => undefined);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal mencatat upload PDF." }, { status: 500 });
+    console.error("pdf-extraction-upload-ack-failed", error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal menyimpan PDF sebagai background job." }, { status: 500 });
   }
 }
