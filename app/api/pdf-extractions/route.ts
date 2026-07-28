@@ -2,8 +2,14 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
-import { submitFinancialPdfBackground } from "@/lib/openai-financial-extraction";
-import { createAsyncJob, findAsyncJobByChecksum, listAsyncJobs, markAsyncJobFailed, markAsyncJobSubmitted, pollAsyncExtractionJobs } from "@/lib/async-pdf-extraction";
+import {
+  createAsyncJob,
+  findAsyncJobByChecksum,
+  kickQueuedAsyncExtractionJobs,
+  listAsyncJobs,
+  pollAsyncExtractionJobs,
+  submitQueuedAsyncJob,
+} from "@/lib/async-pdf-extraction";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -18,6 +24,7 @@ const FILTERS: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   try {
+    await kickQueuedAsyncExtractionJobs();
     await pollAsyncExtractionJobs();
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
@@ -93,7 +100,6 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let jobId: string | null = null;
   try {
     const form = await request.formData();
     const file = form.get("file");
@@ -108,20 +114,28 @@ export async function POST(request: Request) {
     if (existingJob) return NextResponse.json({ ok: true, duplicate: true, jobId: existingJob.id, status: existingJob.status, message: `PDF ini sudah memiliki background job berstatus ${existingJob.status}. Tidak dibuat request AI baru.` }, { status: 202 });
 
     const preflight = inspectPdfForOcr(bytes);
-    const [companies, accounts] = await Promise.all([
-      prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
-      prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true, aliases: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
-    ]);
+    const jobId = randomUUID();
+    await createAsyncJob({
+      id: jobId,
+      fileName: file.name,
+      mimeType: file.type || "application/pdf",
+      fileSize: file.size,
+      checksum,
+      preflight,
+      bytes,
+    });
 
-    jobId = randomUUID();
-    await createAsyncJob({ id: jobId, fileName: file.name, mimeType: file.type || "application/pdf", fileSize: file.size, checksum, preflight });
-    const background = await submitFinancialPdfBackground({ bytes, fileName: file.name, knownCompanies: companies, accounts, preflight });
-    await markAsyncJobSubmitted(jobId, background.id, background.status);
+    void submitQueuedAsyncJob(jobId);
 
-    return NextResponse.json({ ok: true, accepted: true, jobId, status: "PROCESSING", message: "Upload diterima. AI memproses PDF di background; job sudah muncul di Financial Report Pipeline." }, { status: 202 });
+    return NextResponse.json({
+      ok: true,
+      accepted: true,
+      jobId,
+      status: "UPLOADED",
+      message: "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
+    }, { status: 202 });
   } catch (error) {
-    console.error("pdf-extraction-background-submit-failed", error);
-    if (jobId) await markAsyncJobFailed(jobId, error instanceof Error ? error.message : "Gagal memulai background extraction.").catch(() => undefined);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal memulai background extraction." }, { status: 500 });
+    console.error("pdf-extraction-upload-ack-failed", error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal menyimpan PDF sebagai background job." }, { status: 500 });
   }
 }
