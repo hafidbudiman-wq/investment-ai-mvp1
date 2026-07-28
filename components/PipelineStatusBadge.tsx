@@ -15,6 +15,7 @@ const styles: Record<string, { background: string; border: string; color: string
 
 export function PipelineStatusBadge({ status, compact = false }: Props) {
   const normalized = status.replaceAll(" ", "_").toUpperCase();
-  const palette = styles[normalized] ?? { background: "rgba(148, 163, 184, 0.12)", border: "rgba(148, 163, 184, 0.38)", color: "#cbd5e1" };
+  const styleKey = Object.keys(styles).find((key) => normalized === key || normalized.startsWith(`${key}_`));
+  const palette = (styleKey ? styles[styleKey] : undefined) ?? { background: "rgba(148, 163, 184, 0.12)", border: "rgba(148, 163, 184, 0.38)", color: "#cbd5e1" };
   return <span style={{ display: "inline-flex", alignItems: "center", border: `1px solid ${palette.border}`, background: palette.background, color: palette.color, borderRadius: 999, padding: compact ? "3px 8px" : "5px 10px", fontSize: compact ? 11 : 12, fontWeight: 800, letterSpacing: 0.2, whiteSpace: "nowrap" }}>{status.replaceAll("_", " ")}</span>;
 }
