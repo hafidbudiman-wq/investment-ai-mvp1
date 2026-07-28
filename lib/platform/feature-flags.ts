@@ -13,17 +13,22 @@ function readBoolean(name: string, fallback = false): boolean {
   throw new Error(`${name} must be one of true/false, 1/0, yes/no, or on/off.`);
 }
 
+export function assertSafeUploadFlagCombination(flags: PlatformFeatureFlags): void {
+  if (!flags.pdfUploadV2 && !flags.pdfUploadLegacy) {
+    throw new Error("At least one PDF upload path must remain enabled.");
+  }
+  if (flags.pdfUploadV2 && !flags.genericJobWorker) {
+    throw new Error("PDF_UPLOAD_V2 requires GENERIC_JOB_WORKER to be enabled.");
+  }
+}
+
 export function getPlatformFeatureFlags(): PlatformFeatureFlags {
-  return {
+  const flags: PlatformFeatureFlags = {
     pdfUploadV2: readBoolean("PDF_UPLOAD_V2", false),
     pdfUploadLegacy: readBoolean("PDF_UPLOAD_LEGACY", true),
     genericJobWorker: readBoolean("GENERIC_JOB_WORKER", false),
     metadataConfirmationV2: readBoolean("METADATA_CONFIRMATION_V2", false),
   };
-}
-
-export function assertSafeUploadFlagCombination(flags = getPlatformFeatureFlags()): void {
-  if (!flags.pdfUploadV2 && !flags.pdfUploadLegacy) {
-    throw new Error("At least one PDF upload path must remain enabled.");
-  }
+  assertSafeUploadFlagCombination(flags);
+  return flags;
 }
