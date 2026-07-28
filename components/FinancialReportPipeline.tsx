@@ -34,12 +34,13 @@ function actionLabel(status: string) {
   if (status === "COMMITTED") return "View Review Audit";
   if (status === "READY_TO_COMMIT") return "Final Review";
   if (status === "FAILED") return "Error Details";
-  if (status === "PROCESSING" || status === "UPLOADED") return "AI Processing…";
+  if (["UPLOADED", "SUBMITTING", "PROCESSING"].includes(status)) return "AI Processing…";
   return "Continue Review";
 }
 function friendlyStatus(status: string) {
   if (status === "PENDING_REVIEW") return "NEED REVIEW";
   if (status === "READY_TO_COMMIT") return "READY TO COMMIT";
+  if (status === "SUBMITTING") return "SENDING TO AI";
   return status.replaceAll("_", " ");
 }
 
@@ -69,7 +70,7 @@ export function FinancialReportPipeline({ onOpen, refreshKey = "" }: Props) {
         if (cancelled) return;
         const nextRuns = data.runs ?? [];
         setRuns(nextRuns); setSummary(data.summary ?? null); setTotalPages(data.pagination?.totalPages ?? 1);
-        if (nextRuns.some((run: PipelineRun) => run.kind === "JOB" && (run.status === "UPLOADED" || run.status === "PROCESSING"))) {
+        if (nextRuns.some((run: PipelineRun) => run.kind === "JOB" && ["UPLOADED", "SUBMITTING", "PROCESSING"].includes(run.status))) {
           timer = setTimeout(() => void load(false), 5000);
         }
       } catch (cause) {
@@ -101,7 +102,7 @@ export function FinancialReportPipeline({ onOpen, refreshKey = "" }: Props) {
     {!loading && runs.length === 0 && <div className="callout" style={{ marginTop: 12 }}>Belum ada laporan pada filter ini.</div>}
     <div style={{ display: "grid", gap: 10, marginTop: 12 }}>{runs.map((run) => {
       const reviewed = run.review.accepted + run.review.rejected + run.review.committed;
-      const processing = run.kind === "JOB" && (run.status === "UPLOADED" || run.status === "PROCESSING");
+      const processing = run.kind === "JOB" && ["UPLOADED", "SUBMITTING", "PROCESSING"].includes(run.status);
       return <div className="card" key={`${run.kind}-${run.id}`} style={{ padding: 14 }}><div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}><div><strong style={{ color: "#f8fafc" }}>{run.company.ticker} — {run.company.name}</strong><div className="form-hint">{run.periodType ?? "?"} {run.year ?? "?"} · {run.fileName}</div></div><PipelineStatusBadge status={friendlyStatus(run.status)} compact /></div>{processing ? <div className="callout" style={{ marginTop: 10 }}>AI bekerja di background. Pipeline mengecek hasil setiap 5 detik; jangan upload file yang sama lagi.</div> : run.kind === "JOB" && run.status === "FAILED" ? <div className="callout" style={{ marginTop: 10 }}>{run.errorMessage || "Background extraction gagal."}</div> : <><div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}><PipelineStatusBadge status={`COMMITTED ${run.review.committed}`} compact /><PipelineStatusBadge status={`REJECTED ${run.review.rejected}`} compact /><PipelineStatusBadge status={`PENDING ${run.review.pending}`} compact /></div><div className="form-hint" style={{ marginTop: 8 }}>{reviewed}/{run._count.candidates} reviewed · {run._count.chunks} chunks</div></>}<div style={{ marginTop: 10 }}><button className="btn secondary" type="button" disabled={run.kind === "JOB"} onClick={() => run.kind === "RUN" && void onOpen(run.id)}>{actionLabel(run.status)}</button></div></div>;
     })}</div>
     {totalPages > 1 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}><button className="btn secondary" type="button" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button><span className="form-hint">Page {page} / {totalPages}</span><button className="btn secondary" type="button" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</button></div>}
