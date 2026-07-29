@@ -3,26 +3,37 @@ name: Quality Gate
 on:
   pull_request:
   push:
-    branches: [main, mvp-1.2b-canonical-database]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
+      - name: Show runtime
+        run: node --version && npm --version
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
+
       - name: Validate Prisma schema
         run: npx prisma validate
+
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: Run platform tests
+        run: npm run test:platform
+
       - name: Build application
         run: npm run build
