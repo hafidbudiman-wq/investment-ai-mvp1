@@ -27,6 +27,7 @@ type AsyncJob = {
 };
 
 const submittingJobs = new Set<string>();
+const SUBMISSION_LEASE_MS = 5 * 60 * 1000;
 
 export async function ensureAsyncExtractionTable() {
   await prisma.$executeRawUnsafe(`
@@ -98,18 +99,20 @@ export async function listAsyncJobs() {
   return prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT "id","fileName","mimeType","fileSize","checksum","status","openAiResponseId","runId","detectedTicker","detectedCompanyName","detectedYear","detectedPeriodType","errorMessage","preflight","createdAt","updatedAt" FROM "AsyncExtractionJob" WHERE "runId" IS NULL ORDER BY "updatedAt" DESC LIMIT 100`);
 }
 
-async function getAsyncJobWithFile(id: string) {
-  await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "id"=$1 LIMIT 1`, id);
-  return rows[0] ?? null;
-}
-
 export async function submitQueuedAsyncJob(id: string) {
   if (submittingJobs.has(id)) return;
   submittingJobs.add(id);
   try {
-    const job = await getAsyncJobWithFile(id);
-    if (!job || job.status !== "UPLOADED" || job.openAiResponseId) return;
+    await ensureAsyncExtractionTable();
+    const claimed = await prisma.$queryRawUnsafe<AsyncJob[]>(
+      `UPDATE "AsyncExtractionJob"
+       SET "status"='SUBMITTING',"updatedAt"=CURRENT_TIMESTAMP
+       WHERE "id"=$1 AND "status"='UPLOADED' AND "openAiResponseId" IS NULL
+       RETURNING *`,
+      id,
+    );
+    const job = claimed[0];
+    if (!job) return;
     if (!job.fileData?.length) throw new Error("PDF sementara tidak tersedia untuk dikirim ke OpenAI.");
 
     const [companies, accounts] = await Promise.all([
@@ -138,11 +141,18 @@ export async function submitQueuedAsyncJob(id: string) {
 
 export async function kickQueuedAsyncExtractionJobs(limit = 2) {
   await ensureAsyncExtractionTable();
+  const staleBefore = new Date(Date.now() - SUBMISSION_LEASE_MS);
+  await prisma.$executeRawUnsafe(
+    `UPDATE "AsyncExtractionJob"
+     SET "status"='UPLOADED',"errorMessage"='Submission lease expired; job returned to queue.',"updatedAt"=CURRENT_TIMESTAMP
+     WHERE "status"='SUBMITTING' AND "openAiResponseId" IS NULL AND "updatedAt" < $1`,
+    staleBefore,
+  );
   const queued = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
     `SELECT "id" FROM "AsyncExtractionJob" WHERE "status"='UPLOADED' AND "openAiResponseId" IS NULL ORDER BY "createdAt" ASC LIMIT $1`,
     limit,
   );
-  for (const job of queued) void submitQueuedAsyncJob(job.id);
+  await Promise.allSettled(queued.map((job) => submitQueuedAsyncJob(job.id)));
 }
 
 function normalize(value: string | null | undefined) {
