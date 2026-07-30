@@ -60,7 +60,10 @@ test("rejects invalid MIME or extension", () => {
 
 test("policy rejects multipart chunks below the S3 minimum", () => {
   assert.throws(
-    () => getUploadV2Policy({ PDF_UPLOAD_V2_PART_SIZE_BYTES: String(4 * MIB) } as NodeJS.ProcessEnv),
+    () => getUploadV2Policy({
+      ...process.env,
+      PDF_UPLOAD_V2_PART_SIZE_BYTES: String(4 * MIB),
+    }),
     /at least 5 MiB/,
   );
 });
