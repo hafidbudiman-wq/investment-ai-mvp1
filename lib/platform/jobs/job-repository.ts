@@ -16,6 +16,11 @@ type ClaimedJobRow = {
   previousStatus: JobStatus;
 };
 
+type ExhaustedJobRow = {
+  id: string;
+  previousStatus: JobStatus;
+};
+
 export class LostJobLeaseError extends Error {
   constructor(jobId: string) {
     super(`Job lease is no longer owned for ${jobId}.`);
@@ -32,6 +37,60 @@ export async function claimNextJob(
 
   const claimToken = randomUUID();
   return prisma.$transaction(async (tx) => {
+    const exhaustedJobs = await tx.$queryRawUnsafe<ExhaustedJobRow[]>(
+      `WITH exhausted AS (
+         SELECT "id", "status" AS "previousStatus"
+         FROM "Job"
+         WHERE "attemptCount" >= "maxAttempts"
+           AND (
+             "status" = 'RETRY_WAIT'
+             OR (
+               "status" IN ('CLAIMED','RUNNING')
+               AND "leaseExpiresAt" < CURRENT_TIMESTAMP - ($1 * INTERVAL '1 second')
+             )
+           )
+         FOR UPDATE SKIP LOCKED
+       ), failed AS (
+         UPDATE "Job" AS job
+         SET "status"='FAILED',
+             "completedAt"=CURRENT_TIMESTAMP,
+             "claimedBy"=NULL,
+             "claimToken"=NULL,
+             "claimedAt"=NULL,
+             "leaseExpiresAt"=NULL,
+             "errorCode"='MAX_ATTEMPTS_EXHAUSTED',
+             "errorMessage"=COALESCE(job."errorMessage", 'Maximum job attempts exhausted.'),
+             "updatedAt"=CURRENT_TIMESTAMP
+         FROM exhausted
+         WHERE job."id"=exhausted."id"
+         RETURNING job."id", exhausted."previousStatus"
+       )
+       SELECT * FROM failed`,
+      policy.reclaimGraceSeconds,
+    );
+
+    for (const exhausted of exhaustedJobs) {
+      if (exhausted.previousStatus === "CLAIMED" || exhausted.previousStatus === "RUNNING") {
+        await tx.$executeRawUnsafe(
+          `UPDATE "JobAttempt"
+           SET "status"='LEASE_EXPIRED',
+               "finishedAt"=COALESCE("finishedAt", CURRENT_TIMESTAMP),
+               "durationMs"=COALESCE("durationMs", GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - "startedAt")) * 1000)::INTEGER)),
+               "errorCode"=COALESCE("errorCode", 'MAX_ATTEMPTS_EXHAUSTED'),
+               "errorMessage"=COALESCE("errorMessage", 'Lease expired on the final permitted attempt.')
+           WHERE "jobId"=$1 AND "finishedAt" IS NULL`,
+          exhausted.id,
+        );
+      }
+      await tx.$executeRawUnsafe(
+        `INSERT INTO "JobEvent" ("id","jobId","eventType","fromStatus","toStatus","stage","message")
+         VALUES ($1,$2,'MAX_ATTEMPTS_EXHAUSTED',$3,'FAILED','FINALIZE','Maximum job attempts exhausted')`,
+        randomUUID(),
+        exhausted.id,
+        exhausted.previousStatus,
+      );
+    }
+
     const rows = await tx.$queryRawUnsafe<ClaimedJobRow[]>(
       `WITH candidate AS (
          SELECT "id", "status" AS "previousStatus"
@@ -243,12 +302,13 @@ export async function scheduleJobRetry(
   }
 
   await prisma.$transaction(async (tx) => {
-    const changed = await tx.$executeRawUnsafe(
+    const rows = await tx.$queryRawUnsafe<Array<{ status: JobStatus }>>(
       `UPDATE "Job"
-       SET "status"='RETRY_WAIT',
-           "availableAt"=CURRENT_TIMESTAMP + ($4 * INTERVAL '1 second'),
-           "errorCode"=$5,
-           "errorMessage"=$6,
+       SET "status"=CASE WHEN "attemptCount" >= "maxAttempts" THEN 'FAILED' ELSE 'RETRY_WAIT' END,
+           "availableAt"=CASE WHEN "attemptCount" >= "maxAttempts" THEN "availableAt" ELSE CURRENT_TIMESTAMP + ($4 * INTERVAL '1 second') END,
+           "completedAt"=CASE WHEN "attemptCount" >= "maxAttempts" THEN CURRENT_TIMESTAMP ELSE NULL END,
+           "errorCode"=CASE WHEN "attemptCount" >= "maxAttempts" THEN 'MAX_ATTEMPTS_EXHAUSTED' ELSE $5 END,
+           "errorMessage"=CASE WHEN "attemptCount" >= "maxAttempts" THEN COALESCE($6, 'Maximum job attempts exhausted.') ELSE $6 END,
            "claimedBy"=NULL,
            "claimToken"=NULL,
            "claimedAt"=NULL,
@@ -256,7 +316,8 @@ export async function scheduleJobRetry(
            "updatedAt"=CURRENT_TIMESTAMP
        WHERE "id"=$1 AND "claimToken"=$2 AND "claimedBy"=$3
          AND "status" IN ('CLAIMED','RUNNING')
-         AND "leaseExpiresAt" > CURRENT_TIMESTAMP`,
+         AND "leaseExpiresAt" > CURRENT_TIMESTAMP
+       RETURNING "status"`,
       claim.jobId,
       claim.claimToken,
       claim.workerId,
@@ -264,7 +325,8 @@ export async function scheduleJobRetry(
       detail.errorCode ?? null,
       detail.errorMessage?.slice(0, 2000) ?? null,
     );
-    if (changed !== 1) throw new LostJobLeaseError(claim.jobId);
+    const nextStatus = rows[0]?.status;
+    if (!nextStatus) throw new LostJobLeaseError(claim.jobId);
 
     await tx.$executeRawUnsafe(
       `UPDATE "JobAttempt"
@@ -275,17 +337,22 @@ export async function scheduleJobRetry(
       claim.jobId,
       claim.attemptNumber,
       claim.claimToken,
-      detail.errorCode ?? null,
-      detail.errorMessage?.slice(0, 2000) ?? null,
+      nextStatus === "FAILED" ? "MAX_ATTEMPTS_EXHAUSTED" : detail.errorCode ?? null,
+      detail.errorMessage?.slice(0, 2000) ??
+        (nextStatus === "FAILED" ? "Maximum job attempts exhausted." : null),
     );
 
     await tx.$executeRawUnsafe(
       `INSERT INTO "JobEvent" ("id","jobId","eventType","fromStatus","toStatus","stage","message","metadata")
-       VALUES ($1,$2,'RETRY_SCHEDULED','RUNNING','RETRY_WAIT','RETRY',$3,$4::jsonb)`,
+       VALUES ($1,$2,$3,'RUNNING',$4,$5,$6,$7::jsonb)`,
       randomUUID(),
       claim.jobId,
-      detail.errorMessage?.slice(0, 500) ?? "Retry scheduled",
-      JSON.stringify({ delaySeconds }),
+      nextStatus === "FAILED" ? "MAX_ATTEMPTS_EXHAUSTED" : "RETRY_SCHEDULED",
+      nextStatus,
+      nextStatus === "FAILED" ? "FINALIZE" : "RETRY",
+      detail.errorMessage?.slice(0, 500) ??
+        (nextStatus === "FAILED" ? "Maximum job attempts exhausted" : "Retry scheduled"),
+      JSON.stringify(nextStatus === "FAILED" ? { attemptNumber: claim.attemptNumber } : { delaySeconds }),
     );
   });
 }
