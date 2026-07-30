@@ -3,26 +3,60 @@ name: Quality Gate
 on:
   pull_request:
   push:
-    branches: [main, mvp-1.2b-canonical-database]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: investai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d investai"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/investai?schema=public
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
+      - name: Show runtime
+        run: node --version && npm --version
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
+
       - name: Validate Prisma schema
         run: npx prisma validate
+
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: Run platform unit tests
+        run: npm run test:platform
+
+      - name: Apply migrations to disposable PostgreSQL
+        run: npx prisma migrate deploy
+
+      - name: Run PostgreSQL job repository smoke
+        run: npm run test:platform:integration
+
+      - name: Verify migration status
+        run: npx prisma migrate status
+
       - name: Build application
         run: npm run build

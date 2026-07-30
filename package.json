@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "postinstall": "prisma generate",
+    "test:platform": "tsx --test tests/platform/*.test.ts",
+    "test:platform:integration": "tsx tests/platform/job-repository.integration.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts"
   },
@@ -17,6 +20,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.1095.0",
+    "@aws-sdk/s3-request-presigner": "3.1095.0",
     "@prisma/client": "6.12.0",
     "lucide-react": "0.468.0",
     "next": "15.5.20",
