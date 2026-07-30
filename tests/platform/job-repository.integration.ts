@@ -80,6 +80,47 @@ async function main() {
     ],
   );
 
+  const finalRetryJobId = await insertJob({ maxAttempts: 1 });
+  const finalRetryClaim = await claimNextJob("worker-final-retry");
+  assert.equal(finalRetryClaim?.jobId, finalRetryJobId);
+  await markJobRunning(finalRetryClaim!);
+  await scheduleJobRetry(finalRetryClaim!, 1, { errorCode: "TRANSIENT" });
+  const finalRetryJob = await prisma.job.findUniqueOrThrow({ where: { id: finalRetryJobId } });
+  assert.equal(finalRetryJob.status, "FAILED", "final attempt must not remain in RETRY_WAIT");
+  assert.equal(finalRetryJob.errorCode, "MAX_ATTEMPTS_EXHAUSTED");
+  assert.ok(finalRetryJob.completedAt);
+
+  const expiredFinalJobId = await insertJob({ maxAttempts: 1 });
+  const expiredFinalClaim = await claimNextJob("worker-final-expired");
+  assert.equal(expiredFinalClaim?.jobId, expiredFinalJobId);
+  await markJobRunning(expiredFinalClaim!);
+  await prisma.job.update({
+    where: { id: expiredFinalJobId },
+    data: { leaseExpiresAt: new Date(Date.now() - 120_000) },
+  });
+
+  const noReclaim = await claimNextJob("worker-after-final-expiry", {
+    leaseSeconds: 120,
+    heartbeatSeconds: 30,
+    reclaimGraceSeconds: 0,
+    maxAttempts: 3,
+    retryBackoffSeconds: [30, 120, 600],
+  });
+  assert.equal(noReclaim, null, "exhausted expired job must not be reclaimed");
+  const expiredFinalJob = await prisma.job.findUniqueOrThrow({ where: { id: expiredFinalJobId } });
+  assert.equal(expiredFinalJob.status, "FAILED");
+  assert.equal(expiredFinalJob.errorCode, "MAX_ATTEMPTS_EXHAUSTED");
+  const expiredAttempt = await prisma.jobAttempt.findFirstOrThrow({
+    where: { jobId: expiredFinalJobId, attemptNumber: 1 },
+  });
+  assert.equal(expiredAttempt.status, "LEASE_EXPIRED");
+
+  await assert.rejects(
+    () => finishJob(expiredFinalClaim!, "SUCCEEDED"),
+    (error: unknown) => error instanceof LostJobLeaseError,
+    "expired final worker must remain fenced",
+  );
+
   console.log("PostgreSQL job repository integration smoke passed.");
 }
 
