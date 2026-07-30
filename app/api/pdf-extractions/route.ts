@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { after, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
 import {
@@ -8,7 +8,6 @@ import {
   kickQueuedAsyncExtractionJobs,
   listAsyncJobs,
   pollAsyncExtractionJobs,
-  submitQueuedAsyncJob,
 } from "@/lib/async-pdf-extraction";
 import { resetFailedAsyncUpload } from "@/lib/async-pdf-upload-retry";
 
@@ -140,10 +139,6 @@ export async function POST(request: Request) {
       });
     }
 
-    after(async () => {
-      await submitQueuedAsyncJob(jobId);
-    });
-
     return NextResponse.json({
       ok: true,
       accepted: true,
@@ -151,8 +146,8 @@ export async function POST(request: Request) {
       jobId,
       status: "UPLOADED",
       message: existingJob
-        ? "Upload ulang diterima. Job gagal sebelumnya di-reset dan akan diproses kembali tanpa menunggu browser."
-        : "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
+        ? "Upload ulang diterima. Job gagal sebelumnya di-reset dan masuk antrean pemrosesan."
+        : "Upload diterima dan job sudah tersimpan. Pipeline akan mengirimkannya ke AI tanpa menahan request upload.",
     }, { status: 202 });
   } catch (error) {
     console.error("pdf-extraction-upload-ack-failed", error);
