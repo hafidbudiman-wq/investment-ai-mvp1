@@ -1,8 +1,10 @@
 import { FinancialStatementsWorkspace } from "@/components/FinancialStatementsWorkspace";
+import { getPlatformFeatureFlags } from "@/lib/platform/feature-flags";
 
 export const dynamic = "force-dynamic";
 
 export default function StatementsPage() {
+  const flags = getPlatformFeatureFlags();
   return (
     <>
       <div className="header">
@@ -12,7 +14,7 @@ export default function StatementsPage() {
         </div>
       </div>
 
-      <FinancialStatementsWorkspace />
+      <FinancialStatementsWorkspace pdfUploadV2={flags.pdfUploadV2} />
     </>
   );
 }
