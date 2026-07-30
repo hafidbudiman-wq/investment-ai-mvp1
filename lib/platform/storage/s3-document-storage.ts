@@ -19,13 +19,18 @@ import type {
   MultipartUpload,
   ObjectHead,
   SingleUploadInstruction,
+  StorageCallOptions,
   StorageProviderName,
 } from "@/lib/platform/storage/document-storage";
 import type { StorageConfig } from "@/lib/platform/storage/storage-config";
 
 function normalizeEtag(value: string | undefined): string | null {
   if (!value) return null;
-  return value.replace(/^\"|\"$/g, "");
+  return value.replace(/^"|"$/g, "");
+}
+
+function assertNotAborted(options?: StorageCallOptions): void {
+  options?.signal?.throwIfAborted();
 }
 
 export class S3DocumentStorage implements DocumentStorage {
@@ -53,14 +58,17 @@ export class S3DocumentStorage implements DocumentStorage {
     } as const;
   }
 
-  async createSingleUpload(input: {
-    objectKey: string;
-    contentType: string;
-    contentLength: number;
-    expiresInSeconds: number;
-    metadata?: Record<string, string>;
-    signal?: AbortSignal;
-  }): Promise<SingleUploadInstruction> {
+  async createSingleUpload(
+    input: {
+      objectKey: string;
+      contentType: string;
+      contentLength: number;
+      expiresInSeconds: number;
+      metadata?: Record<string, string>;
+    },
+    options?: StorageCallOptions,
+  ): Promise<SingleUploadInstruction> {
+    assertNotAborted(options);
     const command = new PutObjectCommand({
       Bucket: this.config.bucket,
       Key: input.objectKey,
@@ -71,6 +79,7 @@ export class S3DocumentStorage implements DocumentStorage {
     const uploadUrl = await getSignedUrl(this.client, command, {
       expiresIn: input.expiresInSeconds,
     });
+    assertNotAborted(options);
     return {
       ...this.location(input.objectKey),
       mode: "SINGLE_PUT",
@@ -82,13 +91,15 @@ export class S3DocumentStorage implements DocumentStorage {
     };
   }
 
-  async initiateMultipartUpload(input: {
-    objectKey: string;
-    contentType: string;
-    expiresInSeconds: number;
-    metadata?: Record<string, string>;
-    signal?: AbortSignal;
-  }): Promise<MultipartUpload> {
+  async initiateMultipartUpload(
+    input: {
+      objectKey: string;
+      contentType: string;
+      expiresInSeconds: number;
+      metadata?: Record<string, string>;
+    },
+    options?: StorageCallOptions,
+  ): Promise<MultipartUpload> {
     const response = await this.client.send(
       new CreateMultipartUploadCommand({
         Bucket: this.config.bucket,
@@ -96,7 +107,7 @@ export class S3DocumentStorage implements DocumentStorage {
         ContentType: input.contentType,
         Metadata: input.metadata,
       }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
     if (!response.UploadId) throw new Error("Storage provider did not return a multipart upload ID.");
     return {
@@ -107,13 +118,16 @@ export class S3DocumentStorage implements DocumentStorage {
     };
   }
 
-  async presignMultipartPart(input: {
-    objectKey: string;
-    providerUploadId: string;
-    partNumber: number;
-    expiresInSeconds: number;
-    signal?: AbortSignal;
-  }): Promise<MultipartPartInstruction> {
+  async presignMultipartPart(
+    input: {
+      objectKey: string;
+      providerUploadId: string;
+      partNumber: number;
+      expiresInSeconds: number;
+    },
+    options?: StorageCallOptions,
+  ): Promise<MultipartPartInstruction> {
+    assertNotAborted(options);
     const uploadUrl = await getSignedUrl(
       this.client,
       new UploadPartCommand({
@@ -124,6 +138,7 @@ export class S3DocumentStorage implements DocumentStorage {
       }),
       { expiresIn: input.expiresInSeconds },
     );
+    assertNotAborted(options);
     return {
       partNumber: input.partNumber,
       uploadUrl,
@@ -132,11 +147,10 @@ export class S3DocumentStorage implements DocumentStorage {
     };
   }
 
-  async listMultipartParts(input: {
-    objectKey: string;
-    providerUploadId: string;
-    signal?: AbortSignal;
-  }): Promise<CompletedPart[]> {
+  async listMultipartParts(
+    input: { objectKey: string; providerUploadId: string },
+    options?: StorageCallOptions,
+  ): Promise<CompletedPart[]> {
     const parts: CompletedPart[] = [];
     let marker: string | undefined;
     do {
@@ -147,23 +161,23 @@ export class S3DocumentStorage implements DocumentStorage {
           UploadId: input.providerUploadId,
           PartNumberMarker: marker,
         }),
-        { abortSignal: input.signal },
+        { abortSignal: options?.signal },
       );
       for (const part of response.Parts ?? []) {
         const etag = normalizeEtag(part.ETag);
-        if (part.PartNumber && etag) parts.push({ partNumber: part.PartNumber, etag });
+        if (part.PartNumber && etag) {
+          parts.push({ partNumber: part.PartNumber, etag, size: part.Size });
+        }
       }
       marker = response.IsTruncated ? response.NextPartNumberMarker : undefined;
     } while (marker);
     return parts.sort((a, b) => a.partNumber - b.partNumber);
   }
 
-  async completeMultipartUpload(input: {
-    objectKey: string;
-    providerUploadId: string;
-    parts: CompletedPart[];
-    signal?: AbortSignal;
-  }): Promise<ObjectHead> {
+  async completeMultipartUpload(
+    input: { objectKey: string; providerUploadId: string; parts: CompletedPart[] },
+    options?: StorageCallOptions,
+  ): Promise<ObjectHead> {
     const sorted = [...input.parts].sort((a, b) => a.partNumber - b.partNumber);
     if (sorted.length === 0) throw new Error("Cannot complete multipart upload without parts.");
     await this.client.send(
@@ -175,30 +189,32 @@ export class S3DocumentStorage implements DocumentStorage {
           Parts: sorted.map((part) => ({ PartNumber: part.partNumber, ETag: part.etag })),
         },
       }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
-    return this.headObject({ objectKey: input.objectKey, signal: input.signal });
+    return this.headObject({ objectKey: input.objectKey }, options);
   }
 
-  async abortMultipartUpload(input: {
-    objectKey: string;
-    providerUploadId: string;
-    signal?: AbortSignal;
-  }): Promise<void> {
+  async abortMultipartUpload(
+    input: { objectKey: string; providerUploadId: string },
+    options?: StorageCallOptions,
+  ): Promise<void> {
     await this.client.send(
       new AbortMultipartUploadCommand({
         Bucket: this.config.bucket,
         Key: input.objectKey,
         UploadId: input.providerUploadId,
       }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
   }
 
-  async headObject(input: { objectKey: string; signal?: AbortSignal }): Promise<ObjectHead> {
+  async headObject(
+    input: { objectKey: string },
+    options?: StorageCallOptions,
+  ): Promise<ObjectHead> {
     const response = await this.client.send(
       new HeadObjectCommand({ Bucket: this.config.bucket, Key: input.objectKey }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
     if (response.ContentLength == null) throw new Error("Storage object has no content length.");
     return {
@@ -212,8 +228,9 @@ export class S3DocumentStorage implements DocumentStorage {
   }
 
   async openReadStream(
-    input: { objectKey: string; signal?: AbortSignal },
+    input: { objectKey: string },
     range?: { start: number; end?: number },
+    options?: StorageCallOptions,
   ): Promise<Readable> {
     const response = await this.client.send(
       new GetObjectCommand({
@@ -221,17 +238,20 @@ export class S3DocumentStorage implements DocumentStorage {
         Key: input.objectKey,
         Range: range ? `bytes=${range.start}-${range.end ?? ""}` : undefined,
       }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
     if (!response.Body) throw new Error("Storage provider returned an empty object body.");
     if (response.Body instanceof Readable) return response.Body;
     return Readable.fromWeb(response.Body.transformToWebStream() as never);
   }
 
-  async deleteObject(input: { objectKey: string; signal?: AbortSignal }): Promise<void> {
+  async deleteObject(
+    input: { objectKey: string },
+    options?: StorageCallOptions,
+  ): Promise<void> {
     await this.client.send(
       new DeleteObjectCommand({ Bucket: this.config.bucket, Key: input.objectKey }),
-      { abortSignal: input.signal },
+      { abortSignal: options?.signal },
     );
   }
 }
