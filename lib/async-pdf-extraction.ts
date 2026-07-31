@@ -1,107 +1,58 @@
 import { prisma } from "@/lib/prisma";
 import { sha256 } from "@/lib/pdf-extraction";
+import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
 import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
   submitFinancialPdfBackground,
 } from "@/lib/openai-financial-extraction";
 
-type AsyncJob = {
-  id: string;
-  fileName: string;
-  mimeType: string;
-  fileSize: number;
-  checksum: string;
-  status: string;
-  openAiResponseId: string | null;
-  runId: string | null;
-  detectedTicker: string | null;
-  detectedCompanyName: string | null;
-  detectedYear: number | null;
-  detectedPeriodType: string | null;
-  errorMessage: string | null;
-  preflight: unknown;
-  fileData?: Buffer | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+type AsyncJobSummary = Omit<AsyncJob, "fileData">;
 
 const submittingJobs = new Set<string>();
 
-export async function ensureAsyncExtractionTable() {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "AsyncExtractionJob" (
-      "id" TEXT PRIMARY KEY,
-      "fileName" TEXT NOT NULL,
-      "mimeType" TEXT NOT NULL DEFAULT 'application/pdf',
-      "fileSize" INTEGER NOT NULL,
-      "checksum" TEXT NOT NULL UNIQUE,
-      "status" TEXT NOT NULL DEFAULT 'UPLOADED',
-      "openAiResponseId" TEXT,
-      "runId" TEXT,
-      "detectedTicker" TEXT,
-      "detectedCompanyName" TEXT,
-      "detectedYear" INTEGER,
-      "detectedPeriodType" TEXT,
-      "errorMessage" TEXT,
-      "preflight" JSONB,
-      "fileData" BYTEA,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "AsyncExtractionJob" ADD COLUMN IF NOT EXISTS "fileData" BYTEA`);
-  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "AsyncExtractionJob_status_idx" ON "AsyncExtractionJob" ("status")`);
-}
-
 export async function findAsyncJobByChecksum(checksum: string) {
-  await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "checksum" = $1 LIMIT 1`, checksum);
-  return rows[0] ?? null;
+  return prisma.asyncExtractionJob.findUnique({ where: { checksum } });
 }
 
 export async function createAsyncJob(input: { id: string; fileName: string; mimeType: string; fileSize: number; checksum: string; preflight: unknown; bytes: Buffer }) {
-  await ensureAsyncExtractionTable();
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO "AsyncExtractionJob" ("id","fileName","mimeType","fileSize","checksum","status","preflight","fileData") VALUES ($1,$2,$3,$4,$5,'UPLOADED',$6::jsonb,$7)`,
-    input.id,
-    input.fileName,
-    input.mimeType,
-    input.fileSize,
-    input.checksum,
-    JSON.stringify(input.preflight),
-    input.bytes,
-  );
+  await prisma.$transaction(async (tx) => {
+    const document = await tx.financialDocument.upsert({
+      where: { objectKey: `sha256/${input.checksum}.pdf` },
+      update: { content: input.bytes, verifiedSize: input.fileSize, sha256: input.checksum, magicBytesVerified: true, status: "VERIFIED", verifiedAt: new Date() },
+      create: { storageProvider: "POSTGRESQL", bucket: "investai-source-documents", objectKey: `sha256/${input.checksum}.pdf`, originalFileName: input.fileName, mimeType: input.mimeType, verifiedSize: input.fileSize, sha256: input.checksum, content: input.bytes, magicBytesVerified: true, status: "VERIFIED", verifiedAt: new Date() },
+    });
+    await tx.asyncExtractionJob.create({
+      data: {
+        id: input.id,
+        fileName: input.fileName,
+        mimeType: input.mimeType,
+        fileSize: input.fileSize,
+        checksum: input.checksum,
+        status: "UPLOADED",
+        preflight: input.preflight as Prisma.InputJsonValue,
+        fileData: input.bytes,
+        documentId: document.id,
+      },
+    });
+  });
 }
 
 export async function markAsyncJobSubmitted(id: string, responseId: string, status: string) {
   const normalizedStatus = status === "queued" || status === "in_progress" ? "PROCESSING" : status.toUpperCase();
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "openAiResponseId"=$2,"status"=$3,"fileData"=NULL,"errorMessage"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    id,
-    responseId,
-    normalizedStatus,
-  );
+  await prisma.asyncExtractionJob.update({ where: { id }, data: { openAiResponseId: responseId, status: normalizedStatus, fileData: null, errorMessage: null } });
 }
 
 export async function markAsyncJobFailed(id: string, message: string) {
-  await ensureAsyncExtractionTable();
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "status"='FAILED',"errorMessage"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    id,
-    message.slice(0, 2000),
-  );
+  await prisma.asyncExtractionJob.update({ where: { id }, data: { status: "FAILED", errorMessage: message.slice(0, 2000) } });
 }
 
 export async function listAsyncJobs() {
-  await ensureAsyncExtractionTable();
-  return prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT "id","fileName","mimeType","fileSize","checksum","status","openAiResponseId","runId","detectedTicker","detectedCompanyName","detectedYear","detectedPeriodType","errorMessage","preflight","createdAt","updatedAt" FROM "AsyncExtractionJob" WHERE "runId" IS NULL ORDER BY "updatedAt" DESC LIMIT 100`);
+  return prisma.asyncExtractionJob.findMany({ where: { runId: null }, orderBy: { updatedAt: "desc" }, take: 100, omit: { fileData: true } });
 }
 
 async function getAsyncJobWithFile(id: string) {
-  await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "id"=$1 LIMIT 1`, id);
-  return rows[0] ?? null;
+  return prisma.asyncExtractionJob.findUnique({ where: { id }, include: { document: { select: { content: true } } } });
 }
 
 export async function submitQueuedAsyncJob(id: string) {
@@ -110,7 +61,8 @@ export async function submitQueuedAsyncJob(id: string) {
   try {
     const job = await getAsyncJobWithFile(id);
     if (!job || job.status !== "UPLOADED" || job.openAiResponseId) return;
-    if (!job.fileData?.length) throw new Error("PDF sementara tidak tersedia untuk dikirim ke OpenAI.");
+    const sourceBytes = job.document?.content ?? job.fileData;
+    if (!sourceBytes?.length) throw new Error("Source PDF persisten tidak tersedia untuk dikirim ke OpenAI.");
 
     const [companies, accounts] = await Promise.all([
       prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
@@ -122,7 +74,7 @@ export async function submitQueuedAsyncJob(id: string) {
     ]);
 
     const background = await submitFinancialPdfBackground({
-      bytes: Buffer.from(job.fileData),
+      bytes: Buffer.from(sourceBytes),
       fileName: job.fileName,
       knownCompanies: companies,
       accounts,
@@ -137,11 +89,7 @@ export async function submitQueuedAsyncJob(id: string) {
 }
 
 export async function kickQueuedAsyncExtractionJobs(limit = 2) {
-  await ensureAsyncExtractionTable();
-  const queued = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
-    `SELECT "id" FROM "AsyncExtractionJob" WHERE "status"='UPLOADED' AND "openAiResponseId" IS NULL ORDER BY "createdAt" ASC LIMIT $1`,
-    limit,
-  );
+  const queued = await prisma.asyncExtractionJob.findMany({ where: { status: "UPLOADED", openAiResponseId: null }, select: { id: true }, orderBy: { createdAt: "asc" }, take: limit });
   for (const job of queued) void submitQueuedAsyncJob(job.id);
 }
 
@@ -149,11 +97,11 @@ function normalize(value: string | null | undefined) {
   return (value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-async function finalizeJob(job: AsyncJob) {
+async function finalizeJob(job: AsyncJobSummary) {
   if (!job.openAiResponseId) return;
   const response = await retrieveFinancialPdfBackground(job.openAiResponseId);
   if (response.status === "queued" || response.status === "in_progress") {
-    await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='PROCESSING',"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id);
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "PROCESSING" } });
     return;
   }
   if (response.status !== "completed") {
@@ -172,14 +120,12 @@ async function finalizeJob(job: AsyncJob) {
   const company = companies.find((item) => normalize(item.ticker) === detectedTicker)
     ?? companies.find((item) => normalize(item.name) === detectedName);
 
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "detectedTicker"=$2,"detectedCompanyName"=$3,"detectedYear"=$4,"detectedPeriodType"=$5,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    job.id,
-    extracted.detectedCompanyTicker,
-    extracted.detectedCompanyName,
-    extracted.detectedYear,
-    extracted.detectedPeriodType,
-  );
+  await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: {
+    detectedTicker: extracted.detectedCompanyTicker,
+    detectedCompanyName: extracted.detectedCompanyName,
+    detectedYear: extracted.detectedYear,
+    detectedPeriodType: extracted.detectedPeriodType,
+  } });
 
   if (!company || (extracted.detectedCompanyConfidence ?? 0) < 0.95) {
     await markAsyncJobFailed(job.id, `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi emiten belum cocok secara aman dengan Company Master.`);
@@ -192,7 +138,7 @@ async function finalizeJob(job: AsyncJob) {
 
   const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId: company.id, checksum: job.checksum } } });
   if (existing) {
-    await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='COMPLETED',"runId"=$2,"fileData"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id, existing.id);
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId: existing.id, fileData: null } });
     return;
   }
 
@@ -214,6 +160,7 @@ async function finalizeJob(job: AsyncJob) {
       pageCount: extracted.pageCount,
       status: "PROCESSING",
       parserVersion: "mvp-1.2d-v6-ack-first-background",
+      documentId: job.documentId,
     } });
     const chunkIds = new Map<number, string>();
     for (let index = 0; index < chunks.length; index++) {
@@ -227,7 +174,19 @@ async function finalizeJob(job: AsyncJob) {
         section: chunk.section,
         text: chunk.textSummary.slice(0, 12000),
         textHash: sha256(Buffer.from(chunk.textSummary)),
-        metadata: { processingMode: preflight.processingMode, preflightConfidence: preflight.confidence, preflightReason: preflight.reason, openAiResponseId: job.openAiResponseId },
+        metadata: {
+          statementType: chunk.section,
+          companyId: company.id,
+          reportingYear: extracted.detectedYear,
+          reportingPeriod: extracted.detectedPeriodType,
+          currency: extracted.detectedCurrency || company.currency,
+          unitScale: extracted.detectedUnitScale,
+          extractionMethod: preflight.processingMode,
+          extractionConfidence: preflight.confidence,
+          preflightReason: preflight.reason,
+          openAiResponseId: job.openAiResponseId,
+          traceReference: `${job.checksum}:${chunk.pageStart ?? "?"}-${chunk.pageEnd ?? "?"}:${index + 1}`,
+        },
       } });
       chunkIds.set(index, stored.id);
     }
@@ -257,7 +216,7 @@ async function finalizeJob(job: AsyncJob) {
     await tx.extractionRun.update({ where: { id: run.id }, data: { status: "PENDING_REVIEW" } });
     return run.id;
   });
-  await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='COMPLETED',"runId"=$2,"fileData"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id, runId);
+  await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId, fileData: null } });
 }
 
 export async function pollAsyncExtractionJobs(limit = 3) {

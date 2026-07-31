@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
 
 function periodEnd(year: number, period: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY") {
   if (period === "Q1") return new Date(Date.UTC(year, 2, 31));
@@ -114,8 +115,33 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
         const provenance = candidates.map((candidate) => `${candidate.reportedLabel}: ${candidate.rawValue}${candidate.sourcePage ? ` (page ${candidate.sourcePage})` : ""}`).join(" | ");
         const reportedLabel = candidates.length > 1 ? `${account.name} — aggregated from ${candidates.length} reviewed components` : first.reportedLabel;
         const confidence = Math.min(...candidates.map((candidate) => Math.min(candidate.extractionConfidence ?? 0, candidate.mappingConfidence ?? 0)));
+        const normalizedValue = candidates.reduce((sum, candidate) => sum + Number(candidate.numericValue) * Number(candidate.scale || 1), 0);
+        const signConvention = CRITICAL_ACCOUNT_BY_CODE.get(account.code)?.signConvention ?? null;
 
-        await tx.financialEntry.create({ data: { reportId: report.id, statementId: statements.get(account.statementType) ?? null, canonicalAccountId: first.canonicalAccountId!, reportedLabel, rawText: provenance || first.sourceText || first.rawValue, value, scale, currency: first.currency || run.currency || run.company.currency, isEstimated: true, isVerified: true, confidence, sourcePage: sourcePages.length === 1 ? sourcePages[0] : null } });
+        await tx.financialEntry.create({ data: {
+          reportId: report.id,
+          statementId: statements.get(account.statementType) ?? null,
+          canonicalAccountId: first.canonicalAccountId!,
+          reportedLabel,
+          rawText: provenance || first.sourceText || first.rawValue,
+          value,
+          originalValue: value,
+          normalizedValue,
+          originalRawValue: candidates.map((candidate) => candidate.rawValue).join(" | "),
+          scale,
+          currency: first.currency || run.currency || run.company.currency,
+          signConvention,
+          isEstimated: false,
+          isVerified: true,
+          confidence,
+          sourcePage: sourcePages.length === 1 ? sourcePages[0] : null,
+          sourceDocumentId: run.documentId,
+          extractionRunId: run.id,
+          sourceCandidateIds: candidates.map((candidate) => candidate.id),
+          reviewStatus: "VERIFIED",
+          reviewedBy: "web-user",
+          reviewedAt: new Date(),
+        } });
         for (const candidate of candidates) {
           await tx.extractionCandidate.update({ where: { id: candidate.id }, data: { status: "COMMITTED", reviewNote: candidates.length > 1 ? `Aggregated into canonical ${account.code} with reviewed ${candidates.length} components.` : candidate.reviewNote } });
         }

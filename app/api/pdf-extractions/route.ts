@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { after, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
+import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfMagic, validatePdfUpload } from "@/lib/pdf-extraction";
 import {
   createAsyncJob,
   findAsyncJobByChecksum,
@@ -54,8 +54,7 @@ export async function GET(request: Request) {
         else if (candidate.status === "COMMITTED") acc.committed += 1;
         return acc;
       }, { pending: 0, accepted: 0, rejected: 0, committed: 0 });
-      const { candidates: _candidates, ...rest } = run;
-      return { ...rest, kind: "RUN" as const, review };
+      return { ...run, candidates: undefined, kind: "RUN" as const, review };
     });
 
     const jobRows = jobs.map((job) => ({
@@ -102,11 +101,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: { code: "EXTRACTION_PROVIDER_UNAVAILABLE", message: "OPENAI_API_KEY belum dikonfigurasi; upload tidak diproses agar tidak menghasilkan job yang pasti gagal." } },
+        { status: 503 },
+      );
+    }
     const form = await request.formData();
     const file = form.get("file");
     if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     validatePdfUpload(file);
     const bytes = Buffer.from(await file.arrayBuffer());
+    validatePdfMagic(bytes);
     const checksum = sha256(bytes);
 
     const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });

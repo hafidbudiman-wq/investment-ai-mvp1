@@ -1,10 +1,9 @@
 import type { PdfPreflight } from "@/lib/pdf-extraction";
+import { financialExtractionSchema, type ValidatedFinancialExtraction } from "@/lib/financial/extraction-schema";
 
 type CanonicalAccountPrompt = { id: string; code: string; name: string; statementType: string; aliases: unknown };
 type KnownCompanyPrompt = { ticker: string; name: string };
-type AiChunk = { section: string; chunkType: "SECTION" | "TABLE" | "PAGE" | "TOKEN_BLOCK"; pageStart: number | null; pageEnd: number | null; textSummary: string };
-type AiCandidate = { statementType: "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW" | "OTHER" | null; reportedLabel: string; rawValue: string; numericValue: number | null; currency: string | null; scale: number; sourcePage: number | null; sourceText: string | null; canonicalCode: string | null; extractionConfidence: number; mappingConfidence: number };
-export type AiFinancialExtraction = { detectedCompanyTicker: string | null; detectedCompanyName: string | null; detectedCompanyConfidence: number; detectedYear: number | null; detectedPeriodType: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY" | null; detectedPeriodConfidence: number; detectedCurrency: string | null; detectedUnitScale: number | null; pageCount: number | null; chunks: AiChunk[]; candidates: AiCandidate[] };
+export type AiFinancialExtraction = ValidatedFinancialExtraction;
 
 export type BackgroundResponse = {
   id: string;
@@ -21,14 +20,23 @@ function apiKey() {
   return value;
 }
 
-function outputText(response: any): string {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function outputText(response: BackgroundResponse): string {
   if (typeof response?.output_text === "string") return response.output_text;
-  for (const item of response?.output ?? []) for (const content of item?.content ?? []) if (content?.type === "output_text" && typeof content?.text === "string") return content.text;
+  for (const item of response.output ?? []) {
+    if (!isRecord(item) || !Array.isArray(item.content)) continue;
+    for (const content of item.content) {
+      if (isRecord(content) && content.type === "output_text" && typeof content.text === "string") return content.text;
+    }
+  }
   throw new Error("OpenAI tidak mengembalikan output teks yang dapat dibaca.");
 }
 
 function requestBody(params: { bytes: Buffer; fileName: string; knownCompanies: KnownCompanyPrompt[]; accounts: CanonicalAccountPrompt[]; preflight: PdfPreflight }, background: boolean) {
-  const model = process.env.OPENAI_FINANCIAL_MODEL || "gpt-5";
+  const model = process.env.OPENAI_FINANCIAL_MODEL || "gpt-5.6";
   const accountDictionary = params.accounts.map((a) => ({ code: a.code, name: a.name, statementType: a.statementType, aliases: a.aliases }));
   const companyDictionary = params.knownCompanies.map((company) => ({ ticker: company.ticker, name: company.name }));
   const schema = { type: "object", additionalProperties: false, required: ["detectedCompanyTicker","detectedCompanyName","detectedCompanyConfidence","detectedYear","detectedPeriodType","detectedPeriodConfidence","detectedCurrency","detectedUnitScale","pageCount","chunks","candidates"], properties: { detectedCompanyTicker:{anyOf:[{type:"string"},{type:"null"}]}, detectedCompanyName:{anyOf:[{type:"string"},{type:"null"}]}, detectedCompanyConfidence:{type:"number",minimum:0,maximum:1}, detectedYear:{anyOf:[{type:"integer"},{type:"null"}]}, detectedPeriodType:{anyOf:[{type:"string",enum:["Q1","H1","Q3","FY","MONTHLY"]},{type:"null"}]}, detectedPeriodConfidence:{type:"number",minimum:0,maximum:1}, detectedCurrency:{anyOf:[{type:"string"},{type:"null"}]}, detectedUnitScale:{anyOf:[{type:"integer"},{type:"null"}]}, pageCount:{anyOf:[{type:"integer"},{type:"null"}]}, chunks:{type:"array",maxItems:80,items:{type:"object",additionalProperties:false,required:["section","chunkType","pageStart","pageEnd","textSummary"],properties:{section:{type:"string"},chunkType:{type:"string",enum:["SECTION","TABLE","PAGE","TOKEN_BLOCK"]},pageStart:{anyOf:[{type:"integer"},{type:"null"}]},pageEnd:{anyOf:[{type:"integer"},{type:"null"}]},textSummary:{type:"string"}}}}, candidates:{type:"array",maxItems:250,items:{type:"object",additionalProperties:false,required:["statementType","reportedLabel","rawValue","numericValue","currency","scale","sourcePage","sourceText","canonicalCode","extractionConfidence","mappingConfidence"],properties:{statementType:{anyOf:[{type:"string",enum:["INCOME_STATEMENT","BALANCE_SHEET","CASH_FLOW","OTHER"]},{type:"null"}]},reportedLabel:{type:"string"},rawValue:{type:"string"},numericValue:{anyOf:[{type:"number"},{type:"null"}]},currency:{anyOf:[{type:"string"},{type:"null"}]},scale:{type:"integer"},sourcePage:{anyOf:[{type:"integer"},{type:"null"}]},sourceText:{anyOf:[{type:"string"},{type:"null"}]},canonicalCode:{anyOf:[{type:"string"},{type:"null"}]},extractionConfidence:{type:"number",minimum:0,maximum:1},mappingConfidence:{type:"number",minimum:0,maximum:1}}}} } };
@@ -59,9 +67,7 @@ export async function retrieveFinancialPdfBackground(responseId: string) {
 }
 
 export function parseFinancialExtractionResponse(response: BackgroundResponse): AiFinancialExtraction {
-  const parsed = JSON.parse(outputText(response)) as AiFinancialExtraction;
-  if (!Array.isArray(parsed.candidates) || !Array.isArray(parsed.chunks)) throw new Error("Format hasil AI tidak valid.");
-  return parsed;
+  return financialExtractionSchema.parse(JSON.parse(outputText(response)));
 }
 
 export async function extractFinancialPdfWithOpenAI(params: { bytes: Buffer; fileName: string; knownCompanies: KnownCompanyPrompt[]; accounts: CanonicalAccountPrompt[]; preflight: PdfPreflight }): Promise<AiFinancialExtraction> {

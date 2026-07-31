@@ -51,6 +51,12 @@ export function validatePdfUpload(file: UploadedPdfLike) {
   if (file.size > PDF_MAX_BYTES) throw new Error("Ukuran PDF maksimal 12 MB untuk MVP 1.2D.");
 }
 
+export function validatePdfMagic(buffer: Buffer) {
+  if (buffer.length < 5 || buffer.subarray(0, 5).toString("ascii") !== "%PDF-") {
+    throw new Error("Isi file bukan dokumen PDF yang valid.");
+  }
+}
+
 // Lightweight preflight only decides how the downstream multimodal extractor should treat the PDF.
 // It does not attempt to parse financial values. Scanned/image-heavy PDFs are explicitly routed to
 // the model's visual/OCR path, while native PDFs retain their text layer and table geometry.

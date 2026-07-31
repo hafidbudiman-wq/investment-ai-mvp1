@@ -34,12 +34,12 @@ MVP 1 establishes the financial data foundation: company master data, financial 
 1. Install Node.js 20 or newer and PostgreSQL.
 2. Copy `.env.example` to `.env`.
 3. Update `DATABASE_URL`.
-4. Run:
+4. Run controlled migrations and seed master data:
 
 ```bash
-npm install
+npm ci
 npm run db:generate
-npm run db:push
+npm run db:deploy
 npm run db:seed
 npm run dev
 ```
@@ -52,8 +52,10 @@ Open `http://localhost:3000`.
 2. Add a PostgreSQL service.
 3. Ensure `DATABASE_URL` is available to the application service.
 4. Build command: `npm run build`.
-5. Start command: `npm run start`.
-6. Before first use, run `npm run db:push && npm run db:seed` in Railway shell.
+5. Start command: `npm run start` (runs `prisma migrate deploy` before Next.js).
+6. Health check: `/api/health`; it returns ready only after a real PostgreSQL query succeeds.
+
+Never use `prisma db push` in production. Migration files are the reproducible schema source of truth.
 
 ## MVP roadmap
 
