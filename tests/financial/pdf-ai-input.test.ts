@@ -15,6 +15,8 @@ test("keeps ordinary reports intact", async () => {
   assert.equal(prepared.reduced, false);
   assert.equal(prepared.originalPageCount, 12);
   assert.deepEqual(prepared.bytes, input);
+  assert.equal(prepared.inputMode, "PDF");
+  assert.equal(prepared.text, null);
 });
 
 test("bounds very long reports before provider submission", async () => {
@@ -24,4 +26,6 @@ test("bounds very long reports before provider submission", async () => {
   assert.equal(prepared.originalPageCount, AI_PDF_MAX_PAGES + 15);
   const bounded = await PDFDocument.load(prepared.bytes);
   assert.equal(bounded.getPageCount(), AI_PDF_MAX_PAGES);
+  assert.equal(prepared.inputMode, "PDF");
+  assert.equal(prepared.text, null);
 });

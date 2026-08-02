@@ -90,7 +90,8 @@ export async function submitQueuedAsyncJob(id: string) {
         originalPageCount: aiInput.originalPageCount,
         submittedPageCount: aiInput.submittedPageCount,
         reduced: aiInput.reduced,
-        submittedBytes: aiInput.bytes.length,
+        inputMode: aiInput.inputMode,
+        submittedBytes: aiInput.text ? Buffer.byteLength(aiInput.text) : aiInput.bytes.length,
       },
     } satisfies Prisma.InputJsonObject;
     await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { preflight: preflightWithAiInput } });
@@ -101,12 +102,14 @@ export async function submitQueuedAsyncJob(id: string) {
         originalPageCount: aiInput.originalPageCount,
         submittedPageCount: aiInput.submittedPageCount,
         originalBytes: sourceBytes.length,
-        submittedBytes: aiInput.bytes.length,
+        submittedBytes: aiInput.text ? Buffer.byteLength(aiInput.text) : aiInput.bytes.length,
+        inputMode: aiInput.inputMode,
       }));
     }
 
     const background = await submitFinancialPdfBackground({
       bytes: aiInput.bytes,
+      documentText: aiInput.text,
       fileName: job.fileName,
       knownCompanies: companies,
       accounts,
