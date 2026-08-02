@@ -1,1 +1,1 @@
-export const EXTRACTION_PARSER_VERSION = "mvp-1.2d-v9-debt-label-quality";
+export const EXTRACTION_PARSER_VERSION = "mvp-1.2d-v10-chunk-fallback-quality";

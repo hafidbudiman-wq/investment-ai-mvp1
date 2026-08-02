@@ -1,7 +1,7 @@
 import type { PdfPreflight } from "@/lib/pdf-extraction";
 import { financialExtractionSchema, type ValidatedFinancialExtraction } from "@/lib/financial/extraction-schema";
 import { applyCompanyFallback, type CompanyIdentity } from "@/lib/financial/company-fallback";
-import { refineFinancialCandidates } from "@/lib/financial/candidate-quality";
+import { ensureCandidateBackedChunks, refineFinancialCandidates } from "@/lib/financial/candidate-quality";
 
 type CanonicalAccountPrompt = { id: string; code: string; name: string; statementType: string; aliases: unknown };
 type KnownCompanyPrompt = { ticker: string; name: string };
@@ -75,7 +75,7 @@ export async function retrieveFinancialPdfBackground(responseId: string) {
 
 export function parseFinancialExtractionResponse(response: BackgroundResponse, fallbackCompany: CompanyIdentity | null = null): AiFinancialExtraction {
   const raw = JSON.parse(outputText(response));
-  const parsed = financialExtractionSchema.parse(applyCompanyFallback(raw, fallbackCompany));
+  const parsed = financialExtractionSchema.parse(applyCompanyFallback(ensureCandidateBackedChunks(raw), fallbackCompany));
   return financialExtractionSchema.parse(refineFinancialCandidates(parsed));
 }
 

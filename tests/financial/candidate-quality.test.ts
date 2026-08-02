@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { refineFinancialCandidates } from "../../lib/financial/candidate-quality";
+import { ensureCandidateBackedChunks, refineFinancialCandidates } from "../../lib/financial/candidate-quality";
 import type { ValidatedFinancialExtraction } from "../../lib/financial/extraction-schema";
 
 const candidate = (reportedLabel: string, numericValue: number, statementType: "BALANCE_SHEET" | "CASH_FLOW", canonicalCode: string | null = null) => ({
@@ -93,4 +93,21 @@ test("does not hide AR components when the proposed total does not reconcile", (
   const total = candidate("Trade receivables - total net", 120, "BALANCE_SHEET", "AR");
   const refined = refineFinancialCandidates(extraction([related, third, total]));
   assert.equal(refined.candidates.filter((item) => item.canonicalCode === "AR").length, 3);
+});
+
+test("reconstructs a fallback chunk from page-traced candidates", () => {
+  const raw = extraction([candidate("Revenue", 100, "CASH_FLOW", "REV")]);
+  raw.chunks = [];
+  raw.candidates[0].sourcePage = 8;
+  const repaired = ensureCandidateBackedChunks(raw) as ValidatedFinancialExtraction;
+  assert.equal(repaired.chunks.length, 1);
+  assert.equal(repaired.chunks[0].pageStart, 8);
+  assert.equal(repaired.chunks[0].pageEnd, 8);
+});
+
+test("does not disguise an empty extraction as a valid chunk", () => {
+  const raw = extraction([]);
+  raw.chunks = [];
+  const unchanged = ensureCandidateBackedChunks(raw) as ValidatedFinancialExtraction;
+  assert.equal(unchanged.chunks.length, 0);
 });

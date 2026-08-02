@@ -13,6 +13,34 @@ function normalized(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+/** Restores traceable chunk metadata only when the model returned page-traced
+ * candidates but omitted its chunk summaries. Empty candidate payloads still
+ * fail schema validation instead of being disguised as successful extraction.
+ */
+export function ensureCandidateBackedChunks(value: unknown): unknown {
+  if (!isRecord(value) || !Array.isArray(value.chunks) || value.chunks.length > 0 || !Array.isArray(value.candidates) || value.candidates.length === 0) return value;
+  const pages = value.candidates
+    .filter(isRecord)
+    .map((candidate) => candidate.sourcePage)
+    .filter((page): page is number => typeof page === "number" && Number.isInteger(page) && page > 0);
+  const pageStart = pages.length ? Math.min(...pages) : null;
+  const pageEnd = pages.length ? Math.max(...pages) : null;
+  return {
+    ...value,
+    chunks: [{
+      section: "Financial statement candidates - chunk summary reconstructed from source-page evidence",
+      chunkType: "SECTION",
+      pageStart,
+      pageEnd,
+      textSummary: `Fallback chunk covering ${value.candidates.length} page-traced extraction candidates.`,
+    }],
+  };
+}
+
 function uniqueComponents(candidates: Candidate[]) {
   const seen = new Set<string>();
   return candidates.filter((candidate) => {
