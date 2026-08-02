@@ -93,3 +93,14 @@ export function createStructureAwareChunks(
 
   return drafts.map((draft, ordinal) => ({ ...draft, ordinal, checksum: checksum(draft.sourceText) }));
 }
+
+/** Native parsing is only preferred when it actually identifies the three
+ * primary financial-statement structures. Otherwise the AI's page-traced
+ * chunks are safer than a giant OTHER chunk produced by a difficult PDF font.
+ */
+export function hasReliableNativeStatementStructure(chunks: readonly StructureAwareChunk[]) {
+  const primary = new Set(chunks.map((chunk) => chunk.statementType).filter((type) =>
+    type === "BALANCE_SHEET" || type === "INCOME_STATEMENT" || type === "CASH_FLOW",
+  ));
+  return primary.size >= 2 && chunks.some((chunk) => chunk.statementType !== "OTHER");
+}

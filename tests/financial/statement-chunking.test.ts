@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createStructureAwareChunks } from "../../lib/financial/statement-chunking";
+import { createStructureAwareChunks, hasReliableNativeStatementStructure } from "../../lib/financial/statement-chunking";
 import { deflateSync } from "node:zlib";
 import { chunkNativePdf, extractNativePdfPages } from "../../lib/financial/pdf-native-text";
 
@@ -21,6 +21,23 @@ test("chunks bilingual statements by structure and joins continuation pages", ()
 
 test("rejects duplicate page numbers", () => {
   assert.throws(() => createStructureAwareChunks([{ pageNumber: 1, text: "a" }, { pageNumber: 1, text: "b" }]), /unique positive/);
+});
+
+test("rejects giant OTHER native chunks as unreliable structure", () => {
+  const chunks = createStructureAwareChunks([
+    { pageNumber: 1, text: "Cover" },
+    { pageNumber: 2, text: "Unreadable custom-font table" },
+    { pageNumber: 333, text: "Notes" },
+  ]);
+  assert.equal(hasReliableNativeStatementStructure(chunks), false);
+});
+
+test("accepts native chunks after at least two primary statements are identified", () => {
+  const chunks = createStructureAwareChunks([
+    { pageNumber: 1, text: "STATEMENT OF FINANCIAL POSITION\nCash 100" },
+    { pageNumber: 2, text: "STATEMENT OF PROFIT OR LOSS\nRevenue 200" },
+  ]);
+  assert.equal(hasReliableNativeStatementStructure(chunks), true);
 });
 
 test("extracts real PDF content streams before structure-aware chunking", () => {

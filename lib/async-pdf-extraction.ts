@@ -5,6 +5,8 @@ import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
 import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
 import { preparePdfAiInput } from "@/lib/financial/pdf-ai-input";
 import { companyFromFileName } from "@/lib/financial/company-fallback";
+import { hasReliableNativeStatementStructure } from "@/lib/financial/statement-chunking";
+import { EXTRACTION_PARSER_VERSION } from "@/lib/financial/parser-version";
 import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
@@ -79,6 +81,19 @@ export async function submitQueuedAsyncJob(id: string) {
     ]);
 
     const aiInput = await preparePdfAiInput(Buffer.from(sourceBytes));
+    const existingPreflight = job.preflight && typeof job.preflight === "object" && !Array.isArray(job.preflight)
+      ? job.preflight as Record<string, Prisma.JsonValue>
+      : {};
+    const preflightWithAiInput = {
+      ...existingPreflight,
+      aiInput: {
+        originalPageCount: aiInput.originalPageCount,
+        submittedPageCount: aiInput.submittedPageCount,
+        reduced: aiInput.reduced,
+        submittedBytes: aiInput.bytes.length,
+      },
+    } satisfies Prisma.InputJsonObject;
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { preflight: preflightWithAiInput } });
     if (aiInput.reduced) {
       console.info(JSON.stringify({
         event: "pdf_ai_input_bounded",
@@ -95,7 +110,7 @@ export async function submitQueuedAsyncJob(id: string) {
       fileName: job.fileName,
       knownCompanies: companies,
       accounts,
-      preflight: job.preflight as Parameters<typeof submitFinancialPdfBackground>[0]["preflight"],
+      preflight: preflightWithAiInput as unknown as Parameters<typeof submitFinancialPdfBackground>[0]["preflight"],
     });
     await markAsyncJobSubmitted(job.id, background.id, background.status);
   } catch (error) {
@@ -172,12 +187,12 @@ async function finalizeJob(job: AsyncJobSummary) {
       console.warn("native-pdf-chunking-fallback", { jobId: job.id, error: error instanceof Error ? error.message : String(error) });
     }
   }
-  const chunks = nativeChunks.length
+  const chunks = hasReliableNativeStatementStructure(nativeChunks)
     ? nativeChunks.map((chunk) => ({ section: chunk.statementType, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, textSummary: chunk.sourceText }))
     : extracted.chunks.length
       ? extracted.chunks
       : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
-  const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string };
+  const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string; aiInput?: { originalPageCount?: number | null } };
 
   const runId = await prisma.$transaction(async (tx) => {
     const run = await tx.extractionRun.create({ data: {
@@ -190,9 +205,9 @@ async function finalizeJob(job: AsyncJobSummary) {
       periodType: extracted.detectedPeriodType,
       currency: extracted.detectedCurrency || company.currency,
       unitScale: extracted.detectedUnitScale || null,
-      pageCount: extracted.pageCount,
+      pageCount: preflight.aiInput?.originalPageCount ?? extracted.pageCount,
       status: "PROCESSING",
-      parserVersion: "mvp-1.2d-v6-ack-first-background",
+      parserVersion: EXTRACTION_PARSER_VERSION,
       documentId: job.documentId,
     } });
     const chunkIds = new Map<number, string>();

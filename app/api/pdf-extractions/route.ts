@@ -7,7 +7,7 @@ import {
   findAsyncJobByChecksum,
   listAsyncJobs,
 } from "@/lib/async-pdf-extraction";
-import { resetFailedAsyncUpload } from "@/lib/async-pdf-upload-retry";
+import { resetFailedAsyncUpload, resetUntouchedStaleRun } from "@/lib/async-pdf-upload-retry";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -113,7 +113,18 @@ export async function POST(request: Request) {
     const checksum = sha256(bytes);
 
     const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
-    if (existingRun) return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+    if (existingRun) {
+      const reprocessed = await resetUntouchedStaleRun({
+        runId: existingRun.id,
+        fileName: file.name,
+        mimeType: file.type || "application/pdf",
+        fileSize: file.size,
+        preflight: inspectPdfForOcr(bytes),
+        bytes,
+      });
+      if (reprocessed) return NextResponse.json({ ok: true, accepted: true, retried: true, status: "UPLOADED", message: "Staging lama yang belum pernah direview diproses ulang dengan parser kualitas terbaru." }, { status: 202 });
+      return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+    }
 
     const existingJob = await findAsyncJobByChecksum(checksum);
     if (existingJob && existingJob.status !== "FAILED") {
