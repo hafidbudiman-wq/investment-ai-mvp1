@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sha256 } from "@/lib/pdf-extraction";
+import { chunkNativePdf } from "@/lib/financial/pdf-native-text";
 import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
 import {
   parseFinancialExtractionResponse,
@@ -143,7 +144,22 @@ async function finalizeJob(job: AsyncJobSummary) {
   }
 
   const accountByCode = new Map(accounts.map((account) => [account.code.toUpperCase(), account]));
-  const chunks = extracted.chunks.length ? extracted.chunks : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
+  const document = job.documentId
+    ? await prisma.financialDocument.findUnique({ where: { id: job.documentId }, select: { content: true } })
+    : null;
+  let nativeChunks: ReturnType<typeof chunkNativePdf> = [];
+  if (document?.content?.length && preflightMode(job.preflight) !== "VISION_OCR_FALLBACK") {
+    try {
+      nativeChunks = chunkNativePdf(Buffer.from(document.content)).filter((chunk) => chunk.sourceText.trim()).slice(0, 80);
+    } catch (error) {
+      console.warn("native-pdf-chunking-fallback", { jobId: job.id, error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  const chunks = nativeChunks.length
+    ? nativeChunks.map((chunk) => ({ section: chunk.statementType, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, textSummary: chunk.sourceText }))
+    : extracted.chunks.length
+      ? extracted.chunks
+      : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
   const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string };
 
   const runId = await prisma.$transaction(async (tx) => {
@@ -217,6 +233,12 @@ async function finalizeJob(job: AsyncJobSummary) {
     return run.id;
   });
   await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId, fileData: null } });
+}
+
+function preflightMode(value: unknown): string | undefined {
+  return value && typeof value === "object" && "processingMode" in value
+    ? String((value as { processingMode?: unknown }).processingMode)
+    : undefined;
 }
 
 export async function pollAsyncExtractionJobs(limit = 3) {
