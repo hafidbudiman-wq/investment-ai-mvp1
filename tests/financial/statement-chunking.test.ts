@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createStructureAwareChunks } from "../../lib/financial/statement-chunking";
+import { deflateSync } from "node:zlib";
+import { chunkNativePdf, extractNativePdfPages } from "../../lib/financial/pdf-native-text";
 
 test("chunks bilingual statements by structure and joins continuation pages", () => {
   const chunks = createStructureAwareChunks([
@@ -19,4 +21,20 @@ test("chunks bilingual statements by structure and joins continuation pages", ()
 
 test("rejects duplicate page numbers", () => {
   assert.throws(() => createStructureAwareChunks([{ pageNumber: 1, text: "a" }, { pageNumber: 1, text: "b" }]), /unique positive/);
+});
+
+test("extracts real PDF content streams before structure-aware chunking", () => {
+  const stream = deflateSync(Buffer.from("BT (LAPORAN POSISI KEUANGAN) Tj (Dalam jutaan Rupiah) Tj [(Kas) 120 (  1.000)] TJ ET"));
+  const pdf = Buffer.concat([
+    Buffer.from("%PDF-1.7\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n3 0 obj << /Type /Page /Parent 2 0 R /Contents 4 0 R >> endobj\n4 0 obj << /Length "),
+    Buffer.from(String(stream.length)),
+    Buffer.from(" /Filter /FlateDecode >> stream\n"), stream,
+    Buffer.from("\nendstream\nendobj\n%%EOF"),
+  ]);
+  const pages = extractNativePdfPages(pdf);
+  assert.match(pages[0].text, /LAPORAN POSISI KEUANGAN/);
+  const chunks = chunkNativePdf(pdf);
+  assert.equal(chunks[0].statementType, "BALANCE_SHEET");
+  assert.equal(chunks[0].pageStart, 1);
+  assert.equal(chunks[0].unitScale, 1_000_000);
 });

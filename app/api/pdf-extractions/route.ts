@@ -1,14 +1,11 @@
 import { randomUUID } from "crypto";
-import { after, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfMagic, validatePdfUpload } from "@/lib/pdf-extraction";
 import {
   createAsyncJob,
   findAsyncJobByChecksum,
-  kickQueuedAsyncExtractionJobs,
   listAsyncJobs,
-  pollAsyncExtractionJobs,
-  submitQueuedAsyncJob,
 } from "@/lib/async-pdf-extraction";
 import { resetFailedAsyncUpload } from "@/lib/async-pdf-upload-retry";
 
@@ -25,8 +22,6 @@ const FILTERS: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   try {
-    await kickQueuedAsyncExtractionJobs();
-    await pollAsyncExtractionJobs();
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
     const pageSize = Math.min(50, Math.max(5, Number(url.searchParams.get("pageSize") || 20) || 20));
@@ -145,10 +140,6 @@ export async function POST(request: Request) {
         bytes,
       });
     }
-
-    after(async () => {
-      await submitQueuedAsyncJob(jobId);
-    });
 
     return NextResponse.json({
       ok: true,

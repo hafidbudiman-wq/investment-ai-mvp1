@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "prisma migrate deploy && next start",
     "start:app": "next start",
+    "start:worker": "tsx scripts/pdf-worker.ts",
     "postinstall": "prisma generate",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
