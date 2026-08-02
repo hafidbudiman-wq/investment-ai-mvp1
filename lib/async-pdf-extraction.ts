@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { sha256 } from "@/lib/pdf-extraction";
 import { chunkNativePdf } from "@/lib/financial/pdf-native-text";
 import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
+import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
+import { preparePdfAiInput } from "@/lib/financial/pdf-ai-input";
 import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
@@ -11,6 +13,7 @@ import {
 type AsyncJobSummary = Omit<AsyncJob, "fileData">;
 
 const submittingJobs = new Set<string>();
+const criticalAccountCodes = CRITICAL_ACCOUNTS.map((account) => account.code);
 
 export async function findAsyncJobByChecksum(checksum: string) {
   return prisma.asyncExtractionJob.findUnique({ where: { checksum } });
@@ -68,14 +71,26 @@ export async function submitQueuedAsyncJob(id: string) {
     const [companies, accounts] = await Promise.all([
       prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
       prisma.canonicalAccount.findMany({
-        where: { isActive: true, isCalculated: false },
+        where: { isActive: true, isCalculated: false, code: { in: criticalAccountCodes } },
         select: { id: true, code: true, name: true, statementType: true, aliases: true },
         orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }],
       }),
     ]);
 
+    const aiInput = await preparePdfAiInput(Buffer.from(sourceBytes));
+    if (aiInput.reduced) {
+      console.info(JSON.stringify({
+        event: "pdf_ai_input_bounded",
+        jobId: job.id,
+        originalPageCount: aiInput.originalPageCount,
+        submittedPageCount: aiInput.submittedPageCount,
+        originalBytes: sourceBytes.length,
+        submittedBytes: aiInput.bytes.length,
+      }));
+    }
+
     const background = await submitFinancialPdfBackground({
-      bytes: Buffer.from(sourceBytes),
+      bytes: aiInput.bytes,
       fileName: job.fileName,
       knownCompanies: companies,
       accounts,

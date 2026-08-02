@@ -95,6 +95,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const uploadId = request.headers.get("x-investai-upload-id")?.slice(0, 100) || randomUUID();
   try {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
@@ -107,6 +108,7 @@ export async function POST(request: Request) {
     if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     validatePdfUpload(file);
     const bytes = Buffer.from(await file.arrayBuffer());
+    console.info(JSON.stringify({ event: "pdf_upload_received", uploadId, fileName: file.name, fileSize: file.size }));
     validatePdfMagic(bytes);
     const checksum = sha256(bytes);
 
@@ -141,6 +143,7 @@ export async function POST(request: Request) {
       });
     }
 
+    console.info(JSON.stringify({ event: "pdf_upload_accepted", uploadId, jobId, fileName: file.name, fileSize: file.size }));
     return NextResponse.json({
       ok: true,
       accepted: true,
@@ -152,7 +155,7 @@ export async function POST(request: Request) {
         : "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
     }, { status: 202 });
   } catch (error) {
-    console.error("pdf-extraction-upload-ack-failed", error);
+    console.error("pdf-extraction-upload-ack-failed", { uploadId, error });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal menyimpan PDF sebagai background job." }, { status: 500 });
   }
 }

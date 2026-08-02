@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FinancialReportPipeline } from "@/components/FinancialReportPipeline";
 import { PipelineStatusBadge } from "@/components/PipelineStatusBadge";
+import { withNetworkRetry } from "@/lib/network-retry";
 
 type Run = { id: string; fileName: string; status: string; year: number | null; periodType: string | null; createdAt: string; company: { ticker: string; name: string }; _count: { chunks: number; candidates: number } };
 type Account = { id: string; code: string; name: string; statementType: string };
@@ -26,6 +27,7 @@ export function PdfExtractionPanel() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploadAttempt, setUploadAttempt] = useState(0);
   const [selected, setSelected] = useState<RunDetail | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [busyCandidate, setBusyCandidate] = useState("");
@@ -55,9 +57,28 @@ export function PdfExtractionPanel() {
     if (!file) return;
     setLoading(true); setMessage(""); setSelected(null);
     try {
-      const form = new FormData(); form.set("file", file); if (confirmedCompanyId) form.set("confirmedCompanyId", confirmedCompanyId);
-      const response = await fetch("/api/pdf-extractions", { method: "POST", body: form });
-      const data = await response.json();
+      const uploadId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const response = await withNetworkRetry(async (attempt) => {
+        setUploadAttempt(attempt);
+        const form = new FormData();
+        form.set("file", file);
+        if (confirmedCompanyId) form.set("confirmedCompanyId", confirmedCompanyId);
+        const result = await fetch("/api/pdf-extractions", {
+          method: "POST",
+          body: form,
+          headers: { "X-InvestAI-Upload-ID": uploadId },
+        });
+        if (result.status === 502 || result.status === 504) {
+          throw new TypeError(`Temporary Railway gateway failure (${result.status})`);
+        }
+        return result;
+      }, {
+        attempts: 3,
+        baseDelayMs: 1_500,
+        onRetry: (attempt) => setMessage(`Koneksi upload terputus. Mencoba ulang otomatis (${attempt}/3)…`),
+      });
+      const responseText = await response.text();
+      const data = responseText ? JSON.parse(responseText) : {};
       if (!response.ok) {
         if (response.status === 422 && data.code) {
           const gate = data as MetadataGate; setMetadataGate(gate);
@@ -68,7 +89,7 @@ export function PdfExtractionPanel() {
       }
       setMetadataGate(null); setMessage(data.message); refreshPipeline(); if (data.runId) await openRun(data.runId);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Upload gagal."); }
-    finally { setLoading(false); }
+    finally { setLoading(false); setUploadAttempt(0); }
   }
 
   async function submit(event: FormEvent) { event.preventDefault(); await uploadFile(); }
@@ -140,7 +161,7 @@ export function PdfExtractionPanel() {
   return <>
     <section className="card" style={{ marginBottom: 18 }}>
       <div className="header"><div><h2>PDF + AI Extraction — MVP 1.2D</h2><p>Upload laporan baru di sini. Pekerjaan lama tetap tersimpan di Financial Report Pipeline di bawah.</p></div><span className="badge warning">HUMAN REVIEW GATE</span></div>
-      <form onSubmit={submit}><div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setMetadataGate(null); setMessage(""); }} required /></div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file}>{loading ? "AI is reading company, period & statements..." : "Upload & Extract PDF"}</button></form>
+      <form onSubmit={submit}><div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setMetadataGate(null); setMessage(""); }} required /></div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file}>{loading ? `Uploading PDF${uploadAttempt > 1 ? ` — retry ${uploadAttempt}/3` : ""}…` : "Upload & Extract PDF"}</button></form>
       {message && <div className="callout" style={{ marginTop: 14 }}>{message}</div>}
       {metadataGate && <div className="card" style={{ marginTop: 16 }}><h3>Review Metadata AI</h3><p><b>Detected issuer:</b> {metadataGate.detectedCompany?.ticker || "?"} — {metadataGate.detectedCompany?.name || "?"} · confidence {pct(metadataGate.detectedCompany?.confidence)}</p><p><b>Detected period:</b> {metadataGate.detectedPeriod?.periodType || "?"} {metadataGate.detectedPeriod?.year || "?"} · confidence {pct(metadataGate.detectedPeriod?.confidence)}</p>{metadataGate.code === "COMPANY_CONFIRMATION_REQUIRED" && metadataGate.suggestedCompany && <><p>Company Master terdekat: <b>{metadataGate.suggestedCompany.ticker} — {metadataGate.suggestedCompany.name}</b></p><button className="btn" type="button" disabled={loading} onClick={() => uploadFile(metadataGate.suggestedCompany!.id)}>Confirm Company & Continue</button></>}{metadataGate.code === "COMPANY_NOT_FOUND" && <div style={{ display: "grid", gap: 10 }}><div className="callout"><b>Emiten belum ada di Company Master.</b> AI hanya membuat draft. Periksa terutama ticker sebelum menambahkan.</div><div className="form-grid"><div className="field"><label>Ticker</label><input value={companyDraft.ticker} onChange={(e) => setCompanyDraft((v) => ({ ...v, ticker: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Legal Company Name</label><input value={companyDraft.name} onChange={(e) => setCompanyDraft((v) => ({ ...v, name: e.target.value }))} /></div><div className="field"><label>Sector</label><input value={companyDraft.sector} onChange={(e) => setCompanyDraft((v) => ({ ...v, sector: e.target.value }))} /></div><div className="field"><label>Subsector</label><input value={companyDraft.subsector} onChange={(e) => setCompanyDraft((v) => ({ ...v, subsector: e.target.value }))} /></div><div className="field"><label>Country</label><input value={companyDraft.country} maxLength={2} onChange={(e) => setCompanyDraft((v) => ({ ...v, country: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Currency</label><input value={companyDraft.currency} maxLength={3} onChange={(e) => setCompanyDraft((v) => ({ ...v, currency: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Fiscal Year End Month</label><input type="number" min="1" max="12" value={companyDraft.fiscalYearEnd} onChange={(e) => setCompanyDraft((v) => ({ ...v, fiscalYearEnd: e.target.value }))} /></div></div><button className="btn" type="button" disabled={loading || !companyDraft.ticker || !companyDraft.name} onClick={addCompanyAndRetry}>Confirm & Add Company, Then Continue</button></div>}{metadataGate.code === "PERIOD_CONFIRMATION_REQUIRED" && <div className="callout">Periode belum cukup yakin untuk dilanjutkan. Jangan commit sampai periode dikenali jelas.</div>}</div>}
       <FinancialReportPipeline onOpen={(id) => openRun(id)} refreshKey={pipelineRefreshKey} />
