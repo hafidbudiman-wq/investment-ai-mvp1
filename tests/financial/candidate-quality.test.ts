@@ -65,3 +65,21 @@ test("removes unsafe debt mapping when evidence says leases were excluded", () =
   assert.equal(refined.candidates[0].canonicalCode, null);
   assert.equal(refined.candidates[0].mappingConfidence, 0);
 });
+
+test("keeps one canonical AR total when counterparties reconcile exactly", () => {
+  const related = candidate("Piutang usaha - pihak berelasi", 10, "BALANCE_SHEET", "AR");
+  const third = candidate("Piutang usaha - pihak ketiga", 90, "BALANCE_SHEET", "AR");
+  const total = candidate("Piutang usaha - jumlah neto", 100, "BALANCE_SHEET", "AR");
+  const refined = refineFinancialCandidates(extraction([related, third, total]));
+  assert.equal(refined.candidates.filter((item) => item.canonicalCode === "AR").length, 1);
+  assert.equal(refined.candidates.find((item) => item.canonicalCode === "AR")?.numericValue, 100);
+  assert.equal(refined.candidates.filter((item) => item.canonicalCode === null).length, 2);
+});
+
+test("does not hide AR components when the proposed total does not reconcile", () => {
+  const related = candidate("Trade receivables - related parties", 10, "BALANCE_SHEET", "AR");
+  const third = candidate("Trade receivables - third parties", 90, "BALANCE_SHEET", "AR");
+  const total = candidate("Trade receivables - total net", 120, "BALANCE_SHEET", "AR");
+  const refined = refineFinancialCandidates(extraction([related, third, total]));
+  assert.equal(refined.candidates.filter((item) => item.canonicalCode === "AR").length, 3);
+});

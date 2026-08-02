@@ -6,6 +6,8 @@ const DEBT_COMPONENT = /(?:pinjaman\s+bank|bank\s+loans?|pinjaman[^\n]{0,50}non[
 const LEASE_COMPONENT = /(?:liabilitas\s+sewa|lease\s+liabilit(?:y|ies))/i;
 const AGGREGATE_LABEL = /(?:^|\b)(?:jumlah|total|utang\s+berbunga|interest[-\s]?bearing\s+debt)(?:\b|$)/i;
 const CAPEX_COMPONENT = /(?:perolehan|pembelian|penambahan|acquisition|purchase|addition)[^\n]{0,90}(?:aset\s+tetap|property|plant|equipment|aset\s+minyak\s+dan\s+gas|oil\s+and\s+gas\s+propert|aset\s+eksplorasi\s+dan\s+evaluasi|exploration\s+and\s+evaluation|aset\s+konsesi|concession|aset\s+tak\s+berwujud|aset\s+tidak\s+berwujud|intangible)/i;
+const COUNTERPARTY_COMPONENT = /(?:pihak\s+ketiga|third\s+part|pihak\s+berelasi|pihak\s+berhubungan|related\s+part)/i;
+const COUNTERPARTY_TOTAL = /(?:jumlah|total|neto|net\b)/i;
 
 function normalized(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -73,6 +75,24 @@ function capexComponents(candidates: Candidate[]) {
   ).map((candidate) => ({ ...candidate, numericValue: -Math.abs(Number(candidate.numericValue)) })));
 }
 
+function preferVerifiedCounterpartyTotal(candidates: Candidate[], code: "AR" | "AP") {
+  const mapped = candidates.filter((candidate) => candidate.canonicalCode === code && candidate.numericValue !== null);
+  const components = mapped.filter((candidate) => COUNTERPARTY_COMPONENT.test(candidate.reportedLabel));
+  const total = mapped.find((candidate) =>
+    !COUNTERPARTY_COMPONENT.test(candidate.reportedLabel)
+    && (COUNTERPARTY_TOTAL.test(candidate.reportedLabel) || /aggregat|sum(?:med)?\s+from/i.test(candidate.sourceText ?? "")),
+  );
+  if (!total || components.length < 2 || !sameUnit([total, ...components])) return candidates;
+  const componentTotal = components.reduce((sum, candidate) => sum + Number(candidate.numericValue), 0);
+  const tolerance = Math.max(Math.abs(Number(total.numericValue)) * 0.000001, 1);
+  if (Math.abs(componentTotal - Number(total.numericValue)) > tolerance) return candidates;
+
+  const componentKeys = new Set(components.map((candidate) => `${normalized(candidate.reportedLabel)}:${candidate.sourcePage ?? "?"}:${candidate.numericValue}`));
+  return candidates.map((candidate) => componentKeys.has(`${normalized(candidate.reportedLabel)}:${candidate.sourcePage ?? "?"}:${candidate.numericValue}`)
+    ? { ...candidate, canonicalCode: null, mappingConfidence: 0 }
+    : candidate);
+}
+
 /**
  * Applies deterministic investor-account rules after schema validation.
  * AI remains responsible for reading source rows; arithmetic, sign conventions,
@@ -88,6 +108,9 @@ export function refineFinancialCandidates(extraction: ValidatedFinancialExtracti
     }
     return candidate;
   });
+
+  candidates = preferVerifiedCounterpartyTotal(candidates, "AR");
+  candidates = preferVerifiedCounterpartyTotal(candidates, "AP");
 
   const debt = debtComponents(candidates);
   const hasLease = debt.some((candidate) => LEASE_COMPONENT.test(candidate.reportedLabel));
