@@ -1,5 +1,6 @@
 import type { PdfPreflight } from "@/lib/pdf-extraction";
 import { financialExtractionSchema, type ValidatedFinancialExtraction } from "@/lib/financial/extraction-schema";
+import { applyCompanyFallback, type CompanyIdentity } from "@/lib/financial/company-fallback";
 
 type CanonicalAccountPrompt = { id: string; code: string; name: string; statementType: string; aliases: unknown };
 type KnownCompanyPrompt = { ticker: string; name: string };
@@ -71,8 +72,9 @@ export async function retrieveFinancialPdfBackground(responseId: string) {
   return await openAiFetch(`/responses/${encodeURIComponent(responseId)}`, { method: "GET" }) as BackgroundResponse;
 }
 
-export function parseFinancialExtractionResponse(response: BackgroundResponse): AiFinancialExtraction {
-  return financialExtractionSchema.parse(JSON.parse(outputText(response)));
+export function parseFinancialExtractionResponse(response: BackgroundResponse, fallbackCompany: CompanyIdentity | null = null): AiFinancialExtraction {
+  const raw = JSON.parse(outputText(response));
+  return financialExtractionSchema.parse(applyCompanyFallback(raw, fallbackCompany));
 }
 
 export async function extractFinancialPdfWithOpenAI(params: { bytes: Buffer; fileName: string; knownCompanies: KnownCompanyPrompt[]; accounts: CanonicalAccountPrompt[]; preflight: PdfPreflight }): Promise<AiFinancialExtraction> {

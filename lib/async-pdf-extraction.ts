@@ -4,6 +4,7 @@ import { chunkNativePdf } from "@/lib/financial/pdf-native-text";
 import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
 import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
 import { preparePdfAiInput } from "@/lib/financial/pdf-ai-input";
+import { companyFromFileName } from "@/lib/financial/company-fallback";
 import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
@@ -126,11 +127,12 @@ async function finalizeJob(job: AsyncJobSummary) {
     return;
   }
 
-  const extracted = parseFinancialExtractionResponse(response);
   const [companies, accounts] = await Promise.all([
     prisma.company.findMany({ where: { isActive: true }, select: { id: true, ticker: true, name: true, currency: true } }),
     prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
   ]);
+  const fileNameCompany = companyFromFileName(job.fileName, companies);
+  const extracted = parseFinancialExtractionResponse(response, fileNameCompany);
   const detectedTicker = normalize(extracted.detectedCompanyTicker);
   const detectedName = normalize(extracted.detectedCompanyName);
   const company = companies.find((item) => normalize(item.ticker) === detectedTicker)
