@@ -17,7 +17,7 @@ export type BackgroundResponse = {
 
 // Keep PDF input + structured output below the organization's TPM ceiling.
 // The 13 critical InvestAI accounts fit comfortably in this output budget.
-export const FINANCIAL_EXTRACTION_MAX_OUTPUT_TOKENS = 4_000;
+export const FINANCIAL_EXTRACTION_MAX_OUTPUT_TOKENS = 16_000;
 
 function apiKey() {
   const value = process.env.OPENAI_API_KEY;
