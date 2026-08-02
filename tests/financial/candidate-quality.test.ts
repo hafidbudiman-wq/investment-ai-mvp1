@@ -47,6 +47,17 @@ test("derives total debt including current and non-current lease liabilities", (
   assert.match(total?.sourceText ?? "", /lease liabilities/i);
 });
 
+test("recognizes Indonesian utang bank labels used by DRMA", () => {
+  const refined = refineFinancialCandidates(extraction([
+    candidate("Utang bank jangka pendek", 104_392_088_215, "BALANCE_SHEET"),
+    candidate("Bagian utang bank jangka panjang yang jatuh tempo dalam satu tahun", 68_557_536_186, "BALANCE_SHEET"),
+    candidate("Liabilitas sewa - jangka pendek", 115_720_054, "BALANCE_SHEET"),
+    candidate("Utang bank jangka panjang, setelah dikurangi bagian jatuh tempo", 105_607_150_517, "BALANCE_SHEET"),
+    candidate("Liabilitas sewa - jangka panjang", 11_498_550, "BALANCE_SHEET"),
+  ]));
+  assert.equal(refined.candidates.find((item) => item.canonicalCode === "TOTAL_DEBT")?.numericValue, 278_683_993_522);
+});
+
 test("derives sector-aware capex and FCF with canonical signs", () => {
   const refined = refineFinancialCandidates(extraction([
     candidate("Net cash provided by operating activities", 398, "CASH_FLOW", "OCF"),

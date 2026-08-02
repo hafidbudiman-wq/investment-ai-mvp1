@@ -2,7 +2,7 @@ import type { ValidatedFinancialExtraction } from "@/lib/financial/extraction-sc
 
 type Candidate = ValidatedFinancialExtraction["candidates"][number];
 
-const DEBT_COMPONENT = /(?:pinjaman\s+bank|bank\s+loans?|pinjaman[^\n]{0,50}non[-\s]?bank|non[-\s]?bank[^\n]{0,50}loans?|obligasi|bonds?|liabilitas\s+sewa|lease\s+liabilit(?:y|ies)|borrowings?)/i;
+const DEBT_COMPONENT = /(?:pinjaman\s+bank|utang\s+(?:bank|pembiayaan)|bank\s+loans?|pinjaman[^\n]{0,50}non[-\s]?bank|non[-\s]?bank[^\n]{0,50}loans?|obligasi|bonds?|liabilitas\s+sewa|lease\s+liabilit(?:y|ies)|borrowings?)/i;
 const LEASE_COMPONENT = /(?:liabilitas\s+sewa|lease\s+liabilit(?:y|ies))/i;
 const AGGREGATE_LABEL = /(?:^|\b)(?:jumlah|total|utang\s+berbunga|interest[-\s]?bearing\s+debt)(?:\b|$)/i;
 const CAPEX_COMPONENT = /(?:perolehan|pembelian|penambahan|acquisition|purchase|addition)[^\n]{0,90}(?:aset\s+tetap|property|plant|equipment|aset\s+minyak\s+dan\s+gas|oil\s+and\s+gas\s+propert|aset\s+eksplorasi\s+dan\s+evaluasi|exploration\s+and\s+evaluation|aset\s+konsesi|concession|aset\s+tak\s+berwujud|aset\s+tidak\s+berwujud|intangible)/i;
