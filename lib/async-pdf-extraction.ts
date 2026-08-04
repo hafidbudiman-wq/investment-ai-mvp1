@@ -185,15 +185,18 @@ async function finalizeJob(job: AsyncJobSummary) {
   let nativeChunks: ReturnType<typeof chunkNativePdf> = [];
   if (document?.content?.length && preflightMode(job.preflight) !== "VISION_OCR_FALLBACK") {
     try {
-      nativeChunks = chunkNativePdf(Buffer.from(document.content)).filter((chunk) => chunk.sourceText.trim()).slice(0, 80);
+      nativeChunks = (await chunkNativePdf(Buffer.from(document.content))).filter((chunk) => chunk.sourceText.trim()).slice(0, 80);
     } catch (error) {
       console.warn("native-pdf-chunking-fallback", { jobId: job.id, error: error instanceof Error ? error.message : String(error) });
     }
   }
-  const chunks = hasReliableNativeStatementStructure(nativeChunks)
-    ? nativeChunks.map((chunk) => ({ section: chunk.statementType, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, textSummary: chunk.sourceText }))
-    : extracted.chunks.length
-      ? extracted.chunks
+  // AI/OCR chunks cover hybrid and scanned pages and therefore remain the
+  // authoritative evidence map. Native chunks are only a bounded fallback when
+  // the validated extraction response contains no chunk map.
+  const chunks = extracted.chunks.length
+    ? extracted.chunks
+    : hasReliableNativeStatementStructure(nativeChunks)
+      ? nativeChunks.map((chunk) => ({ section: chunk.statementType, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, textSummary: chunk.sourceText }))
       : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
   const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string; aiInput?: { originalPageCount?: number | null } };
 
