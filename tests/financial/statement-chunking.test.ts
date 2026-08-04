@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createStructureAwareChunks, hasReliableNativeStatementStructure } from "../../lib/financial/statement-chunking";
-import { deflateSync } from "node:zlib";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 import { chunkNativePdf, extractNativePdfPages } from "../../lib/financial/pdf-native-text";
 
 test("chunks bilingual statements by structure and joins continuation pages", () => {
@@ -40,14 +40,15 @@ test("accepts native chunks after at least two primary statements are identified
   assert.equal(hasReliableNativeStatementStructure(chunks), true);
 });
 
-test("extracts real PDF content streams before structure-aware chunking", async () => {
-  const stream = deflateSync(Buffer.from("BT (LAPORAN POSISI KEUANGAN) Tj (Dalam jutaan Rupiah) Tj [(Kas) 120 (  1.000)] TJ ET"));
-  const pdf = Buffer.concat([
-    Buffer.from("%PDF-1.7\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n3 0 obj << /Type /Page /Parent 2 0 R /Contents 4 0 R >> endobj\n4 0 obj << /Length "),
-    Buffer.from(String(stream.length)),
-    Buffer.from(" /Filter /FlateDecode >> stream\n"), stream,
-    Buffer.from("\nendstream\nendobj\n%%EOF"),
-  ]);
+test("extracts a valid PDF through PDF.js before structure-aware chunking", async () => {
+  const document = await PDFDocument.create();
+  const font = await document.embedFont(StandardFonts.Helvetica);
+  const page = document.addPage([595, 842]);
+  page.drawText("LAPORAN POSISI KEUANGAN", { x: 50, y: 780, size: 14, font });
+  page.drawText("Dalam jutaan Rupiah", { x: 50, y: 750, size: 11, font });
+  page.drawText("Kas 1.000", { x: 50, y: 720, size: 11, font });
+  const pdf = Buffer.from(await document.save({ useObjectStreams: false }));
+
   const pages = await extractNativePdfPages(pdf);
   assert.match(pages[0].text, /LAPORAN POSISI KEUANGAN/);
   const chunks = await chunkNativePdf(pdf);
