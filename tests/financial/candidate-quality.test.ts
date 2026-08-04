@@ -58,6 +58,24 @@ test("recognizes Indonesian utang bank labels used by DRMA", () => {
   assert.equal(refined.candidates.find((item) => item.canonicalCode === "TOTAL_DEBT")?.numericValue, 278_683_993_522);
 });
 
+test("derives ICBP total debt including other long-term debt and leases", () => {
+  const refined = refineFinancialCandidates(extraction([
+    candidate("Utang bank jangka pendek, cerukan dan utang trust receipts", 287_819, "BALANCE_SHEET"),
+    candidate("Utang bank - jatuh tempo dalam satu tahun", 333_397, "BALANCE_SHEET"),
+    candidate("Utang bank jangka panjang", 494_121, "BALANCE_SHEET"),
+    candidate("Utang obligasi", 44_416_407, "BALANCE_SHEET"),
+    candidate("Utang jangka panjang lainnya", 8_753, "BALANCE_SHEET"),
+    candidate("Liabilitas sewa - jangka pendek", 123_054, "BALANCE_SHEET"),
+    candidate("Liabilitas sewa - jangka panjang", 155_308, "BALANCE_SHEET"),
+    candidate("Total debt", 44_694_769, "BALANCE_SHEET", "TOTAL_DEBT"),
+  ]));
+
+  const totals = refined.candidates.filter((item) => item.canonicalCode === "TOTAL_DEBT");
+  assert.equal(totals.length, 1);
+  assert.equal(totals[0].numericValue, 45_818_859);
+  assert.match(totals[0].sourceText ?? "", /Utang jangka panjang lainnya 8753/);
+});
+
 test("derives sector-aware capex and FCF with canonical signs", () => {
   const refined = refineFinancialCandidates(extraction([
     candidate("Net cash provided by operating activities", 398, "CASH_FLOW", "OCF"),
