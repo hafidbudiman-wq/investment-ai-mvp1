@@ -37,7 +37,6 @@ export async function extractNativePdfPages(bytes: Buffer): Promise<ExtractedPag
     data: new Uint8Array(bytes),
     standardFontDataUrl,
     disableFontFace: true,
-    isEvalSupported: false,
     maxImageSize: 0,
     stopAtErrors: true,
   });
