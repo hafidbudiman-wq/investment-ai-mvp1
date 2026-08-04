@@ -6,18 +6,13 @@ export const NATIVE_PDF_MAX_PAGES = 120;
 export const NATIVE_PDF_MAX_CHARACTERS = 2_000_000;
 export const NATIVE_PDF_MAX_PAGE_CHARACTERS = 100_000;
 
-function pageText(items: Awaited<ReturnType<Awaited<ReturnType<typeof getDocument>["promise"]>["getPage"]>> extends never ? never : never): string {
-  void items;
-  return "";
-}
-
-function textFromItems(items: Awaited<ReturnType<Awaited<ReturnType<Awaited<ReturnType<typeof getDocument>["promise"]>["getPage"]>>["getTextContent"]>>["items"]): string {
+function textFromItems(items: readonly unknown[]): string {
   const lines: string[] = [];
   let current = "";
   for (const item of items) {
-    if (!("str" in item)) continue;
+    if (!item || typeof item !== "object" || !("str" in item) || typeof item.str !== "string") continue;
     current += `${current ? " " : ""}${item.str}`;
-    if (item.hasEOL) {
+    if ("hasEOL" in item && item.hasEOL) {
       if (current.trim()) lines.push(current.trim());
       current = "";
     }
