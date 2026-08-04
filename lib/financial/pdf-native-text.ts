@@ -1,57 +1,81 @@
-import { inflateSync } from "node:zlib";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { createStructureAwareChunks, type ExtractedPage, type StructureAwareChunk } from "@/lib/financial/statement-chunking";
 
-function unescapePdfString(value: string): string {
-  return value.replace(/\\([0-7]{1,3}|n|r|t|b|f|[()\\])/g, (_match, escape: string) => {
-    if (/^[0-7]+$/.test(escape)) return String.fromCharCode(Number.parseInt(escape, 8));
-    return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f" } as Record<string, string>)[escape] ?? escape;
-  });
+export const NATIVE_PDF_MAX_BYTES = 12 * 1024 * 1024;
+export const NATIVE_PDF_MAX_PAGES = 120;
+export const NATIVE_PDF_MAX_CHARACTERS = 2_000_000;
+export const NATIVE_PDF_MAX_PAGE_CHARACTERS = 100_000;
+
+function pageText(items: Awaited<ReturnType<Awaited<ReturnType<typeof getDocument>["promise"]>["getPage"]>> extends never ? never : never): string {
+  void items;
+  return "";
 }
 
-function textFromContentStream(stream: Buffer): string {
-  const source = stream.toString("latin1");
+function textFromItems(items: Awaited<ReturnType<Awaited<ReturnType<Awaited<ReturnType<typeof getDocument>["promise"]>["getPage"]>>["getTextContent"]>>["items"]): string {
   const lines: string[] = [];
-  const operator = /(\((?:\\.|[^\\)])*\)|<([0-9a-fA-F\s]+)>|\[((?:\((?:\\.|[^\\)])*\)|<[^>]*>|[^\]])*)\])\s*(Tj|'|"|TJ)/g;
-  for (const match of source.matchAll(operator)) {
-    const strings: string[] = [];
-    for (const token of match[1].matchAll(/\((?:\\.|[^\\)])*\)|<([0-9a-fA-F\s]+)>/g)) {
-      if (token[0].startsWith("(")) strings.push(unescapePdfString(token[0].slice(1, -1)));
-      else strings.push(Buffer.from((token[1] ?? "").replace(/\s/g, ""), "hex").toString("latin1"));
+  let current = "";
+  for (const item of items) {
+    if (!("str" in item)) continue;
+    current += `${current ? " " : ""}${item.str}`;
+    if (item.hasEOL) {
+      if (current.trim()) lines.push(current.trim());
+      current = "";
     }
-    if (strings.length) lines.push(strings.join(""));
   }
-  return lines.join("\n").replace(/\u0000/g, "").trim();
+  if (current.trim()) lines.push(current.trim());
+  return lines.join("\n").trim();
 }
 
-/** Extracts the native text layer page-by-page without treating the PDF binary as plain text. */
-export function extractNativePdfPages(bytes: Buffer): ExtractedPage[] {
+/**
+ * Uses PDF.js instead of manually inflating arbitrary PDF objects. PDF.js follows
+ * the document page tree, applies the active font/ToUnicode mapping, and reads
+ * only requested page content. Explicit byte, page, per-page, and aggregate text
+ * budgets keep untrusted uploads bounded; a rejected native parse falls back to
+ * the validated AI/OCR chunks.
+ */
+export async function extractNativePdfPages(bytes: Buffer): Promise<ExtractedPage[]> {
   if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") throw new Error("Invalid PDF header.");
-  const binary = bytes.toString("latin1");
-  const objects = new Map<number, { dictionary: string; stream?: Buffer }>();
-  const objectPattern = /(\d+)\s+\d+\s+obj\b([\s\S]*?)endobj/g;
-  for (const match of binary.matchAll(objectPattern)) {
-    const body = match[2];
-    const streamMatch = body.match(/([\s\S]*?)stream\r?\n([\s\S]*?)\r?\nendstream/);
-    let stream: Buffer | undefined;
-    if (streamMatch) {
-      const encoded = Buffer.from(streamMatch[2], "latin1");
-      stream = /\/FlateDecode\b/.test(streamMatch[1]) ? inflateSync(encoded) : encoded;
-    }
-    objects.set(Number(match[1]), { dictionary: streamMatch?.[1] ?? body, stream });
-  }
+  if (bytes.length > NATIVE_PDF_MAX_BYTES) throw new Error("PDF exceeds the native parsing byte budget.");
 
-  const pages: ExtractedPage[] = [];
-  for (const object of objects.values()) {
-    if (!/\/Type\s*\/Page\b/.test(object.dictionary)) continue;
-    const contents = object.dictionary.match(/\/Contents\s*(?:\[([^\]]+)\]|(\d+)\s+\d+\s+R)/);
-    const references = [...(contents?.[1] ?? contents?.[2] ?? "").matchAll(/(\d+)(?:\s+\d+\s+R)?/g)].map((item) => Number(item[1]));
-    const text = references.map((reference) => objects.get(reference)?.stream).filter((value): value is Buffer => Boolean(value)).map(textFromContentStream).filter(Boolean).join("\n");
-    pages.push({ pageNumber: pages.length + 1, text });
+  const standardFontDataUrl = `${process.cwd()}/node_modules/pdfjs-dist/standard_fonts/`;
+  const loadingTask = getDocument({
+    data: new Uint8Array(bytes),
+    standardFontDataUrl,
+    disableFontFace: true,
+    isEvalSupported: false,
+    maxImageSize: 0,
+    stopAtErrors: true,
+  });
+
+  try {
+    const document = await loadingTask.promise;
+    if (document.numPages > NATIVE_PDF_MAX_PAGES) {
+      throw new Error("PDF exceeds the native parsing page budget.");
+    }
+
+    const pages: ExtractedPage[] = [];
+    let totalCharacters = 0;
+    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber++) {
+      const page = await document.getPage(pageNumber);
+      const text = textFromItems((await page.getTextContent()).items);
+      if (text.length > NATIVE_PDF_MAX_PAGE_CHARACTERS) {
+        throw new Error(`PDF page ${pageNumber} exceeds the native text budget.`);
+      }
+      totalCharacters += text.length;
+      if (totalCharacters > NATIVE_PDF_MAX_CHARACTERS) {
+        throw new Error("PDF exceeds the aggregate native text budget.");
+      }
+      pages.push({ pageNumber, text });
+      page.cleanup();
+    }
+
+    if (!pages.length) throw new Error("PDF does not contain a readable page tree.");
+    return pages;
+  } finally {
+    await loadingTask.destroy();
   }
-  if (!pages.length) throw new Error("PDF does not contain a readable page tree.");
-  return pages;
 }
 
-export function chunkNativePdf(bytes: Buffer): StructureAwareChunk[] {
-  return createStructureAwareChunks(extractNativePdfPages(bytes), "NATIVE_TEXT");
+export async function chunkNativePdf(bytes: Buffer): Promise<StructureAwareChunk[]> {
+  return createStructureAwareChunks(await extractNativePdfPages(bytes), "NATIVE_TEXT");
 }
