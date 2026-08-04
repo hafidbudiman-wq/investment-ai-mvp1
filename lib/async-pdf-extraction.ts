@@ -182,7 +182,7 @@ async function finalizeJob(job: AsyncJobSummary) {
   const document = job.documentId
     ? await prisma.financialDocument.findUnique({ where: { id: job.documentId }, select: { content: true } })
     : null;
-  let nativeChunks: ReturnType<typeof chunkNativePdf> = [];
+  let nativeChunks: Awaited<ReturnType<typeof chunkNativePdf>> = [];
   if (document?.content?.length && preflightMode(job.preflight) !== "VISION_OCR_FALLBACK") {
     try {
       nativeChunks = (await chunkNativePdf(Buffer.from(document.content))).filter((chunk) => chunk.sourceText.trim()).slice(0, 80);
