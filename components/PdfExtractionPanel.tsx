@@ -151,10 +151,17 @@ export function PdfExtractionPanel() {
     const candidateCommitted = candidate.status === "COMMITTED";
     const candidateRejected = candidate.status === "REJECTED";
     const controlsLocked = committed || candidateCommitted;
+    const classificationLocked = reviewed || controlsLocked;
     return <div className="extraction-candidate" key={candidate.id} style={reviewed || controlsLocked ? { opacity: 0.78 } : undefined}>
       <div className="extraction-main"><strong>{candidate.reportedLabel}</strong><span className="metric-value">{candidate.rawValue}</span><small>Page {candidate.sourcePage ?? "?"} · Read {pct(candidate.extractionConfidence)} · Map {pct(candidate.mappingConfidence)} · {candidate.candidateRole} · QC {candidate.qualityStatus}</small>{candidate.componentOf && <small>Evidence component of {candidate.componentOf}</small>}{candidate.sourceText && <small className="evidence">Evidence: {candidate.sourceText}</small>}</div>
       <div className="extraction-actions">
-        <select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id || reviewed || controlsLocked}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>
+        {classificationLocked
+          ? <div className="form-hint">{candidateRejected
+            ? "Evidence only — no canonical mapping and not saved"
+            : candidate.canonicalAccount
+              ? `${candidate.canonicalAccount.code} — ${candidate.canonicalAccount.name} (locked)`
+              : "Canonical mapping unavailable"}</div>
+          : <select value={candidate.canonicalAccountId ?? ""} onChange={(e) => review(candidate, "ACCEPTED", e.target.value || null)} disabled={busyCandidate === candidate.id}><option value="">— Select canonical account —</option>{accounts.map((a) => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}</select>}
         {candidateCommitted ? <PipelineStatusBadge status="COMMITTED TO CANONICAL 🔒" compact /> : candidateRejected && committed ? <PipelineStatusBadge status="EVIDENCE — NOT COMMITTED" compact /> : reviewed ? <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}><PipelineStatusBadge status={candidate.status === "ACCEPTED" ? "GREEN ✓" : "EVIDENCE ONLY"} compact />{candidate.reviewedBy !== "canonical-quality-engine" && <button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "PENDING")}>Make Pending</button>}</div> : <div><button className="btn" type="button" disabled={!candidate.canonicalAccountId || busyCandidate === candidate.id} onClick={() => review(candidate, "ACCEPTED")}>Accept Exception</button>{" "}<button className="btn secondary" type="button" disabled={busyCandidate === candidate.id} onClick={() => review(candidate, "REJECTED")}>Reject Exception</button></div>}
       </div>
     </div>;
