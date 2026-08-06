@@ -15,6 +15,8 @@ MVP 1 establishes the financial data foundation: company master data, financial 
 - Financial data validation library
 - PostgreSQL database design with Prisma
 - Canonical account mapping
+- Deterministic canonical quality engine with GREEN / YELLOW / RED gates
+- Issuer-specific mapping memory that reduces repeat AI work
 - Data warning and review status models
 - Seed data for ICBP, BTPS, SMRA, MEDC, and POWR
 - Health-check API at `/api/health`
@@ -31,7 +33,7 @@ MVP 1 establishes the financial data foundation: company master data, financial 
 
 ## Run locally
 
-1. Install Node.js 20 or newer and PostgreSQL.
+1. Install Node.js 22 and PostgreSQL.
 2. Copy `.env.example` to `.env`.
 3. Update `DATABASE_URL`.
 4. Run controlled migrations and seed master data:
@@ -69,4 +71,4 @@ Never use `prisma db push` in production. Migration files are the reproducible s
 
 ## Important control principle
 
-AI-extracted financial values must be previewed, mapped, and verified before they enter the canonical database.
+AI reads source rows, but deterministic accounting rules decide canonical facts. GREEN facts are prepared automatically, components/duplicates remain evidence-only, and YELLOW/RED exceptions are blocked. The user performs one explicit Save before canonical PostgreSQL is written.

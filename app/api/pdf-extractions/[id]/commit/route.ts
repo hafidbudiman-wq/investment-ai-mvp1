@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
+import { learnCommittedCanonicalMappings } from "@/lib/async-pdf-extraction";
 
 function periodEnd(year: number, period: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY") {
   if (period === "Q1") return new Date(Date.UTC(year, 2, 31));
@@ -59,6 +60,8 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     if (pending.length) return NextResponse.json({ error: `Masih ada ${pending.length} candidate yang belum direview.` }, { status: 400 });
     const accepted = run.candidates.filter((c) => c.status === "ACCEPTED" && c.canonicalAccountId && c.numericValue !== null);
     if (!accepted.length) return NextResponse.json({ error: "Tidak ada candidate ACCEPTED untuk disimpan." }, { status: 400 });
+    const unsafeAccepted = accepted.filter((candidate) => candidate.qualityStatus !== "GREEN");
+    if (unsafeAccepted.length) return NextResponse.json({ error: `${unsafeAccepted.length} candidate ACCEPTED belum berstatus GREEN. Commit diblokir oleh canonical quality gate.` }, { status: 422 });
 
     const groupedAccepted = new Map<string, typeof accepted>();
     for (const candidate of accepted) {
@@ -139,7 +142,7 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
           extractionRunId: run.id,
           sourceCandidateIds: candidates.map((candidate) => candidate.id),
           reviewStatus: "VERIFIED",
-          reviewedBy: "web-user",
+          reviewedBy: first.reviewedBy || "canonical-quality-engine",
           reviewedAt: new Date(),
         } });
         for (const candidate of candidates) {
@@ -147,11 +150,16 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
         }
       }
       await tx.sourceFile.create({ data: { reportId: report.id, sourceType: "PDF", fileName: run.fileName, mimeType: run.mimeType, fileSize: run.fileSize, checksum: run.checksum } });
-      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${accepted.length} reviewed PDF candidates committed into ${groupedAccepted.size} canonical financial facts after validation. Safe aggregation supports AR/AP counterparties and DEBT_ISSUED/DEBT_REPAID maturity components; provenance is preserved in FinancialEntry.rawText.` } });
+      await tx.auditLog.create({ data: { reportId: report.id, action: "PDF_AI_COMMIT", actor: "web-user", entity: "ExtractionRun", entityId: run.id, note: `${groupedAccepted.size} GREEN canonical facts committed after deterministic validation. Evidence-only components and duplicates remain in staging audit history.` } });
       await tx.extractionRun.update({ where: { id: run.id }, data: { status: "COMMITTED", reportId: report.id } });
       return report.id;
     });
-    return NextResponse.json({ ok: true, reportId, message: `${groupedAccepted.size} canonical financial facts berhasil masuk PostgreSQL dari ${accepted.length} reviewed candidates.` });
+    try {
+      await learnCommittedCanonicalMappings(id);
+    } catch (mappingError) {
+      console.error("committed-canonical-mapping-learning-failed", { runId: id, mappingError });
+    }
+    return NextResponse.json({ ok: true, reportId, message: `${groupedAccepted.size} canonical GREEN facts berhasil masuk PostgreSQL. Mapping emiten dipelajari untuk laporan berikutnya tanpa panggilan AI tambahan.` });
   } catch (error) {
     console.error("pdf-extraction-commit-failed", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Commit gagal." }, { status: 500 });

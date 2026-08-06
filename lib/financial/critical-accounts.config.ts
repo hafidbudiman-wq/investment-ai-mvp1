@@ -11,10 +11,8 @@ export type CriticalAccountDefinition = {
   validationRules: readonly string[];
 };
 
-// The repository contained no versioned list for the previously discussed 13-account gate.
-// This explicit candidate set is intentionally marked provisional until the product owner
-// confirms that it matches the historical list. Readiness reports must not call it approved.
-export const CRITICAL_ACCOUNTS_STATUS = "PROVISIONAL_REQUIRES_PRODUCT_OWNER_CONFIRMATION" as const;
+// Product owner approved this 13-account investor dataset for MVP 1 canonical ingestion.
+export const CRITICAL_ACCOUNTS_STATUS = "APPROVED_MVP1_CANONICAL_SET" as const;
 
 export const CRITICAL_ACCOUNTS = [
   { code: "REV", nameId: "Pendapatan / Penjualan Neto", nameEn: "Revenue / Net Sales", aliases: ["pendapatan", "penjualan neto", "net sales", "revenue"], statementType: "INCOME_STATEMENT", aggregationRule: "DIRECT_TOTAL", signConvention: "POSITIVE", unit: "DOCUMENT_UNIT", periodType: "FLOW", validationRules: ["current-period", "primary-statement-total", "non-negative"] },

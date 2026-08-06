@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { kickQueuedAsyncExtractionJobs, pollAsyncExtractionJobs } from "../lib/async-pdf-extraction";
+import { kickQueuedAsyncExtractionJobs, pollAsyncExtractionJobs, reclassifyPendingExtractionRuns } from "../lib/async-pdf-extraction";
 import { prisma } from "../lib/prisma";
 
 const pollIntervalMs = Math.max(1_000, Number(process.env.WORKER_POLL_INTERVAL_MS ?? 5_000));
@@ -7,6 +7,7 @@ const workerId = process.env.WORKER_ID?.trim() || `pdf-worker-${randomUUID()}`;
 let stopping = false;
 
 export async function runWorkerCycle(): Promise<void> {
+  await reclassifyPendingExtractionRuns(10);
   await kickQueuedAsyncExtractionJobs(5);
   await pollAsyncExtractionJobs(10);
 }

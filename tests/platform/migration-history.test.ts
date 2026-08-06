@@ -32,3 +32,12 @@ test("source-document and reviewed-fact migrations are additive", async () => {
     assert.match(sql, /ADD COLUMN IF NOT EXISTS/);
   }
 });
+
+test("canonical-quality migration is additive and preserves existing staging", async () => {
+  const sql = await readFile("prisma/migrations/20260806173000_canonical_quality_engine/migration.sql", "utf8");
+  assert.doesNotMatch(sql, /\b(?:DROP|TRUNCATE|DELETE FROM)\b/i);
+  assert.match(sql, /ADD COLUMN IF NOT EXISTS "candidateRole"/);
+  assert.match(sql, /ADD COLUMN IF NOT EXISTS "qualityStatus"/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS "CompanyAccountMapping"/);
+  assert.match(sql, /CompanyAccountMapping_companyId_statementType_normalizedLabel_key/);
+});

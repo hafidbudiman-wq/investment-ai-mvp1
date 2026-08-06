@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -21,7 +22,17 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       select: { id: true, code: true, name: true, statementType: true },
       orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }],
     });
-    return NextResponse.json({ ok: true, run, accounts });
+    const verifiedCodes = run.candidates
+      .filter((candidate) => candidate.status === "ACCEPTED" && candidate.qualityStatus === "GREEN" && candidate.canonicalAccount)
+      .map((candidate) => candidate.canonicalAccount!.code);
+    const qualitySummary = {
+      verifiedFacts: verifiedCodes.length,
+      evidenceOnly: run.candidates.filter((candidate) => candidate.status === "REJECTED").length,
+      exceptions: run.candidates.filter((candidate) => candidate.status === "PENDING").length,
+      verifiedCodes,
+      missingCodes: CRITICAL_ACCOUNTS.map((account) => account.code).filter((code) => !verifiedCodes.includes(code)),
+    };
+    return NextResponse.json({ ok: true, run, accounts, qualitySummary });
   } catch (error) {
     console.error("pdf-extraction-detail-failed", error);
     return NextResponse.json({ error: "Gagal membaca hasil extraction." }, { status: 500 });

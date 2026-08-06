@@ -8,6 +8,12 @@ import { companyFromFileName } from "@/lib/financial/company-fallback";
 import { hasReliableNativeStatementStructure } from "@/lib/financial/statement-chunking";
 import { EXTRACTION_PARSER_VERSION } from "@/lib/financial/parser-version";
 import {
+  classifyCanonicalCandidates,
+  normalizeCanonicalLabel,
+  summarizeCanonicalDecisions,
+  type FinancialCandidate,
+} from "@/lib/financial/canonical-quality";
+import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
   submitFinancialPdfBackground,
@@ -172,6 +178,19 @@ async function finalizeJob(job: AsyncJobSummary) {
     return;
   }
 
+  const learnedMappings = (await prisma.companyAccountMapping.findMany({
+    where: { companyId: company.id, isApproved: true },
+    include: { canonicalAccount: { select: { code: true } } },
+  })).map((mapping) => ({
+    normalizedLabel: mapping.normalizedLabel,
+    statementType: mapping.statementType,
+    canonicalCode: mapping.canonicalAccount.code,
+    confidence: mapping.confidence,
+    method: mapping.method,
+  }));
+  const canonicalDecisions = classifyCanonicalCandidates(extracted.candidates, learnedMappings);
+  const qualitySummary = summarizeCanonicalDecisions(canonicalDecisions);
+
   const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId: company.id, checksum: job.checksum } } });
   if (existing) {
     await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId: existing.id, fileData: null } });
@@ -244,9 +263,10 @@ async function finalizeJob(job: AsyncJobSummary) {
       } });
       chunkIds.set(index, stored.id);
     }
-    for (const candidate of extracted.candidates) {
+    for (const decision of canonicalDecisions) {
+      const candidate = decision.candidate;
       if (candidate.numericValue === null || !Number.isFinite(candidate.numericValue)) continue;
-      const canonical = candidate.canonicalCode ? accountByCode.get(candidate.canonicalCode.toUpperCase()) : undefined;
+      const canonical = decision.canonicalCode ? accountByCode.get(decision.canonicalCode.toUpperCase()) : undefined;
       const matchingChunk = chunks.findIndex((chunk) => candidate.sourcePage != null && chunk.pageStart != null && chunk.pageEnd != null && candidate.sourcePage >= chunk.pageStart && candidate.sourcePage <= chunk.pageEnd);
       await tx.extractionCandidate.create({ data: {
         runId: run.id,
@@ -262,15 +282,152 @@ async function finalizeJob(job: AsyncJobSummary) {
         sourceText: candidate.sourceText?.slice(0, 2000) ?? null,
         canonicalAccountId: canonical?.id ?? null,
         extractionConfidence: Math.max(0, Math.min(1, candidate.extractionConfidence)),
-        mappingConfidence: canonical ? Math.max(0, Math.min(1, candidate.mappingConfidence)) : 0,
-        mappingMethod: canonical ? "AI" : null,
-        status: "PENDING",
+        mappingConfidence: canonical ? decision.mappingConfidence : 0,
+        mappingMethod: canonical ? decision.mappingMethod : decision.mappingMethod === "RULE" ? "RULE" : null,
+        candidateRole: decision.candidateRole,
+        componentOf: decision.componentOf,
+        qualityStatus: decision.qualityStatus,
+        qualityReasons: decision.qualityReasons,
+        status: decision.automaticDecision,
+        reviewNote: decision.qualityReasons.join(" ").slice(0, 1000),
+        reviewedBy: decision.automaticDecision === "PENDING" ? null : "canonical-quality-engine",
+        reviewedAt: decision.automaticDecision === "PENDING" ? null : new Date(),
       } });
     }
-    await tx.extractionRun.update({ where: { id: run.id }, data: { status: "PENDING_REVIEW" } });
+    await tx.extractionRun.update({
+      where: { id: run.id },
+      data: { status: qualitySummary.exceptions === 0 && qualitySummary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" },
+    });
     return run.id;
   });
   await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId, fileData: null } });
+}
+
+function storedCandidate(candidate: {
+  statementType: "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW" | "OTHER" | null;
+  reportedLabel: string;
+  rawValue: string;
+  numericValue: unknown;
+  currency: string | null;
+  scale: number;
+  sourcePage: number | null;
+  sourceText: string | null;
+  canonicalAccount: { code: string } | null;
+  extractionConfidence: number | null;
+  mappingConfidence: number | null;
+}): FinancialCandidate {
+  return {
+    statementType: candidate.statementType,
+    reportedLabel: candidate.reportedLabel,
+    rawValue: candidate.rawValue,
+    numericValue: candidate.numericValue === null ? null : Number(candidate.numericValue),
+    currency: candidate.currency,
+    scale: candidate.scale,
+    sourcePage: candidate.sourcePage,
+    sourceText: candidate.sourceText,
+    canonicalCode: candidate.canonicalAccount?.code ?? null,
+    extractionConfidence: candidate.extractionConfidence ?? 0,
+    mappingConfidence: candidate.mappingConfidence ?? 0,
+  };
+}
+
+/** Reclassifies staging produced by older parser versions without another AI call. */
+export async function reclassifyPendingExtractionRuns(limit = 10) {
+  const runs = await prisma.extractionRun.findMany({
+    where: {
+      status: { in: ["PENDING_REVIEW", "READY_TO_COMMIT"] },
+      parserVersion: { not: EXTRACTION_PARSER_VERSION },
+    },
+    include: {
+      candidates: { orderBy: [{ sourcePage: "asc" }, { createdAt: "asc" }], include: { canonicalAccount: { select: { code: true } } } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: limit,
+  });
+  if (!runs.length) return 0;
+
+  const accountByCode = new Map((await prisma.canonicalAccount.findMany({
+    where: { isActive: true, code: { in: criticalAccountCodes } },
+    select: { id: true, code: true },
+  })).map((account) => [account.code, account]));
+
+  for (const run of runs) {
+    const learnedMappings = (await prisma.companyAccountMapping.findMany({
+      where: { companyId: run.companyId, isApproved: true },
+      include: { canonicalAccount: { select: { code: true } } },
+    })).map((mapping) => ({
+      normalizedLabel: mapping.normalizedLabel,
+      statementType: mapping.statementType,
+      canonicalCode: mapping.canonicalAccount.code,
+      confidence: mapping.confidence,
+      method: mapping.method,
+    }));
+    const decisions = classifyCanonicalCandidates(run.candidates.map(storedCandidate), learnedMappings);
+    const summary = summarizeCanonicalDecisions(decisions);
+    await prisma.$transaction(async (tx) => {
+      for (let index = 0; index < run.candidates.length; index++) {
+        const stored = run.candidates[index];
+        const decision = decisions[index];
+        const canonical = decision.canonicalCode ? accountByCode.get(decision.canonicalCode) : undefined;
+        await tx.extractionCandidate.update({
+          where: { id: stored.id },
+          data: {
+            canonicalAccountId: canonical?.id ?? null,
+            mappingConfidence: canonical ? decision.mappingConfidence : 0,
+            mappingMethod: canonical ? decision.mappingMethod : decision.mappingMethod === "RULE" ? "RULE" : null,
+            candidateRole: decision.candidateRole,
+            componentOf: decision.componentOf,
+            qualityStatus: decision.qualityStatus,
+            qualityReasons: decision.qualityReasons,
+            status: decision.automaticDecision,
+            reviewNote: decision.qualityReasons.join(" ").slice(0, 1000),
+            reviewedBy: decision.automaticDecision === "PENDING" ? null : "canonical-quality-engine",
+            reviewedAt: decision.automaticDecision === "PENDING" ? null : new Date(),
+          },
+        });
+      }
+      await tx.extractionRun.update({
+        where: { id: run.id },
+        data: {
+          parserVersion: EXTRACTION_PARSER_VERSION,
+          status: summary.exceptions === 0 && summary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW",
+          errorMessage: summary.exceptions ? `${summary.exceptions} canonical quality exception(s) require review.` : null,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          action: "CANONICAL_QUALITY_RECLASSIFIED",
+          actor: "canonical-quality-engine",
+          entity: "ExtractionRun",
+          entityId: run.id,
+          note: `${summary.verifiedFacts} verified canonical facts, ${summary.evidenceOnly} evidence-only rows, ${summary.exceptions} exceptions. No OpenAI request was made.`,
+          after: {
+            parserVersion: EXTRACTION_PARSER_VERSION,
+            verifiedCodes: summary.verifiedCodes,
+            missingCodes: summary.missingCodes,
+          },
+        },
+      });
+    });
+  }
+  return runs.length;
+}
+
+export async function learnCommittedCanonicalMappings(runId: string) {
+  const run = await prisma.extractionRun.findUnique({
+    where: { id: runId },
+    include: { candidates: { where: { status: "COMMITTED", candidateRole: "FINAL_FACT" }, include: { canonicalAccount: true } } },
+  });
+  if (!run) return;
+  for (const candidate of run.candidates) {
+    if (!candidate.canonicalAccountId || !candidate.statementType) continue;
+    const normalizedLabel = normalizeCanonicalLabel(candidate.reportedLabel);
+    await prisma.companyAccountMapping.upsert({
+      where: { companyId_statementType_normalizedLabel: { companyId: run.companyId, statementType: candidate.statementType, normalizedLabel } },
+      update: { sourceLabel: candidate.reportedLabel, canonicalAccountId: candidate.canonicalAccountId, method: "RULE", confidence: 1, isApproved: true, evidenceCount: { increment: 1 } },
+      create: { companyId: run.companyId, statementType: candidate.statementType, normalizedLabel, sourceLabel: candidate.reportedLabel, canonicalAccountId: candidate.canonicalAccountId, method: "RULE", confidence: 1, isApproved: true },
+    });
+  }
 }
 
 function preflightMode(value: unknown): string | undefined {

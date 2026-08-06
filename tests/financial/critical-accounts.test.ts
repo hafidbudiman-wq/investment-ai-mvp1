@@ -11,5 +11,5 @@ test("critical-account candidate set is centralized and internally complete", ()
     assert.ok(account.aliases.length > 0);
     assert.ok(account.validationRules.length > 0);
   }
-  assert.equal(CRITICAL_ACCOUNTS_STATUS, "PROVISIONAL_REQUIRES_PRODUCT_OWNER_CONFIRMATION");
+  assert.equal(CRITICAL_ACCOUNTS_STATUS, "APPROVED_MVP1_CANONICAL_SET");
 });

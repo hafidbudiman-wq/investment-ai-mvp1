@@ -93,6 +93,7 @@ model Company {
   isActive       Boolean           @default(true)
   reports        FinancialReport[]
   extractionRuns ExtractionRun[]
+  canonicalMappings CompanyAccountMapping[]
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 }
@@ -167,6 +168,7 @@ model CanonicalAccount {
   isActive             Boolean               @default(true)
   entries              FinancialEntry[]
   mappings             AccountMapping[]
+  companyMappings      CompanyAccountMapping[]
   extractionCandidates ExtractionCandidate[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @default(now()) @updatedAt
@@ -230,6 +232,27 @@ model AccountMapping {
 
   @@index([normalizedLabel])
   @@index([companyId, statementType])
+}
+
+model CompanyAccountMapping {
+  id                 String           @id @default(cuid())
+  companyId          String
+  company            Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  statementType      StatementType
+  normalizedLabel    String
+  sourceLabel        String
+  canonicalAccountId String
+  canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id], onDelete: Cascade)
+  method             MappingMethod    @default(RULE)
+  confidence         Float            @default(1)
+  evidenceCount      Int              @default(1)
+  isApproved         Boolean          @default(true)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([companyId, statementType, normalizedLabel])
+  @@index([canonicalAccountId])
+  @@index([companyId, isApproved])
 }
 
 model DataWarning {
@@ -352,6 +375,10 @@ model ExtractionCandidate {
   extractionConfidence Float?
   mappingConfidence    Float?
   mappingMethod        MappingMethod?
+  candidateRole        String                    @default("FINAL_FACT")
+  componentOf          String?
+  qualityStatus        String                    @default("YELLOW")
+  qualityReasons       Json?
   status               ExtractionCandidateStatus @default(PENDING)
   reviewNote           String?
   reviewedBy           String?
