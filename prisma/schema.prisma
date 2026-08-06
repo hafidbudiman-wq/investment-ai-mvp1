@@ -81,20 +81,21 @@ enum ExtractionChunkType {
 }
 
 model Company {
-  id             String              @id @default(cuid())
-  ticker         String              @unique
+  id             String            @id @default(cuid())
+  ticker         String            @unique
   name           String
   sector         String?
   subsector      String?
-  country        String              @default("ID")
+  country        String            @default("ID")
   ipoYear        Int?
-  currency       String              @default("IDR")
-  fiscalYearEnd  Int                 @default(12)
-  isActive       Boolean             @default(true)
+  currency       String            @default("IDR")
+  fiscalYearEnd  Int               @default(12)
+  isActive       Boolean           @default(true)
   reports        FinancialReport[]
   extractionRuns ExtractionRun[]
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  canonicalMappings CompanyAccountMapping[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 }
 
 model FinancialReport {
@@ -126,16 +127,16 @@ model FinancialReport {
 }
 
 model FinancialStatement {
-  id             String             @id @default(cuid())
+  id             String           @id @default(cuid())
   reportId       String
-  report         FinancialReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  report         FinancialReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
   statementType  StatementType
   currency       String
-  unitScale      Int                @default(1)
-  isConsolidated Boolean            @default(true)
+  unitScale      Int              @default(1)
+  isConsolidated Boolean          @default(true)
   entries        FinancialEntry[]
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@unique([reportId, statementType])
 }
@@ -167,6 +168,7 @@ model CanonicalAccount {
   isActive             Boolean               @default(true)
   entries              FinancialEntry[]
   mappings             AccountMapping[]
+  companyMappings      CompanyAccountMapping[]
   extractionCandidates ExtractionCandidate[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @default(now()) @updatedAt
@@ -186,18 +188,32 @@ model FinancialEntry {
   reportedLabel      String?
   rawText            String?
   value              Decimal             @db.Decimal(28, 6)
+  originalValue      Decimal?            @db.Decimal(28, 6)
+  normalizedValue    Decimal?            @db.Decimal(38, 6)
+  originalRawValue   String?
   scale              Int                 @default(1)
   currency           String              @default("IDR")
+  signConvention     String?
   isEstimated        Boolean             @default(false)
   isVerified         Boolean             @default(false)
   confidence         Float?
   sourcePage         Int?
+  sourceDocumentId   String?
+  sourceDocument     FinancialDocument?  @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+  extractionRunId    String?
+  extractionRun      ExtractionRun?      @relation(fields: [extractionRunId], references: [id], onDelete: SetNull)
+  sourceCandidateIds Json?
+  reviewStatus       ReviewStatus        @default(VERIFIED)
+  reviewedBy         String?
+  reviewedAt         DateTime?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
   @@unique([reportId, canonicalAccountId])
   @@index([canonicalAccountId])
   @@index([statementId])
+  @@index([sourceDocumentId])
+  @@index([extractionRunId])
 }
 
 model AccountMapping {
@@ -216,6 +232,27 @@ model AccountMapping {
 
   @@index([normalizedLabel])
   @@index([companyId, statementType])
+}
+
+model CompanyAccountMapping {
+  id                 String           @id @default(cuid())
+  companyId          String
+  company            Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  statementType      StatementType
+  normalizedLabel    String
+  sourceLabel        String
+  canonicalAccountId String
+  canonicalAccount   CanonicalAccount @relation(fields: [canonicalAccountId], references: [id], onDelete: Cascade)
+  method             MappingMethod    @default(RULE)
+  confidence         Float            @default(1)
+  evidenceCount      Int              @default(1)
+  isApproved         Boolean          @default(true)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([companyId, statementType, normalizedLabel])
+  @@index([canonicalAccountId])
+  @@index([companyId, isApproved])
 }
 
 model DataWarning {
@@ -286,12 +323,17 @@ model ExtractionRun {
   errorMessage  String?
   chunks        ExtractionChunk[]
   candidates    ExtractionCandidate[]
+  asyncJob      AsyncExtractionJob?
+  documentId    String?
+  document      FinancialDocument?    @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  reviewedFacts FinancialEntry[]
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @default(now()) @updatedAt
 
   @@unique([companyId, checksum])
   @@index([companyId, createdAt])
   @@index([status])
+  @@index([documentId])
 }
 
 model ExtractionChunk {
@@ -333,6 +375,10 @@ model ExtractionCandidate {
   extractionConfidence Float?
   mappingConfidence    Float?
   mappingMethod        MappingMethod?
+  candidateRole        String                    @default("FINAL_FACT")
+  componentOf          String?
+  qualityStatus        String                    @default("YELLOW")
+  qualityReasons       Json?
   status               ExtractionCandidateStatus @default(PENDING)
   reviewNote           String?
   reviewedBy           String?
@@ -343,6 +389,32 @@ model ExtractionCandidate {
   @@index([runId, status])
   @@index([canonicalAccountId])
   @@index([chunkId])
+}
+
+model AsyncExtractionJob {
+  id                  String             @id
+  fileName            String
+  mimeType            String             @default("application/pdf")
+  fileSize            Int
+  checksum            String             @unique
+  status              String             @default("UPLOADED")
+  openAiResponseId    String?
+  runId               String?            @unique
+  run                 ExtractionRun?     @relation(fields: [runId], references: [id], onDelete: SetNull)
+  documentId          String?
+  document            FinancialDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  detectedTicker      String?
+  detectedCompanyName String?
+  detectedYear        Int?
+  detectedPeriodType  String?
+  errorMessage        String?
+  preflight           Json?
+  fileData            Bytes?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([status, createdAt])
+  @@index([documentId])
 }
 
 model UploadSession {
@@ -387,24 +459,28 @@ model UploadPart {
 }
 
 model FinancialDocument {
-  id                 String              @id @default(cuid())
-  uploadSessionId    String?             @unique
-  uploadSession      UploadSession?      @relation(fields: [uploadSessionId], references: [id], onDelete: SetNull)
+  id                 String               @id @default(cuid())
+  uploadSessionId    String?              @unique
+  uploadSession      UploadSession?       @relation(fields: [uploadSessionId], references: [id], onDelete: SetNull)
   storageProvider    String
   bucket             String
-  objectKey          String              @unique
+  objectKey          String               @unique
   originalFileName   String
   mimeType           String
   verifiedSize       Int
   sha256             String?
-  magicBytesVerified Boolean             @default(false)
-  status             String              @default("UPLOADED")
+  content            Bytes?
+  magicBytesVerified Boolean              @default(false)
+  status             String               @default("UPLOADED")
   uploadedBy         String?
   verifiedAt         DateTime?
   jobs               Job[]
+  asyncJobs          AsyncExtractionJob[]
+  extractionRuns     ExtractionRun[]
+  reviewedFacts      FinancialEntry[]
   metadataAssertions MetadataAssertion[]
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
   @@index([sha256])
   @@index([status, createdAt])

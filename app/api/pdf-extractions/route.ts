@@ -1,16 +1,13 @@
 import { randomUUID } from "crypto";
-import { after, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfUpload } from "@/lib/pdf-extraction";
+import { inspectPdfForOcr, isUploadedPdfLike, sha256, validatePdfMagic, validatePdfUpload } from "@/lib/pdf-extraction";
 import {
   createAsyncJob,
   findAsyncJobByChecksum,
-  kickQueuedAsyncExtractionJobs,
   listAsyncJobs,
-  pollAsyncExtractionJobs,
-  submitQueuedAsyncJob,
 } from "@/lib/async-pdf-extraction";
-import { resetFailedAsyncUpload } from "@/lib/async-pdf-upload-retry";
+import { resetFailedAsyncUpload, resetUntouchedStaleRun } from "@/lib/async-pdf-upload-retry";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -25,8 +22,6 @@ const FILTERS: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   try {
-    await kickQueuedAsyncExtractionJobs();
-    await pollAsyncExtractionJobs();
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1) || 1);
     const pageSize = Math.min(50, Math.max(5, Number(url.searchParams.get("pageSize") || 20) || 20));
@@ -54,8 +49,7 @@ export async function GET(request: Request) {
         else if (candidate.status === "COMMITTED") acc.committed += 1;
         return acc;
       }, { pending: 0, accepted: 0, rejected: 0, committed: 0 });
-      const { candidates: _candidates, ...rest } = run;
-      return { ...rest, kind: "RUN" as const, review };
+      return { ...run, candidates: undefined, kind: "RUN" as const, review };
     });
 
     const jobRows = jobs.map((job) => ({
@@ -101,16 +95,36 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const uploadId = request.headers.get("x-investai-upload-id")?.slice(0, 100) || randomUUID();
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: { code: "EXTRACTION_PROVIDER_UNAVAILABLE", message: "OPENAI_API_KEY belum dikonfigurasi; upload tidak diproses agar tidak menghasilkan job yang pasti gagal." } },
+        { status: 503 },
+      );
+    }
     const form = await request.formData();
     const file = form.get("file");
     if (!isUploadedPdfLike(file)) return NextResponse.json({ error: "PDF belum dipilih atau upload tidak terbaca dengan benar." }, { status: 400 });
     validatePdfUpload(file);
     const bytes = Buffer.from(await file.arrayBuffer());
+    console.info(JSON.stringify({ event: "pdf_upload_received", uploadId, fileName: file.name, fileSize: file.size }));
+    validatePdfMagic(bytes);
     const checksum = sha256(bytes);
 
     const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
-    if (existingRun) return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+    if (existingRun) {
+      const reprocessed = await resetUntouchedStaleRun({
+        runId: existingRun.id,
+        fileName: file.name,
+        mimeType: file.type || "application/pdf",
+        fileSize: file.size,
+        preflight: inspectPdfForOcr(bytes),
+        bytes,
+      });
+      if (reprocessed) return NextResponse.json({ ok: true, accepted: true, retried: true, status: "UPLOADED", message: "Staging lama yang belum pernah direview diproses ulang dengan parser kualitas terbaru." }, { status: 202 });
+      return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+    }
 
     const existingJob = await findAsyncJobByChecksum(checksum);
     if (existingJob && existingJob.status !== "FAILED") {
@@ -140,10 +154,7 @@ export async function POST(request: Request) {
       });
     }
 
-    after(async () => {
-      await submitQueuedAsyncJob(jobId);
-    });
-
+    console.info(JSON.stringify({ event: "pdf_upload_accepted", uploadId, jobId, fileName: file.name, fileSize: file.size }));
     return NextResponse.json({
       ok: true,
       accepted: true,
@@ -155,7 +166,7 @@ export async function POST(request: Request) {
         : "Upload diterima dan job sudah tersimpan. AI akan memproses PDF di background; halaman boleh ditutup.",
     }, { status: 202 });
   } catch (error) {
-    console.error("pdf-extraction-upload-ack-failed", error);
+    console.error("pdf-extraction-upload-ack-failed", { uploadId, error });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Gagal menyimpan PDF sebagai background job." }, { status: 500 });
   }
 }

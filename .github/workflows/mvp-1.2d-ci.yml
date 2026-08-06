@@ -22,7 +22,7 @@ jobs:
           npm --version
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --ignore-scripts
+        run: npm ci --no-audit --no-fund --ignore-scripts
 
       - name: Validate Prisma schema
         run: npx prisma validate

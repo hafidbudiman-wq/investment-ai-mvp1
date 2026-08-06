@@ -141,13 +141,15 @@ async function main() {
 
   for (const company of [
     {ticker:"ICBP",name:"Indofood CBP Sukses Makmur Tbk",sector:"Consumer Non-Cyclicals",subsector:"Processed Foods"},
+    {ticker:"DRMA",name:"Dharma Polimetal Tbk",sector:"Industrials",subsector:"Auto Parts"},
     {ticker:"BTPS",name:"Bank BTPN Syariah Tbk",sector:"Financials",subsector:"Banks"},
     {ticker:"SMRA",name:"Summarecon Agung Tbk",sector:"Properties",subsector:"Real Estate"},
     {ticker:"MEDC",name:"Medco Energi Internasional Tbk",sector:"Energy",subsector:"Oil & Gas",currency:"USD"},
+    {ticker:"LSIP",name:"PP London Sumatra Indonesia Tbk",sector:"Consumer Non-Cyclicals",subsector:"Plantations"},
     {ticker:"POWR",name:"Cikarang Listrindo Tbk",sector:"Utilities",subsector:"Independent Power Producer"},
   ]) await prisma.company.upsert({where:{ticker:company.ticker},update:company,create:company});
 
-  console.log(`Seeded ${accounts.length} canonical accounts with complete 46/46 investor dictionary coverage.`);
+  console.log(`Seeded ${accounts.length} canonical accounts with complete investor dictionary coverage.`);
 }
 
 main().catch((e)=>{console.error(e);process.exit(1)}).finally(()=>prisma.$disconnect());

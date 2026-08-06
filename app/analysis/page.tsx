@@ -14,9 +14,10 @@ function multiple(value: number | null) { return value == null ? "N/A" : `${valu
 export default async function AnalysisPage({ searchParams }: { searchParams: Promise<{ reportId?: string }> }) {
   const params = await searchParams;
   const reports = await prisma.financialReport.findMany({
+    where: { status: "VERIFIED" },
     include: {
       company: true,
-      entries: { include: { canonicalAccount: true } },
+      entries: { where: { isVerified: true, reviewStatus: "VERIFIED" }, include: { canonicalAccount: true } },
     },
     orderBy: [{ year: "desc" }, { company: { ticker: "asc" } }],
   }).catch(() => []);
@@ -26,7 +27,7 @@ export default async function AnalysisPage({ searchParams }: { searchParams: Pro
     return <div className="header"><div><h1>Fundamental Analysis</h1><p>Belum ada laporan keuangan untuk dianalisis.</p></div></div>;
   }
 
-  const values = new Map(selected.entries.map((entry) => [entry.canonicalAccount.code, n(entry.value)]));
+  const values = new Map(selected.entries.map((entry) => [entry.canonicalAccount.code, n(entry.normalizedValue ?? Number(entry.value) * entry.scale)]));
   const revenue = values.get("REV") ?? null;
   const netProfit = values.get("NET_PROFIT") ?? null;
   const assets = values.get("TOTAL_ASSETS") ?? null;

@@ -1,107 +1,71 @@
 import { prisma } from "@/lib/prisma";
 import { sha256 } from "@/lib/pdf-extraction";
+import { chunkNativePdf } from "@/lib/financial/pdf-native-text";
+import type { AsyncExtractionJob as AsyncJob, Prisma } from "@prisma/client";
+import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
+import { preparePdfAiInput } from "@/lib/financial/pdf-ai-input";
+import { companyFromFileName } from "@/lib/financial/company-fallback";
+import { hasReliableNativeStatementStructure } from "@/lib/financial/statement-chunking";
+import { EXTRACTION_PARSER_VERSION } from "@/lib/financial/parser-version";
+import {
+  classifyCanonicalCandidates,
+  normalizeCanonicalLabel,
+  summarizeCanonicalDecisions,
+  type FinancialCandidate,
+} from "@/lib/financial/canonical-quality";
 import {
   parseFinancialExtractionResponse,
   retrieveFinancialPdfBackground,
   submitFinancialPdfBackground,
 } from "@/lib/openai-financial-extraction";
 
-type AsyncJob = {
-  id: string;
-  fileName: string;
-  mimeType: string;
-  fileSize: number;
-  checksum: string;
-  status: string;
-  openAiResponseId: string | null;
-  runId: string | null;
-  detectedTicker: string | null;
-  detectedCompanyName: string | null;
-  detectedYear: number | null;
-  detectedPeriodType: string | null;
-  errorMessage: string | null;
-  preflight: unknown;
-  fileData?: Buffer | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+type AsyncJobSummary = Omit<AsyncJob, "fileData">;
 
 const submittingJobs = new Set<string>();
-
-export async function ensureAsyncExtractionTable() {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "AsyncExtractionJob" (
-      "id" TEXT PRIMARY KEY,
-      "fileName" TEXT NOT NULL,
-      "mimeType" TEXT NOT NULL DEFAULT 'application/pdf',
-      "fileSize" INTEGER NOT NULL,
-      "checksum" TEXT NOT NULL UNIQUE,
-      "status" TEXT NOT NULL DEFAULT 'UPLOADED',
-      "openAiResponseId" TEXT,
-      "runId" TEXT,
-      "detectedTicker" TEXT,
-      "detectedCompanyName" TEXT,
-      "detectedYear" INTEGER,
-      "detectedPeriodType" TEXT,
-      "errorMessage" TEXT,
-      "preflight" JSONB,
-      "fileData" BYTEA,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  await prisma.$executeRawUnsafe(`ALTER TABLE "AsyncExtractionJob" ADD COLUMN IF NOT EXISTS "fileData" BYTEA`);
-  await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "AsyncExtractionJob_status_idx" ON "AsyncExtractionJob" ("status")`);
-}
+const criticalAccountCodes = CRITICAL_ACCOUNTS.map((account) => account.code);
 
 export async function findAsyncJobByChecksum(checksum: string) {
-  await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "checksum" = $1 LIMIT 1`, checksum);
-  return rows[0] ?? null;
+  return prisma.asyncExtractionJob.findUnique({ where: { checksum } });
 }
 
 export async function createAsyncJob(input: { id: string; fileName: string; mimeType: string; fileSize: number; checksum: string; preflight: unknown; bytes: Buffer }) {
-  await ensureAsyncExtractionTable();
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO "AsyncExtractionJob" ("id","fileName","mimeType","fileSize","checksum","status","preflight","fileData") VALUES ($1,$2,$3,$4,$5,'UPLOADED',$6::jsonb,$7)`,
-    input.id,
-    input.fileName,
-    input.mimeType,
-    input.fileSize,
-    input.checksum,
-    JSON.stringify(input.preflight),
-    input.bytes,
-  );
+  await prisma.$transaction(async (tx) => {
+    const document = await tx.financialDocument.upsert({
+      where: { objectKey: `sha256/${input.checksum}.pdf` },
+      update: { content: input.bytes, verifiedSize: input.fileSize, sha256: input.checksum, magicBytesVerified: true, status: "VERIFIED", verifiedAt: new Date() },
+      create: { storageProvider: "POSTGRESQL", bucket: "investai-source-documents", objectKey: `sha256/${input.checksum}.pdf`, originalFileName: input.fileName, mimeType: input.mimeType, verifiedSize: input.fileSize, sha256: input.checksum, content: input.bytes, magicBytesVerified: true, status: "VERIFIED", verifiedAt: new Date() },
+    });
+    await tx.asyncExtractionJob.create({
+      data: {
+        id: input.id,
+        fileName: input.fileName,
+        mimeType: input.mimeType,
+        fileSize: input.fileSize,
+        checksum: input.checksum,
+        status: "UPLOADED",
+        preflight: input.preflight as Prisma.InputJsonValue,
+        fileData: input.bytes,
+        documentId: document.id,
+      },
+    });
+  });
 }
 
 export async function markAsyncJobSubmitted(id: string, responseId: string, status: string) {
   const normalizedStatus = status === "queued" || status === "in_progress" ? "PROCESSING" : status.toUpperCase();
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "openAiResponseId"=$2,"status"=$3,"fileData"=NULL,"errorMessage"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    id,
-    responseId,
-    normalizedStatus,
-  );
+  await prisma.asyncExtractionJob.update({ where: { id }, data: { openAiResponseId: responseId, status: normalizedStatus, fileData: null, errorMessage: null } });
 }
 
 export async function markAsyncJobFailed(id: string, message: string) {
-  await ensureAsyncExtractionTable();
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "status"='FAILED',"errorMessage"=$2,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    id,
-    message.slice(0, 2000),
-  );
+  await prisma.asyncExtractionJob.update({ where: { id }, data: { status: "FAILED", errorMessage: message.slice(0, 2000) } });
 }
 
 export async function listAsyncJobs() {
-  await ensureAsyncExtractionTable();
-  return prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT "id","fileName","mimeType","fileSize","checksum","status","openAiResponseId","runId","detectedTicker","detectedCompanyName","detectedYear","detectedPeriodType","errorMessage","preflight","createdAt","updatedAt" FROM "AsyncExtractionJob" WHERE "runId" IS NULL ORDER BY "updatedAt" DESC LIMIT 100`);
+  return prisma.asyncExtractionJob.findMany({ where: { runId: null }, orderBy: { updatedAt: "desc" }, take: 100, omit: { fileData: true } });
 }
 
 async function getAsyncJobWithFile(id: string) {
-  await ensureAsyncExtractionTable();
-  const rows = await prisma.$queryRawUnsafe<AsyncJob[]>(`SELECT * FROM "AsyncExtractionJob" WHERE "id"=$1 LIMIT 1`, id);
-  return rows[0] ?? null;
+  return prisma.asyncExtractionJob.findUnique({ where: { id }, include: { document: { select: { content: true } } } });
 }
 
 export async function submitQueuedAsyncJob(id: string) {
@@ -110,23 +74,52 @@ export async function submitQueuedAsyncJob(id: string) {
   try {
     const job = await getAsyncJobWithFile(id);
     if (!job || job.status !== "UPLOADED" || job.openAiResponseId) return;
-    if (!job.fileData?.length) throw new Error("PDF sementara tidak tersedia untuk dikirim ke OpenAI.");
+    const sourceBytes = job.document?.content ?? job.fileData;
+    if (!sourceBytes?.length) throw new Error("Source PDF persisten tidak tersedia untuk dikirim ke OpenAI.");
 
     const [companies, accounts] = await Promise.all([
       prisma.company.findMany({ where: { isActive: true }, select: { ticker: true, name: true } }),
       prisma.canonicalAccount.findMany({
-        where: { isActive: true, isCalculated: false },
+        where: { isActive: true, isCalculated: false, code: { in: criticalAccountCodes } },
         select: { id: true, code: true, name: true, statementType: true, aliases: true },
         orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }],
       }),
     ]);
 
+    const aiInput = await preparePdfAiInput(Buffer.from(sourceBytes));
+    const existingPreflight = job.preflight && typeof job.preflight === "object" && !Array.isArray(job.preflight)
+      ? job.preflight as Record<string, Prisma.JsonValue>
+      : {};
+    const preflightWithAiInput = {
+      ...existingPreflight,
+      aiInput: {
+        originalPageCount: aiInput.originalPageCount,
+        submittedPageCount: aiInput.submittedPageCount,
+        reduced: aiInput.reduced,
+        inputMode: aiInput.inputMode,
+        submittedBytes: aiInput.text ? Buffer.byteLength(aiInput.text) : aiInput.bytes.length,
+      },
+    } satisfies Prisma.InputJsonObject;
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { preflight: preflightWithAiInput } });
+    if (aiInput.reduced) {
+      console.info(JSON.stringify({
+        event: "pdf_ai_input_bounded",
+        jobId: job.id,
+        originalPageCount: aiInput.originalPageCount,
+        submittedPageCount: aiInput.submittedPageCount,
+        originalBytes: sourceBytes.length,
+        submittedBytes: aiInput.text ? Buffer.byteLength(aiInput.text) : aiInput.bytes.length,
+        inputMode: aiInput.inputMode,
+      }));
+    }
+
     const background = await submitFinancialPdfBackground({
-      bytes: Buffer.from(job.fileData),
+      bytes: aiInput.bytes,
+      documentText: aiInput.text,
       fileName: job.fileName,
       knownCompanies: companies,
       accounts,
-      preflight: job.preflight as Parameters<typeof submitFinancialPdfBackground>[0]["preflight"],
+      preflight: preflightWithAiInput as unknown as Parameters<typeof submitFinancialPdfBackground>[0]["preflight"],
     });
     await markAsyncJobSubmitted(job.id, background.id, background.status);
   } catch (error) {
@@ -137,11 +130,7 @@ export async function submitQueuedAsyncJob(id: string) {
 }
 
 export async function kickQueuedAsyncExtractionJobs(limit = 2) {
-  await ensureAsyncExtractionTable();
-  const queued = await prisma.$queryRawUnsafe<Array<{ id: string }>>(
-    `SELECT "id" FROM "AsyncExtractionJob" WHERE "status"='UPLOADED' AND "openAiResponseId" IS NULL ORDER BY "createdAt" ASC LIMIT $1`,
-    limit,
-  );
+  const queued = await prisma.asyncExtractionJob.findMany({ where: { status: "UPLOADED", openAiResponseId: null }, select: { id: true }, orderBy: { createdAt: "asc" }, take: limit });
   for (const job of queued) void submitQueuedAsyncJob(job.id);
 }
 
@@ -149,11 +138,11 @@ function normalize(value: string | null | undefined) {
   return (value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-async function finalizeJob(job: AsyncJob) {
+async function finalizeJob(job: AsyncJobSummary) {
   if (!job.openAiResponseId) return;
   const response = await retrieveFinancialPdfBackground(job.openAiResponseId);
   if (response.status === "queued" || response.status === "in_progress") {
-    await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='PROCESSING',"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id);
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "PROCESSING" } });
     return;
   }
   if (response.status !== "completed") {
@@ -162,24 +151,23 @@ async function finalizeJob(job: AsyncJob) {
     return;
   }
 
-  const extracted = parseFinancialExtractionResponse(response);
   const [companies, accounts] = await Promise.all([
     prisma.company.findMany({ where: { isActive: true }, select: { id: true, ticker: true, name: true, currency: true } }),
     prisma.canonicalAccount.findMany({ where: { isActive: true, isCalculated: false }, select: { id: true, code: true, name: true, statementType: true }, orderBy: [{ statementType: "asc" }, { sortOrder: "asc" }] }),
   ]);
+  const fileNameCompany = companyFromFileName(job.fileName, companies);
+  const extracted = parseFinancialExtractionResponse(response, fileNameCompany);
   const detectedTicker = normalize(extracted.detectedCompanyTicker);
   const detectedName = normalize(extracted.detectedCompanyName);
   const company = companies.find((item) => normalize(item.ticker) === detectedTicker)
     ?? companies.find((item) => normalize(item.name) === detectedName);
 
-  await prisma.$executeRawUnsafe(
-    `UPDATE "AsyncExtractionJob" SET "detectedTicker"=$2,"detectedCompanyName"=$3,"detectedYear"=$4,"detectedPeriodType"=$5,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`,
-    job.id,
-    extracted.detectedCompanyTicker,
-    extracted.detectedCompanyName,
-    extracted.detectedYear,
-    extracted.detectedPeriodType,
-  );
+  await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: {
+    detectedTicker: extracted.detectedCompanyTicker,
+    detectedCompanyName: extracted.detectedCompanyName,
+    detectedYear: extracted.detectedYear,
+    detectedPeriodType: extracted.detectedPeriodType,
+  } });
 
   if (!company || (extracted.detectedCompanyConfidence ?? 0) < 0.95) {
     await markAsyncJobFailed(job.id, `AI mendeteksi ${extracted.detectedCompanyTicker ?? "?"} — ${extracted.detectedCompanyName ?? "?"}, tetapi emiten belum cocok secara aman dengan Company Master.`);
@@ -190,15 +178,46 @@ async function finalizeJob(job: AsyncJob) {
     return;
   }
 
+  const learnedMappings = (await prisma.companyAccountMapping.findMany({
+    where: { companyId: company.id, isApproved: true },
+    include: { canonicalAccount: { select: { code: true } } },
+  })).map((mapping) => ({
+    normalizedLabel: mapping.normalizedLabel,
+    statementType: mapping.statementType,
+    canonicalCode: mapping.canonicalAccount.code,
+    confidence: mapping.confidence,
+    method: mapping.method,
+  }));
+  const canonicalDecisions = classifyCanonicalCandidates(extracted.candidates, learnedMappings);
+  const qualitySummary = summarizeCanonicalDecisions(canonicalDecisions);
+
   const existing = await prisma.extractionRun.findUnique({ where: { companyId_checksum: { companyId: company.id, checksum: job.checksum } } });
   if (existing) {
-    await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='COMPLETED',"runId"=$2,"fileData"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id, existing.id);
+    await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId: existing.id, fileData: null } });
     return;
   }
 
   const accountByCode = new Map(accounts.map((account) => [account.code.toUpperCase(), account]));
-  const chunks = extracted.chunks.length ? extracted.chunks : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
-  const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string };
+  const document = job.documentId
+    ? await prisma.financialDocument.findUnique({ where: { id: job.documentId }, select: { content: true } })
+    : null;
+  let nativeChunks: Awaited<ReturnType<typeof chunkNativePdf>> = [];
+  if (document?.content?.length && preflightMode(job.preflight) !== "VISION_OCR_FALLBACK") {
+    try {
+      nativeChunks = (await chunkNativePdf(Buffer.from(document.content))).filter((chunk) => chunk.sourceText.trim()).slice(0, 80);
+    } catch (error) {
+      console.warn("native-pdf-chunking-fallback", { jobId: job.id, error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  // AI/OCR chunks cover hybrid and scanned pages and therefore remain the
+  // authoritative evidence map. Native chunks are only a bounded fallback when
+  // the validated extraction response contains no chunk map.
+  const chunks = extracted.chunks.length
+    ? extracted.chunks
+    : hasReliableNativeStatementStructure(nativeChunks)
+      ? nativeChunks.map((chunk) => ({ section: chunk.statementType, chunkType: chunk.chunkType, pageStart: chunk.pageStart, pageEnd: chunk.pageEnd, textSummary: chunk.sourceText }))
+      : [{ section: "Financial Statements", chunkType: "SECTION" as const, pageStart: null, pageEnd: null, textSummary: "AI extraction result" }];
+  const preflight = (job.preflight ?? {}) as { processingMode?: string; confidence?: number; reason?: string; aiInput?: { originalPageCount?: number | null } };
 
   const runId = await prisma.$transaction(async (tx) => {
     const run = await tx.extractionRun.create({ data: {
@@ -211,9 +230,10 @@ async function finalizeJob(job: AsyncJob) {
       periodType: extracted.detectedPeriodType,
       currency: extracted.detectedCurrency || company.currency,
       unitScale: extracted.detectedUnitScale || null,
-      pageCount: extracted.pageCount,
+      pageCount: preflight.aiInput?.originalPageCount ?? extracted.pageCount,
       status: "PROCESSING",
-      parserVersion: "mvp-1.2d-v6-ack-first-background",
+      parserVersion: EXTRACTION_PARSER_VERSION,
+      documentId: job.documentId,
     } });
     const chunkIds = new Map<number, string>();
     for (let index = 0; index < chunks.length; index++) {
@@ -227,13 +247,26 @@ async function finalizeJob(job: AsyncJob) {
         section: chunk.section,
         text: chunk.textSummary.slice(0, 12000),
         textHash: sha256(Buffer.from(chunk.textSummary)),
-        metadata: { processingMode: preflight.processingMode, preflightConfidence: preflight.confidence, preflightReason: preflight.reason, openAiResponseId: job.openAiResponseId },
+        metadata: {
+          statementType: chunk.section,
+          companyId: company.id,
+          reportingYear: extracted.detectedYear,
+          reportingPeriod: extracted.detectedPeriodType,
+          currency: extracted.detectedCurrency || company.currency,
+          unitScale: extracted.detectedUnitScale,
+          extractionMethod: preflight.processingMode,
+          extractionConfidence: preflight.confidence,
+          preflightReason: preflight.reason,
+          openAiResponseId: job.openAiResponseId,
+          traceReference: `${job.checksum}:${chunk.pageStart ?? "?"}-${chunk.pageEnd ?? "?"}:${index + 1}`,
+        },
       } });
       chunkIds.set(index, stored.id);
     }
-    for (const candidate of extracted.candidates) {
+    for (const decision of canonicalDecisions) {
+      const candidate = decision.candidate;
       if (candidate.numericValue === null || !Number.isFinite(candidate.numericValue)) continue;
-      const canonical = candidate.canonicalCode ? accountByCode.get(candidate.canonicalCode.toUpperCase()) : undefined;
+      const canonical = decision.canonicalCode ? accountByCode.get(decision.canonicalCode.toUpperCase()) : undefined;
       const matchingChunk = chunks.findIndex((chunk) => candidate.sourcePage != null && chunk.pageStart != null && chunk.pageEnd != null && candidate.sourcePage >= chunk.pageStart && candidate.sourcePage <= chunk.pageEnd);
       await tx.extractionCandidate.create({ data: {
         runId: run.id,
@@ -249,15 +282,158 @@ async function finalizeJob(job: AsyncJob) {
         sourceText: candidate.sourceText?.slice(0, 2000) ?? null,
         canonicalAccountId: canonical?.id ?? null,
         extractionConfidence: Math.max(0, Math.min(1, candidate.extractionConfidence)),
-        mappingConfidence: canonical ? Math.max(0, Math.min(1, candidate.mappingConfidence)) : 0,
-        mappingMethod: canonical ? "AI" : null,
-        status: "PENDING",
+        mappingConfidence: canonical ? decision.mappingConfidence : 0,
+        mappingMethod: canonical ? decision.mappingMethod : decision.mappingMethod === "RULE" ? "RULE" : null,
+        candidateRole: decision.candidateRole,
+        componentOf: decision.componentOf,
+        qualityStatus: decision.qualityStatus,
+        qualityReasons: decision.qualityReasons,
+        status: decision.automaticDecision,
+        reviewNote: decision.qualityReasons.join(" ").slice(0, 1000),
+        reviewedBy: decision.automaticDecision === "PENDING" ? null : "canonical-quality-engine",
+        reviewedAt: decision.automaticDecision === "PENDING" ? null : new Date(),
       } });
     }
-    await tx.extractionRun.update({ where: { id: run.id }, data: { status: "PENDING_REVIEW" } });
+    await tx.extractionRun.update({
+      where: { id: run.id },
+      data: { status: qualitySummary.exceptions === 0 && qualitySummary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" },
+    });
     return run.id;
   });
-  await prisma.$executeRawUnsafe(`UPDATE "AsyncExtractionJob" SET "status"='COMPLETED',"runId"=$2,"fileData"=NULL,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=$1`, job.id, runId);
+  await prisma.asyncExtractionJob.update({ where: { id: job.id }, data: { status: "COMPLETED", runId, fileData: null } });
+}
+
+function storedCandidate(candidate: {
+  statementType: "INCOME_STATEMENT" | "BALANCE_SHEET" | "CASH_FLOW" | "OTHER" | null;
+  reportedLabel: string;
+  rawValue: string;
+  numericValue: unknown;
+  currency: string | null;
+  scale: number;
+  sourcePage: number | null;
+  sourceText: string | null;
+  canonicalAccount: { code: string } | null;
+  extractionConfidence: number | null;
+  mappingConfidence: number | null;
+}): FinancialCandidate {
+  return {
+    statementType: candidate.statementType,
+    reportedLabel: candidate.reportedLabel,
+    rawValue: candidate.rawValue,
+    numericValue: candidate.numericValue === null ? null : Number(candidate.numericValue),
+    currency: candidate.currency,
+    scale: candidate.scale,
+    sourcePage: candidate.sourcePage,
+    sourceText: candidate.sourceText,
+    canonicalCode: candidate.canonicalAccount?.code ?? null,
+    extractionConfidence: candidate.extractionConfidence ?? 0,
+    mappingConfidence: candidate.mappingConfidence ?? 0,
+  };
+}
+
+/** Reclassifies staging produced by older parser versions without another AI call. */
+export async function reclassifyPendingExtractionRuns(limit = 10) {
+  const runs = await prisma.extractionRun.findMany({
+    where: {
+      status: { in: ["PENDING_REVIEW", "READY_TO_COMMIT"] },
+      parserVersion: { not: EXTRACTION_PARSER_VERSION },
+    },
+    include: {
+      candidates: { orderBy: [{ sourcePage: "asc" }, { createdAt: "asc" }], include: { canonicalAccount: { select: { code: true } } } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: limit,
+  });
+  if (!runs.length) return 0;
+
+  const accountByCode = new Map((await prisma.canonicalAccount.findMany({
+    where: { isActive: true, code: { in: criticalAccountCodes } },
+    select: { id: true, code: true },
+  })).map((account) => [account.code, account]));
+
+  for (const run of runs) {
+    const learnedMappings = (await prisma.companyAccountMapping.findMany({
+      where: { companyId: run.companyId, isApproved: true },
+      include: { canonicalAccount: { select: { code: true } } },
+    })).map((mapping) => ({
+      normalizedLabel: mapping.normalizedLabel,
+      statementType: mapping.statementType,
+      canonicalCode: mapping.canonicalAccount.code,
+      confidence: mapping.confidence,
+      method: mapping.method,
+    }));
+    const decisions = classifyCanonicalCandidates(run.candidates.map(storedCandidate), learnedMappings);
+    const summary = summarizeCanonicalDecisions(decisions);
+    await prisma.$transaction(async (tx) => {
+      for (let index = 0; index < run.candidates.length; index++) {
+        const stored = run.candidates[index];
+        const decision = decisions[index];
+        const canonical = decision.canonicalCode ? accountByCode.get(decision.canonicalCode) : undefined;
+        await tx.extractionCandidate.update({
+          where: { id: stored.id },
+          data: {
+            canonicalAccountId: canonical?.id ?? null,
+            mappingConfidence: canonical ? decision.mappingConfidence : 0,
+            mappingMethod: canonical ? decision.mappingMethod : decision.mappingMethod === "RULE" ? "RULE" : null,
+            candidateRole: decision.candidateRole,
+            componentOf: decision.componentOf,
+            qualityStatus: decision.qualityStatus,
+            qualityReasons: decision.qualityReasons,
+            status: decision.automaticDecision,
+            reviewNote: decision.qualityReasons.join(" ").slice(0, 1000),
+            reviewedBy: decision.automaticDecision === "PENDING" ? null : "canonical-quality-engine",
+            reviewedAt: decision.automaticDecision === "PENDING" ? null : new Date(),
+          },
+        });
+      }
+      await tx.extractionRun.update({
+        where: { id: run.id },
+        data: {
+          parserVersion: EXTRACTION_PARSER_VERSION,
+          status: summary.exceptions === 0 && summary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW",
+          errorMessage: summary.exceptions ? `${summary.exceptions} canonical quality exception(s) require review.` : null,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          action: "CANONICAL_QUALITY_RECLASSIFIED",
+          actor: "canonical-quality-engine",
+          entity: "ExtractionRun",
+          entityId: run.id,
+          note: `${summary.verifiedFacts} verified canonical facts, ${summary.evidenceOnly} evidence-only rows, ${summary.exceptions} exceptions. No OpenAI request was made.`,
+          after: {
+            parserVersion: EXTRACTION_PARSER_VERSION,
+            verifiedCodes: summary.verifiedCodes,
+            missingCodes: summary.missingCodes,
+          },
+        },
+      });
+    });
+  }
+  return runs.length;
+}
+
+export async function learnCommittedCanonicalMappings(runId: string) {
+  const run = await prisma.extractionRun.findUnique({
+    where: { id: runId },
+    include: { candidates: { where: { status: "COMMITTED", candidateRole: "FINAL_FACT" }, include: { canonicalAccount: true } } },
+  });
+  if (!run) return;
+  for (const candidate of run.candidates) {
+    if (!candidate.canonicalAccountId || !candidate.statementType) continue;
+    const normalizedLabel = normalizeCanonicalLabel(candidate.reportedLabel);
+    await prisma.companyAccountMapping.upsert({
+      where: { companyId_statementType_normalizedLabel: { companyId: run.companyId, statementType: candidate.statementType, normalizedLabel } },
+      update: { sourceLabel: candidate.reportedLabel, canonicalAccountId: candidate.canonicalAccountId, method: "RULE", confidence: 1, isApproved: true, evidenceCount: { increment: 1 } },
+      create: { companyId: run.companyId, statementType: candidate.statementType, normalizedLabel, sourceLabel: candidate.reportedLabel, canonicalAccountId: candidate.canonicalAccountId, method: "RULE", confidence: 1, isApproved: true },
+    });
+  }
+}
+
+function preflightMode(value: unknown): string | undefined {
+  return value && typeof value === "object" && "processingMode" in value
+    ? String((value as { processingMode?: unknown }).processingMode)
+    : undefined;
 }
 
 export async function pollAsyncExtractionJobs(limit = 3) {
