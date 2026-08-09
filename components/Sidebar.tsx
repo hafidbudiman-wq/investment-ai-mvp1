@@ -8,6 +8,7 @@ const nav = [
   ["Dashboard", "/"],
   ["Companies", "/companies"],
   ["Financial Statements", "/financial-statements"],
+  ["Financial Trends", "/financial-trends"],
   ["Fundamental Analysis", "/analysis"],
   ["Data Management", "/data-management"],
   ["Settings", "/settings"],

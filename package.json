@@ -33,7 +33,7 @@
     "@aws-sdk/s3-request-presigner": "3.1095.0",
     "@prisma/client": "6.12.0",
     "lucide-react": "0.468.0",
-    "next": "15.5.20",
+    "next": "15.5.23",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "6.2.108",
     "react": "19.1.0",
@@ -46,9 +46,15 @@
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "eslint": "8.57.1",
-    "eslint-config-next": "15.5.20",
+    "eslint-config-next": "15.5.23",
     "prisma": "6.12.0",
     "tsx": "4.20.3",
     "typescript": "5.8.3"
+  },
+  "overrides": {
+    "js-yaml": "4.3.1",
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26",
+    "sharp": "0.35.3"
   }
 }
