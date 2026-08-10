@@ -40,11 +40,17 @@ const drma = [
   candidate("Liabilitas sewa — bagian jangka panjang", 11_498_550, "BALANCE_SHEET"),
   candidate("Total debt — aggregate including bank loans and lease liabilities", 278_683_993_522, "BALANCE_SHEET"),
   candidate("Total interest-bearing debt including lease liabilities", 278_683_993_522, "BALANCE_SHEET", "TOTAL_DEBT", "Rule-derived from source components: DRMA debt components"),
+  candidate("TOTAL ASET", 4_286_878_723_108, "BALANCE_SHEET", "TOTAL_ASSETS"),
+  candidate("Total Liabilitas", 1_351_223_609_596, "BALANCE_SHEET", "TOTAL_LIAB"),
+  candidate("Total Ekuitas", 2_935_655_113_512, "BALANCE_SHEET", "EQUITY"),
+  candidate("Total ekuitas yang diatribusikan kepada pemilik entitas induk", 2_775_760_819_361, "BALANCE_SHEET", "EQUITY_PARENT"),
+  { ...candidate("Jumlah saham biasa beredar", 4_705_882_300, "BALANCE_SHEET", "SHARES_OUTSTANDING"), currency: "SHARES" },
   candidate("Penjualan neto", 5_939_676_041_503, "INCOME_STATEMENT", "REV"),
   candidate("Beban pokok penjualan", 4_869_211_295_212, "INCOME_STATEMENT", "COGS"),
   candidate("Laba bruto", 1_070_464_746_291, "INCOME_STATEMENT", "GROSS_PROFIT"),
   candidate("Laba usaha", 843_558_843_036, "INCOME_STATEMENT", "OPERATING_PROFIT"),
   candidate("Laba neto yang dapat diatribusikan kepada pemilik entitas induk", 652_584_272_073, "INCOME_STATEMENT", "NET_PROFIT_PARENT"),
+  candidate("Laba per saham dasar", 139, "INCOME_STATEMENT", "EPS_BASIC"),
   candidate("Kas neto diperoleh dari aktivitas operasi", 924_029_458_371, "CASH_FLOW", "OCF"),
   candidate("Perolehan aset tetap", -271_215_292_164, "CASH_FLOW"),
   candidate("Capital expenditure — aggregate", -313_970_875_677, "CASH_FLOW"),
@@ -67,11 +73,17 @@ const icbp = [
   candidate("Liabilitas sewa—bagian tidak lancar", 155_308, "BALANCE_SHEET"),
   candidate("Total debt—aggregate including lease liabilities", 45_818_859, "BALANCE_SHEET"),
   candidate("Total interest-bearing debt including lease liabilities", 45_818_859, "BALANCE_SHEET", "TOTAL_DEBT", "Rule-derived from source components: ICBP debt components"),
+  candidate("TOTAL ASET", 131_995_676, "BALANCE_SHEET", "TOTAL_ASSETS"),
+  candidate("TOTAL LIABILITAS", 62_495_900, "BALANCE_SHEET", "TOTAL_LIAB"),
+  candidate("TOTAL EKUITAS", 69_499_776, "BALANCE_SHEET", "EQUITY"),
+  candidate("Ekuitas yang Dapat Diatribusikan kepada Pemilik Entitas Induk", 47_532_078, "BALANCE_SHEET", "EQUITY_PARENT"),
+  { ...candidate("Jumlah saham beredar", 11_661_908_000, "BALANCE_SHEET", "SHARES_OUTSTANDING"), currency: "SHARES" },
   candidate("PENJUALAN NETO", 37_600_928, "INCOME_STATEMENT", "REV"),
   candidate("BEBAN POKOK PENJUALAN", 24_478_388, "INCOME_STATEMENT", "COGS"),
   candidate("LABA BRUTO", 13_122_540, "INCOME_STATEMENT", "GROSS_PROFIT"),
   candidate("LABA USAHA", 8_475_878, "INCOME_STATEMENT", "OPERATING_PROFIT"),
   candidate("Laba periode berjalan yang dapat diatribusikan kepada pemilik entitas induk", 5_536_138, "INCOME_STATEMENT", "NET_PROFIT_PARENT"),
+  candidate("Laba per saham dasar", 475, "INCOME_STATEMENT", "EPS_BASIC"),
   candidate("Kas Neto yang Diperoleh dari Aktivitas Operasi", 4_844_057, "CASH_FLOW", "OCF"),
   candidate("Penambahan aset tetap dan uang muka pembelian aset tetap", -2_447_972, "CASH_FLOW", "CAPEX"),
   candidate("CAPEX—aggregate", -2_447_972, "CASH_FLOW", "CAPEX"),
@@ -139,10 +151,16 @@ function medcBalance(period: "H1" | "FY") {
 
 const medcH1 = [
   ...medcBalance("H1"),
+  candidate("JUMLAH ASET", 8_073_314_788, "BALANCE_SHEET", "TOTAL_ASSETS", "MEDC total assets"),
+  candidate("Jumlah Liabilitas", 5_768_641_486, "BALANCE_SHEET", "TOTAL_LIAB", "MEDC total liabilities"),
+  candidate("Jumlah Ekuitas", 2_304_673_302, "BALANCE_SHEET", "EQUITY", "MEDC total equity"),
+  candidate("Jumlah ekuitas yang dapat diatribusikan kepada pemilik entitas induk", 2_071_197_306, "BALANCE_SHEET", "EQUITY_PARENT", "MEDC parent equity"),
+  { ...candidate("Jumlah saham beredar setelah saham treasuri", 24_683_001_744, "BALANCE_SHEET", "SHARES_OUTSTANDING", "MEDC outstanding shares"), currency: "SHARES" },
   candidate("JUMLAH PENDAPATAN", 1_138_390_027, "INCOME_STATEMENT", "REV"),
   candidate("JUMLAH BEBAN POKOK PENDAPATAN DAN BIAYA LANGSUNG LAINNYA", 702_600_099, "INCOME_STATEMENT", "COGS"),
   candidate("LABA KOTOR", 435_789_928, "INCOME_STATEMENT", "GROSS_PROFIT"),
   candidate("Laba periode berjalan yang diatribusikan kepada pemilik entitas induk", 37_188_257, "INCOME_STATEMENT", "NET_PROFIT_PARENT"),
+  { ...candidate("Laba per saham dasar", 0.0015, "INCOME_STATEMENT", "EPS_BASIC", "MEDC basic EPS"), currency: "USD" },
   candidate("Kas neto diperoleh dari aktivitas operasi", 398_350_369, "CASH_FLOW", "OCF"),
   candidate("Penambahan aset eksplorasi dan evaluasi", -9_662_851, "CASH_FLOW"),
   candidate("Perolehan aset tetap", -6_677_451, "CASH_FLOW"),
@@ -193,17 +211,17 @@ const lsip = [
 ];
 
 for (const fixture of [
-  { name: "DRMA FY 2025", candidates: drma, expected: { verifiedFacts: 13, evidenceOnly: 9, exceptions: 0 } },
-  { name: "ICBP H1 2025", candidates: icbp, expected: { verifiedFacts: 13, evidenceOnly: 9, exceptions: 0 } },
-  { name: "ICBP H1 2026 live staging", candidates: icbp2026Staging, expected: { verifiedFacts: 13, evidenceOnly: 13, exceptions: 0 } },
-  { name: "MEDC H1 2025", candidates: medcH1, expected: { verifiedFacts: 12, evidenceOnly: 17, exceptions: 0 } },
-  { name: "MEDC FY 2025", candidates: medcFy, expected: { verifiedFacts: 12, evidenceOnly: 23, exceptions: 0 } },
-  { name: "LSIP Q1 2026", candidates: lsip, expected: { verifiedFacts: 13, evidenceOnly: 4, exceptions: 0 } },
+  { name: "DRMA FY 2025", candidates: drma, expected: { verifiedFacts: 19, evidenceOnly: 9, exceptions: 0, missingFacts: 0, readyToCommit: true } },
+  { name: "ICBP H1 2025", candidates: icbp, expected: { verifiedFacts: 19, evidenceOnly: 9, exceptions: 0, missingFacts: 0, readyToCommit: true } },
+  { name: "ICBP H1 2026 live staging", candidates: icbp2026Staging, expected: { verifiedFacts: 13, evidenceOnly: 13, exceptions: 0, missingFacts: 6, readyToCommit: false } },
+  { name: "MEDC H1 2025", candidates: medcH1, expected: { verifiedFacts: 18, evidenceOnly: 17, exceptions: 0, missingFacts: 1, readyToCommit: true } },
+  { name: "MEDC FY 2025", candidates: medcFy, expected: { verifiedFacts: 12, evidenceOnly: 23, exceptions: 0, missingFacts: 7, readyToCommit: false } },
+  { name: "LSIP Q1 2026", candidates: lsip, expected: { verifiedFacts: 13, evidenceOnly: 4, exceptions: 0, missingFacts: 6, readyToCommit: false } },
 ]) {
-  test(`${fixture.name} golden canonical decisions are complete and exception-free`, () => {
+  test(`${fixture.name} golden canonical decisions are deterministic and exception-free`, () => {
     const decisions = classifyCanonicalCandidates(fixture.candidates);
     const summary = summarizeCanonicalDecisions(decisions);
-    assert.deepEqual({ verifiedFacts: summary.verifiedFacts, evidenceOnly: summary.evidenceOnly, exceptions: summary.exceptions }, fixture.expected);
+    assert.deepEqual({ verifiedFacts: summary.verifiedFacts, evidenceOnly: summary.evidenceOnly, exceptions: summary.exceptions, missingFacts: summary.missingCodes.length, readyToCommit: summary.readyToCommit }, fixture.expected);
     assert.equal(new Set(summary.verifiedCodes).size, summary.verifiedFacts);
   });
 }
@@ -230,6 +248,22 @@ test("a broken gross-profit equation is never auto-accepted", () => {
   for (const code of ["REV", "COGS", "GROSS_PROFIT"]) {
     assert.equal(decisions.some((decision) => decision.canonicalCode === code && decision.automaticDecision === "ACCEPTED"), false);
   }
+});
+
+test("a broken balance-sheet equation is never auto-accepted", () => {
+  const broken = icbp.map((item) => item.canonicalCode === "TOTAL_ASSETS" ? { ...item, numericValue: Number(item.numericValue) + 100 } : item);
+  const decisions = classifyCanonicalCandidates(broken);
+  const incorrectlyAccepted = ["TOTAL_ASSETS", "TOTAL_LIAB", "EQUITY"].filter((code) =>
+    decisions.some((decision) => decision.canonicalCode === code && decision.automaticDecision === "ACCEPTED"),
+  );
+  assert.deepEqual(incorrectlyAccepted, []);
+});
+
+test("shares outstanding with document-unit scaling remains an exception", () => {
+  const scaled = { ...candidate("Jumlah saham beredar", 11_661.908, "BALANCE_SHEET", "SHARES_OUTSTANDING"), currency: "IDR", scale: 1_000_000 };
+  const [decision] = classifyCanonicalCandidates([scaled]);
+  assert.equal(decision.automaticDecision, "PENDING");
+  assert.equal(decision.qualityStatus, "YELLOW");
 });
 
 test("approved issuer mapping is reused without another AI decision", () => {

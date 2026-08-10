@@ -17,7 +17,7 @@ export type BackgroundResponse = {
 };
 
 // Keep PDF input + structured output below the organization's TPM ceiling.
-// The 13 critical InvestAI accounts fit comfortably in this output budget.
+// The 19 critical InvestAI facts fit comfortably in this output budget.
 export const FINANCIAL_EXTRACTION_MAX_OUTPUT_TOKENS = 16_000;
 
 function apiKey() {
@@ -43,7 +43,17 @@ function outputText(response: BackgroundResponse): string {
 
 function requestBody(params: { bytes: Buffer; documentText?: string | null; fileName: string; knownCompanies: KnownCompanyPrompt[]; accounts: CanonicalAccountPrompt[]; preflight: PdfPreflight }, background: boolean) {
   const model = process.env.OPENAI_FINANCIAL_MODEL || "gpt-5.6";
-  const accountDictionary = params.accounts.map((a) => ({ code: a.code, name: a.name, statementType: a.statementType, aliases: a.aliases }));
+  const accountDictionary = params.accounts.map((a) => ({
+    code: a.code,
+    name: a.name,
+    statementType: a.statementType,
+    aliases: a.aliases,
+    unitRule: a.code === "SHARES_OUTSTANDING"
+      ? "Full share count, exclude treasury shares, currency SHARES, scale 1."
+      : a.code === "EPS_BASIC"
+        ? "Full per-share amount shown in the statement, scale 1."
+        : "Use the financial statement's displayed currency and unit scale.",
+  }));
   const companyDictionary = params.knownCompanies.map((company) => ({ ticker: company.ticker, name: company.name }));
   const schema = { type: "object", additionalProperties: false, required: ["detectedCompanyTicker","detectedCompanyName","detectedCompanyConfidence","detectedYear","detectedPeriodType","detectedPeriodConfidence","detectedCurrency","detectedUnitScale","pageCount","chunks","candidates"], properties: { detectedCompanyTicker:{anyOf:[{type:"string"},{type:"null"}]}, detectedCompanyName:{anyOf:[{type:"string"},{type:"null"}]}, detectedCompanyConfidence:{type:"number",minimum:0,maximum:1}, detectedYear:{anyOf:[{type:"integer"},{type:"null"}]}, detectedPeriodType:{anyOf:[{type:"string",enum:["Q1","H1","Q3","FY","MONTHLY"]},{type:"null"}]}, detectedPeriodConfidence:{type:"number",minimum:0,maximum:1}, detectedCurrency:{anyOf:[{type:"string"},{type:"null"}]}, detectedUnitScale:{anyOf:[{type:"integer"},{type:"null"}]}, pageCount:{anyOf:[{type:"integer"},{type:"null"}]}, chunks:{type:"array",maxItems:80,items:{type:"object",additionalProperties:false,required:["section","chunkType","pageStart","pageEnd","textSummary"],properties:{section:{type:"string"},chunkType:{type:"string",enum:["SECTION","TABLE","PAGE","TOKEN_BLOCK"]},pageStart:{anyOf:[{type:"integer"},{type:"null"}]},pageEnd:{anyOf:[{type:"integer"},{type:"null"}]},textSummary:{type:"string"}}}}, candidates:{type:"array",maxItems:250,items:{type:"object",additionalProperties:false,required:["statementType","reportedLabel","rawValue","numericValue","currency","scale","sourcePage","sourceText","canonicalCode","extractionConfidence","mappingConfidence"],properties:{statementType:{anyOf:[{type:"string",enum:["INCOME_STATEMENT","BALANCE_SHEET","CASH_FLOW","OTHER"]},{type:"null"}]},reportedLabel:{type:"string"},rawValue:{type:"string"},numericValue:{anyOf:[{type:"number"},{type:"null"}]},currency:{anyOf:[{type:"string"},{type:"null"}]},scale:{type:"integer"},sourcePage:{anyOf:[{type:"integer"},{type:"null"}]},sourceText:{anyOf:[{type:"string"},{type:"null"}]},canonicalCode:{anyOf:[{type:"string"},{type:"null"}]},extractionConfidence:{type:"number",minimum:0,maximum:1},mappingConfidence:{type:"number",minimum:0,maximum:1}}}} } };
   const modeInstruction = params.preflight.processingMode === "VISION_OCR_FALLBACK"

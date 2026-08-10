@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
+import { COMMIT_REQUIRED_ACCOUNT_CODES, CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
 import { learnCommittedCanonicalMappings } from "@/lib/async-pdf-extraction";
 
 function periodEnd(year: number, period: "Q1" | "H1" | "Q3" | "FY" | "MONTHLY") {
@@ -62,6 +62,11 @@ export async function POST(_request: Request, context: { params: Promise<{ id: s
     if (!accepted.length) return NextResponse.json({ error: "Tidak ada candidate ACCEPTED untuk disimpan." }, { status: 400 });
     const unsafeAccepted = accepted.filter((candidate) => candidate.qualityStatus !== "GREEN");
     if (unsafeAccepted.length) return NextResponse.json({ error: `${unsafeAccepted.length} candidate ACCEPTED belum berstatus GREEN. Commit diblokir oleh canonical quality gate.` }, { status: 422 });
+    const acceptedCodes = new Set(accepted.map((candidate) => candidate.canonicalAccount?.code).filter((code): code is string => Boolean(code)));
+    const missingRequiredCodes = COMMIT_REQUIRED_ACCOUNT_CODES.filter((code) => !acceptedCodes.has(code));
+    if (missingRequiredCodes.length) {
+      return NextResponse.json({ error: `Commit diblokir: critical facts wajib belum lengkap (${missingRequiredCodes.join(", ")}).` }, { status: 422 });
+    }
 
     const groupedAccepted = new Map<string, typeof accepted>();
     for (const candidate of accepted) {

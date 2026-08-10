@@ -296,7 +296,7 @@ async function finalizeJob(job: AsyncJobSummary) {
     }
     await tx.extractionRun.update({
       where: { id: run.id },
-      data: { status: qualitySummary.exceptions === 0 && qualitySummary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" },
+      data: { status: qualitySummary.readyToCommit ? "READY_TO_COMMIT" : "PENDING_REVIEW" },
     });
     return run.id;
   });
@@ -390,8 +390,12 @@ export async function reclassifyPendingExtractionRuns(limit = 10) {
         where: { id: run.id },
         data: {
           parserVersion: EXTRACTION_PARSER_VERSION,
-          status: summary.exceptions === 0 && summary.verifiedFacts > 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW",
-          errorMessage: summary.exceptions ? `${summary.exceptions} canonical quality exception(s) require review.` : null,
+          status: summary.readyToCommit ? "READY_TO_COMMIT" : "PENDING_REVIEW",
+          errorMessage: summary.exceptions
+            ? `${summary.exceptions} canonical quality exception(s) require review.`
+            : summary.missingRequiredCodes.length
+              ? `Missing required canonical facts: ${summary.missingRequiredCodes.join(", ")}.`
+              : null,
         },
       });
       await tx.auditLog.create({
@@ -405,6 +409,8 @@ export async function reclassifyPendingExtractionRuns(limit = 10) {
             parserVersion: EXTRACTION_PARSER_VERSION,
             verifiedCodes: summary.verifiedCodes,
             missingCodes: summary.missingCodes,
+            missingRequiredCodes: summary.missingRequiredCodes,
+            readyToCommit: summary.readyToCommit,
           },
         },
       });

@@ -54,7 +54,7 @@ async function extractPageMarkedText(bytes: Buffer): Promise<{ text: string; ori
  * Keeps long financial statements below provider TPM limits without requiring
  * the user to split the source document. Primary statements and the first
  * notes are at the front of IDX financial-statement PDFs, which cover the
- * provisional 13-account extraction gate.
+ * approved 19-fact extraction gate.
  */
 export async function preparePdfAiInput(bytes: Buffer): Promise<PreparedPdfAiInput> {
   if (isEncryptedPdf(bytes)) {

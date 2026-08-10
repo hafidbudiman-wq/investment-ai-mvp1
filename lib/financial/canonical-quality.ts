@@ -1,4 +1,4 @@
-import { CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
+import { COMMIT_REQUIRED_ACCOUNT_CODES, CRITICAL_ACCOUNT_BY_CODE } from "@/lib/financial/critical-accounts.config";
 import type { ValidatedFinancialExtraction } from "@/lib/financial/extraction-schema";
 
 export type FinancialCandidate = ValidatedFinancialExtraction["candidates"][number];
@@ -155,7 +155,7 @@ export function classifyCanonicalCandidates(
         componentOf: null,
         candidateRole: "COMPONENT",
         qualityStatus: "GREEN",
-        qualityReasons: ["Evidence row is outside the 13 critical canonical facts and is not committed."],
+        qualityReasons: ["Evidence row is outside the 19 critical canonical facts and is not committed."],
         automaticDecision: "REJECTED",
         mappingMethod: null,
         mappingConfidence: 0,
@@ -228,6 +228,38 @@ export function classifyCanonicalCandidates(
     else for (const decision of [revenue, cogs, gross]) decision.qualityReasons.push("Gross-profit equation reconciles.");
   }
 
+  const totalAssets = winner(decisions, "TOTAL_ASSETS");
+  const totalLiabilities = winner(decisions, "TOTAL_LIAB");
+  const totalEquity = winner(decisions, "EQUITY");
+  if (totalAssets && totalLiabilities && totalEquity && sameUnit([totalAssets.candidate, totalLiabilities.candidate, totalEquity.candidate])) {
+    const expected = numeric(totalLiabilities.candidate)! + numeric(totalEquity.candidate)!;
+    if (!approximatelyEqual(expected, numeric(totalAssets.candidate)!)) {
+      addFailure(decisions, ["TOTAL_ASSETS", "TOTAL_LIAB", "EQUITY"], "Total assets do not reconcile to total liabilities plus total equity.");
+    } else {
+      for (const decision of [totalAssets, totalLiabilities, totalEquity]) decision.qualityReasons.push("Balance-sheet equation reconciles.");
+    }
+  }
+
+  const sharesOutstanding = winner(decisions, "SHARES_OUTSTANDING");
+  if (sharesOutstanding) {
+    const value = numeric(sharesOutstanding.candidate);
+    if (sharesOutstanding.candidate.currency !== "SHARES" || sharesOutstanding.candidate.scale !== 1 || value === null || value <= 0 || !Number.isInteger(value)) {
+      addFailure(decisions, ["SHARES_OUTSTANDING"], "Shares outstanding must be a positive full-share integer with currency SHARES and scale 1.");
+    } else {
+      sharesOutstanding.qualityReasons.push("Outstanding-share unit and scale are valid.");
+    }
+  }
+
+  const basicEps = winner(decisions, "EPS_BASIC");
+  if (basicEps) {
+    const value = numeric(basicEps.candidate);
+    if (basicEps.candidate.scale !== 1 || value === null || !Number.isFinite(value)) {
+      addFailure(decisions, ["EPS_BASIC"], "Basic EPS must be stored as a finite per-share amount with scale 1.");
+    } else {
+      basicEps.qualityReasons.push("Basic EPS uses a full per-share amount with scale 1.");
+    }
+  }
+
   const ocf = winner(decisions, "OCF");
   const capex = winner(decisions, "CAPEX");
   const fcf = winner(decisions, "FCF");
@@ -271,11 +303,15 @@ export function classifyCanonicalCandidates(
 export function summarizeCanonicalDecisions(decisions: CanonicalCandidateDecision[]) {
   const verifiedCodes = decisions.filter((decision) => decision.automaticDecision === "ACCEPTED" && decision.canonicalCode).map((decision) => decision.canonicalCode!);
   const missingCodes = [...CRITICAL_ACCOUNT_BY_CODE.keys()].filter((code) => !verifiedCodes.includes(code));
+  const missingRequiredCodes = COMMIT_REQUIRED_ACCOUNT_CODES.filter((code) => !verifiedCodes.includes(code));
+  const exceptions = decisions.filter((decision) => decision.automaticDecision === "PENDING").length;
   return {
     verifiedFacts: verifiedCodes.length,
     evidenceOnly: decisions.filter((decision) => decision.automaticDecision === "REJECTED").length,
-    exceptions: decisions.filter((decision) => decision.automaticDecision === "PENDING").length,
+    exceptions,
     verifiedCodes,
     missingCodes,
+    missingRequiredCodes,
+    readyToCommit: exceptions === 0 && missingRequiredCodes.length === 0,
   };
 }

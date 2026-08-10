@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { COMMIT_REQUIRED_ACCOUNT_CODES } from "@/lib/financial/critical-accounts.config";
 import { z } from "zod";
 
 const reviewSchema = z.object({
@@ -37,7 +38,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       }
     }
 
-    const { updated, pending } = await prisma.$transaction(async (tx) => {
+    const { updated, pending, missingRequiredCodes, readyToCommit } = await prisma.$transaction(async (tx) => {
       const updated = await tx.extractionCandidate.update({
         where: { id: candidate.id },
         data: {
@@ -49,7 +50,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         },
       });
       const pending = await tx.extractionCandidate.count({ where: { runId: id, status: "PENDING" } });
-      await tx.extractionRun.update({ where: { id }, data: { status: pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" } });
+      const greenAccepted = await tx.extractionCandidate.findMany({
+        where: { runId: id, status: "ACCEPTED", qualityStatus: "GREEN", canonicalAccountId: { not: null } },
+        select: { canonicalAccount: { select: { code: true } } },
+      });
+      const greenCodes = new Set(greenAccepted.map((item) => item.canonicalAccount?.code).filter((code): code is string => Boolean(code)));
+      const missingRequiredCodes = COMMIT_REQUIRED_ACCOUNT_CODES.filter((code) => !greenCodes.has(code));
+      const readyToCommit = pending === 0 && missingRequiredCodes.length === 0;
+      await tx.extractionRun.update({ where: { id }, data: { status: readyToCommit ? "READY_TO_COMMIT" : "PENDING_REVIEW" } });
       await tx.auditLog.create({ data: {
         action: "EXTRACTION_CANDIDATE_REVIEWED",
         actor: parsed.data.decision === "PENDING" ? "web-user" : updated.reviewedBy,
@@ -58,10 +66,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         before: { status: candidate.status, canonicalAccountId: candidate.canonicalAccountId, reviewNote: candidate.reviewNote },
         after: { status: updated.status, canonicalAccountId: updated.canonicalAccountId, reviewNote: updated.reviewNote, runId: id },
       } });
-      return { updated, pending };
+      return { updated, pending, missingRequiredCodes, readyToCommit };
     });
 
-    return NextResponse.json({ ok: true, candidate: updated, pending });
+    return NextResponse.json({ ok: true, candidate: updated, pending, missingRequiredCodes, readyToCommit });
   } catch (error) {
     console.error("pdf-candidate-review-failed", error);
     return NextResponse.json({ error: "Gagal menyimpan review." }, { status: 500 });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
+import { COMMIT_REQUIRED_ACCOUNT_CODES, CRITICAL_ACCOUNTS } from "@/lib/financial/critical-accounts.config";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -25,12 +25,16 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     const verifiedCodes = run.candidates
       .filter((candidate) => candidate.status === "ACCEPTED" && candidate.qualityStatus === "GREEN" && candidate.canonicalAccount)
       .map((candidate) => candidate.canonicalAccount!.code);
+    const missingRequiredCodes = COMMIT_REQUIRED_ACCOUNT_CODES.filter((code) => !verifiedCodes.includes(code));
+    const exceptions = run.candidates.filter((candidate) => candidate.status === "PENDING").length;
     const qualitySummary = {
       verifiedFacts: verifiedCodes.length,
       evidenceOnly: run.candidates.filter((candidate) => candidate.status === "REJECTED").length,
-      exceptions: run.candidates.filter((candidate) => candidate.status === "PENDING").length,
+      exceptions,
       verifiedCodes,
       missingCodes: CRITICAL_ACCOUNTS.map((account) => account.code).filter((code) => !verifiedCodes.includes(code)),
+      missingRequiredCodes,
+      readyToCommit: exceptions === 0 && missingRequiredCodes.length === 0,
     };
     return NextResponse.json({ ok: true, run, accounts, qualitySummary });
   } catch (error) {

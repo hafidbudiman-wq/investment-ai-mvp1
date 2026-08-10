@@ -18,11 +18,20 @@ Only one GREEN final candidate may exist for each canonical code.
 1. COGS is stored as a positive analytical expense.
 2. CAPEX is stored as a negative cash outflow.
 3. `GROSS_PROFIT = REV - COGS` must reconcile in the same currency and unit.
-4. `FCF = OCF + negative CAPEX` must reconcile in the same currency and unit.
-5. Total debt sums current and non-current bank/non-bank borrowings, bonds, and lease liabilities.
-6. AR and AP counterparty components must reconcile to their selected totals when the components are present.
-7. Productive-asset CAPEX includes PPE, oil-and-gas properties, exploration/evaluation, concessions, and identifiable intangibles. Generic “other assets” are excluded unless their productive long-lived nature is proven.
-8. Missing metrics are reported as “not safely reported”; the engine never invents an operating-profit subtotal.
+4. `TOTAL_ASSETS = TOTAL_LIAB + EQUITY` must reconcile in the same currency and unit.
+5. Shares outstanding must be a positive full-share integer, exclude treasury shares, use currency `SHARES`, and use scale `1`.
+6. Basic EPS must be the reported full per-share amount with scale `1`.
+7. `FCF = OCF + negative CAPEX` must reconcile in the same currency and unit.
+8. Total debt sums current and non-current bank/non-bank borrowings, bonds, and lease liabilities.
+9. AR and AP counterparty components must reconcile to their selected totals when the components are present.
+10. Productive-asset CAPEX includes PPE, oil-and-gas properties, exploration/evaluation, concessions, and identifiable intangibles. Generic “other assets” are excluded unless their productive long-lived nature is proven.
+11. Missing metrics are reported as “not safely reported”; the engine never invents an operating-profit subtotal.
+
+## Approved MVP1 core facts
+
+The quality gate covers 19 facts. The six additions to the original set are `TOTAL_ASSETS`, `TOTAL_LIAB`, `EQUITY`, `EQUITY_PARENT`, `SHARES_OUTSTANDING`, and `EPS_BASIC`.
+
+Save requires 18 GREEN facts. `OPERATING_PROFIT` is the only permitted omission because some issuers do not present a unique operating subtotal; the engine must not invent one. A run with any other missing critical fact remains `PENDING_REVIEW`.
 
 ## Mapping memory and API budget
 
@@ -43,4 +52,4 @@ The versioned test set covers:
 - MEDC FY 2025
 - LSIP Q1 2026
 
-Every fixture checks canonical fact count, evidence-only count, zero expected exceptions, duplicate suppression, and accounting equations. MEDC has 12 rather than 13 facts because operating profit is not safely reported as a direct subtotal.
+Every fixture checks canonical fact count, missing-fact count, evidence-only count, zero expected exceptions, duplicate suppression, and accounting equations. ICBP H1 2025 and DRMA FY 2025 cover all 19 facts. MEDC H1 2025 covers 18 because operating profit is not safely reported as a direct subtotal. Older staging fixtures remain partial by design and prove that missing facts are reported rather than invented.
