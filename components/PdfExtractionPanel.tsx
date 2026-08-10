@@ -39,8 +39,8 @@ export function PdfExtractionPanel() {
 
   function refreshPipeline() { setPipelineRefreshKey(`${Date.now()}`); }
 
-  async function openRun(id: string, resetPanels = true) {
-    setMessage("");
+  async function openRun(id: string, resetPanels = true, preserveMessage = false) {
+    if (!preserveMessage) setMessage("");
     const response = await fetch(`/api/pdf-extractions/${id}`, { cache: "no-store" });
     const data = await response.json();
     if (!response.ok) return setMessage(data.error || "Gagal membuka hasil extraction.");
@@ -88,7 +88,7 @@ export function PdfExtractionPanel() {
         }
         throw new Error(data.error ?? data.message ?? "Upload gagal.");
       }
-      setMetadataGate(null); setMessage(data.message); refreshPipeline(); if (data.runId) await openRun(data.runId);
+      setMetadataGate(null); setMessage(data.message); refreshPipeline(); if (data.runId) await openRun(data.runId, true, Boolean(data.duplicate));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Upload gagal."); }
     finally { setLoading(false); setUploadAttempt(0); }
   }
