@@ -112,7 +112,11 @@ export async function POST(request: Request) {
     validatePdfMagic(bytes);
     const checksum = sha256(bytes);
 
-    const existingRun = await prisma.extractionRun.findFirst({ where: { checksum }, orderBy: { createdAt: "desc" } });
+    const existingRun = await prisma.extractionRun.findFirst({
+      where: { checksum },
+      include: { company: { select: { ticker: true } } },
+      orderBy: { createdAt: "desc" },
+    });
     if (existingRun) {
       const reprocessed = await resetUntouchedStaleRun({
         runId: existingRun.id,
@@ -123,7 +127,11 @@ export async function POST(request: Request) {
         bytes,
       });
       if (reprocessed) return NextResponse.json({ ok: true, accepted: true, retried: true, status: "UPLOADED", message: "Staging lama yang belum pernah direview diproses ulang dengan parser kualitas terbaru." }, { status: 202 });
-      return NextResponse.json({ ok: true, duplicate: true, runId: existingRun.id, message: "PDF ini sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi." });
+      const storedPeriod = [existingRun.company.ticker, existingRun.periodType, existingRun.year].filter(Boolean).join(" ");
+      const message = existingRun.status === "COMMITTED"
+        ? `Data ${storedPeriod} sudah pernah tersimpan di PostgreSQL. Tidak dibuat data duplikat dan AI tidak dipanggil lagi.`
+        : `PDF ${storedPeriod || "ini"} sudah pernah diproses. Hasil sebelumnya dibuka tanpa memanggil AI lagi.`;
+      return NextResponse.json({ ok: true, duplicate: true, committed: existingRun.status === "COMMITTED", runId: existingRun.id, message });
     }
 
     const existingJob = await findAsyncJobByChecksum(checksum);
