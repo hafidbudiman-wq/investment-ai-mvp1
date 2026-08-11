@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { COMMIT_REQUIRED_ACCOUNT_CODES } from "@/lib/financial/critical-accounts.config";
 import { z } from "zod";
 
 const reviewSchema = z.object({
@@ -24,25 +25,51 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const candidate = await prisma.extractionCandidate.findFirst({ where: { id: parsed.data.candidateId, runId: id } });
     if (!candidate) return NextResponse.json({ error: "Candidate tidak ditemukan." }, { status: 404 });
 
-    if (parsed.data.decision === "ACCEPTED" && !(parsed.data.canonicalAccountId ?? candidate.canonicalAccountId)) {
+    const targetAccountId = parsed.data.canonicalAccountId === undefined ? candidate.canonicalAccountId : parsed.data.canonicalAccountId;
+    if (parsed.data.decision === "ACCEPTED" && !targetAccountId) {
       return NextResponse.json({ error: "Candidate hanya dapat diterima setelah canonical account dipilih." }, { status: 400 });
     }
 
-    const updated = await prisma.extractionCandidate.update({
-      where: { id: candidate.id },
-      data: {
-        status: parsed.data.decision,
-        canonicalAccountId: parsed.data.canonicalAccountId === undefined ? candidate.canonicalAccountId : parsed.data.canonicalAccountId,
-        reviewNote: parsed.data.reviewNote ?? (parsed.data.decision === "PENDING" ? "Returned to pending for review." : null),
-        reviewedBy: parsed.data.decision === "PENDING" ? null : "web-user",
-        reviewedAt: parsed.data.decision === "PENDING" ? null : new Date(),
-      },
+    if (targetAccountId) {
+      const target = await prisma.canonicalAccount.findFirst({ where: { id: targetAccountId, isActive: true }, select: { statementType: true } });
+      if (!target) return NextResponse.json({ error: "Canonical account tidak tersedia atau tidak aktif." }, { status: 400 });
+      if (candidate.statementType && candidate.statementType !== "OTHER" && target.statementType !== candidate.statementType) {
+        return NextResponse.json({ error: "Canonical account harus berasal dari jenis laporan yang sama dengan candidate." }, { status: 422 });
+      }
+    }
+
+    const { updated, pending, missingRequiredCodes, readyToCommit } = await prisma.$transaction(async (tx) => {
+      const updated = await tx.extractionCandidate.update({
+        where: { id: candidate.id },
+        data: {
+          status: parsed.data.decision,
+          canonicalAccountId: targetAccountId,
+          reviewNote: parsed.data.reviewNote ?? (parsed.data.decision === "PENDING" ? "Returned to pending for review." : null),
+          reviewedBy: parsed.data.decision === "PENDING" ? null : "web-user",
+          reviewedAt: parsed.data.decision === "PENDING" ? null : new Date(),
+        },
+      });
+      const pending = await tx.extractionCandidate.count({ where: { runId: id, status: "PENDING" } });
+      const greenAccepted = await tx.extractionCandidate.findMany({
+        where: { runId: id, status: "ACCEPTED", qualityStatus: "GREEN", canonicalAccountId: { not: null } },
+        select: { canonicalAccount: { select: { code: true } } },
+      });
+      const greenCodes = new Set(greenAccepted.map((item) => item.canonicalAccount?.code).filter((code): code is string => Boolean(code)));
+      const missingRequiredCodes = COMMIT_REQUIRED_ACCOUNT_CODES.filter((code) => !greenCodes.has(code));
+      const readyToCommit = pending === 0 && missingRequiredCodes.length === 0;
+      await tx.extractionRun.update({ where: { id }, data: { status: readyToCommit ? "READY_TO_COMMIT" : "PENDING_REVIEW" } });
+      await tx.auditLog.create({ data: {
+        action: "EXTRACTION_CANDIDATE_REVIEWED",
+        actor: parsed.data.decision === "PENDING" ? "web-user" : updated.reviewedBy,
+        entity: "ExtractionCandidate",
+        entityId: candidate.id,
+        before: { status: candidate.status, canonicalAccountId: candidate.canonicalAccountId, reviewNote: candidate.reviewNote },
+        after: { status: updated.status, canonicalAccountId: updated.canonicalAccountId, reviewNote: updated.reviewNote, runId: id },
+      } });
+      return { updated, pending, missingRequiredCodes, readyToCommit };
     });
 
-    const pending = await prisma.extractionCandidate.count({ where: { runId: id, status: "PENDING" } });
-    await prisma.extractionRun.update({ where: { id }, data: { status: pending === 0 ? "READY_TO_COMMIT" : "PENDING_REVIEW" } });
-
-    return NextResponse.json({ ok: true, candidate: updated, pending });
+    return NextResponse.json({ ok: true, candidate: updated, pending, missingRequiredCodes, readyToCommit });
   } catch (error) {
     console.error("pdf-candidate-review-failed", error);
     return NextResponse.json({ error: "Gagal menyimpan review." }, { status: 500 });

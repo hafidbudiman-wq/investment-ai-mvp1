@@ -5,6 +5,7 @@ node_modules
 *.log
 .DS_Store
 coverage
+tmp
 prisma/dev.db
 
 *.tsbuildinfo

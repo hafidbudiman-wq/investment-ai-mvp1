@@ -19,7 +19,7 @@ export async function GET() {
       orderBy: { ticker: "asc" },
     });
     return NextResponse.json({ ok: true, companies });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ ok: false, error: "Database is not connected." }, { status: 503 });
   }
 }
