@@ -50,3 +50,16 @@ test("database resumable-upload migration only extends temporary upload tables",
   assert.match(sql, /UploadSession_checksum_status_idx/);
   assert.doesNotMatch(sql, /ALTER TABLE "(?:Company|FinancialReport|FinancialEntry|ExtractionRun)"/);
 });
+
+test("database-chunked constraints accept mobile parts without touching financial tables", async () => {
+  const sql = await readFile("prisma/migrations/20260811024500_database_chunked_upload_constraints/migration.sql", "utf8");
+  assert.match(sql, /UploadSession_mode_check/);
+  assert.match(sql, /UploadSession_part_size_check/);
+  assert.match(sql, /UploadSession_status_check/);
+  assert.match(sql, /'DATABASE_CHUNKED'/);
+  assert.match(sql, /"partSize" = 1048576/);
+  assert.match(sql, /'COMPLETED'/);
+  assert.match(sql, /'DUPLICATE'/);
+  assert.doesNotMatch(sql, /\b(?:DROP TABLE|TRUNCATE|DELETE FROM|UPDATE|INSERT INTO)\b/i);
+  assert.doesNotMatch(sql, /(?:Company|FinancialReport|FinancialEntry|ExtractionRun)/);
+});

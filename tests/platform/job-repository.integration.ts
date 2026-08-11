@@ -24,7 +24,42 @@ async function insertJob(input: { availableAt?: Date; maxAttempts?: number } = {
   return id;
 }
 
+async function verifyDatabaseChunkedUploadConstraints() {
+  const id = randomUUID();
+  try {
+    const session = await prisma.uploadSession.create({
+      data: {
+        id,
+        correlationId: randomUUID(),
+        uploadMode: "DATABASE_CHUNKED",
+        status: "INITIATED",
+        storageProvider: "POSTGRESQL",
+        bucket: "investai-upload-parts",
+        objectKey: `constraint-smoke/${id}.pdf`,
+        originalFileName: "constraint-smoke.pdf",
+        mimeType: "application/pdf",
+        expectedSize: 1048577,
+        checksum: "a".repeat(64),
+        partSize: 1048576,
+        lastPartNumber: 2,
+        resumeTokenHash: "b".repeat(64),
+        expiresAt: new Date(Date.now() + 60_000),
+      },
+    });
+    assert.equal(session.uploadMode, "DATABASE_CHUNKED");
+    assert.equal(session.partSize, 1048576);
+
+    const completed = await prisma.uploadSession.update({ where: { id }, data: { status: "COMPLETED" } });
+    assert.equal(completed.status, "COMPLETED");
+    const duplicate = await prisma.uploadSession.update({ where: { id }, data: { status: "DUPLICATE" } });
+    assert.equal(duplicate.status, "DUPLICATE");
+  } finally {
+    await prisma.uploadSession.deleteMany({ where: { id } });
+  }
+}
+
 async function main() {
+  await verifyDatabaseChunkedUploadConstraints();
   await prisma.jobEvent.deleteMany();
   await prisma.jobAttempt.deleteMany();
   await prisma.job.deleteMany();
