@@ -429,6 +429,7 @@ model UploadSession {
   originalFileName String
   mimeType         String
   expectedSize     Int
+  checksum         String
   partSize         Int?
   resumeTokenHash  String
   lastPartNumber   Int?
@@ -442,6 +443,7 @@ model UploadSession {
   updatedAt        DateTime           @updatedAt
 
   @@index([status, expiresAt])
+  @@index([checksum, status])
 }
 
 model UploadPart {
@@ -451,6 +453,7 @@ model UploadPart {
   partNumber      Int
   etag            String
   size            Int
+  content         Bytes?
   completedAt     DateTime      @default(now())
   createdAt       DateTime      @default(now())
 

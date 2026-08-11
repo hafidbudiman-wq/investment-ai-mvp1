@@ -41,3 +41,12 @@ test("canonical-quality migration is additive and preserves existing staging", a
   assert.match(sql, /CREATE TABLE IF NOT EXISTS "CompanyAccountMapping"/);
   assert.match(sql, /CompanyAccountMapping_companyId_statementType_normalizedLabel_key/);
 });
+
+test("database resumable-upload migration only extends temporary upload tables", async () => {
+  const sql = await readFile("prisma/migrations/20260811011500_database_resumable_pdf_upload/migration.sql", "utf8");
+  assert.doesNotMatch(sql, /\b(?:DROP|TRUNCATE|DELETE FROM)\b/i);
+  assert.match(sql, /ALTER TABLE "UploadSession" ADD COLUMN "checksum"/);
+  assert.match(sql, /ALTER TABLE "UploadPart" ADD COLUMN "content" BYTEA/);
+  assert.match(sql, /UploadSession_checksum_status_idx/);
+  assert.doesNotMatch(sql, /ALTER TABLE "(?:Company|FinancialReport|FinancialEntry|ExtractionRun)"/);
+});

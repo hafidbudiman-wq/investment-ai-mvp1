@@ -28,7 +28,7 @@ export function PdfExtractionPanel() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [uploadAttempt, setUploadAttempt] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [selected, setSelected] = useState<RunDetail | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [busyCandidate, setBusyCandidate] = useState("");
@@ -54,43 +54,105 @@ export function PdfExtractionPanel() {
 
   useEffect(() => { refreshPipeline(); }, []);
 
+  async function fileChecksum(selectedFile: File) {
+    if (!globalThis.crypto?.subtle) throw new Error("Browser ini belum mendukung pemeriksaan checksum PDF.");
+    const digest = await globalThis.crypto.subtle.digest("SHA-256", await selectedFile.arrayBuffer());
+    return Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
+  }
+
+  function responseError(data: unknown, fallback: string) {
+    if (!data || typeof data !== "object") return fallback;
+    const error = (data as { error?: unknown }).error;
+    if (typeof error === "string") return error;
+    if (error && typeof error === "object" && "message" in error && typeof error.message === "string") return error.message;
+    return fallback;
+  }
+
+  function removeResumeState(key: string) {
+    try { localStorage.removeItem(key); } catch { /* upload still works without browser persistence */ }
+  }
+
+  function saveResumeState(key: string, value: { sessionId: string; resumeToken: string }) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* upload still works without browser persistence */ }
+  }
+
   async function uploadFile(confirmedCompanyId?: string) {
     if (!file) return;
     setLoading(true); setMessage(""); setSelected(null);
     try {
-      const uploadId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      const response = await withNetworkRetry(async (attempt) => {
-        setUploadAttempt(attempt);
-        const form = new FormData();
-        form.set("file", file);
-        if (confirmedCompanyId) form.set("confirmedCompanyId", confirmedCompanyId);
-        const result = await fetch("/api/pdf-extractions", {
+      void confirmedCompanyId;
+      setUploadStatus("Memeriksa PDF…");
+      const checksum = await fileChecksum(file);
+      const storageKey = `investai-pdf-upload:${checksum}`;
+      let previous: { sessionId?: string; resumeToken?: string } = {};
+      try { previous = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch { previous = {}; }
+
+      const initResponse = await withNetworkRetry(async () => {
+        const result = await fetch("/api/pdf-extractions/uploads", {
           method: "POST",
-          body: form,
-          headers: { "X-InvestAI-Upload-ID": uploadId },
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileName: file.name,
+            mimeType: file.type || "application/pdf",
+            fileSize: file.size,
+            checksum,
+            sessionId: previous.sessionId,
+            resumeToken: previous.resumeToken,
+          }),
         });
-        if (result.status === 502 || result.status === 504) {
-          throw new TypeError(`Temporary Railway gateway failure (${result.status})`);
-        }
+        if (result.status === 502 || result.status === 504) throw new TypeError(`Temporary Railway gateway failure (${result.status})`);
         return result;
-      }, {
-        attempts: 3,
-        baseDelayMs: 1_500,
-        onRetry: (attempt) => setMessage(`Koneksi upload terputus. Mencoba ulang otomatis (${attempt}/3)…`),
-      });
-      const responseText = await response.text();
-      const data = responseText ? JSON.parse(responseText) : {};
-      if (!response.ok) {
-        if (response.status === 422 && data.code) {
-          const gate = data as MetadataGate; setMetadataGate(gate);
-          setCompanyDraft({ ticker: gate.detectedCompany?.ticker ?? "", name: gate.detectedCompany?.name ?? "", sector: "", subsector: "", country: "ID", currency: gate.detectedCurrency || "IDR", fiscalYearEnd: "12" });
-          setMessage(gate.message); return;
-        }
-        throw new Error(data.error ?? data.message ?? "Upload gagal.");
+      }, { attempts: 3, baseDelayMs: 1_000, onRetry: (attempt) => setMessage(`Koneksi pemeriksaan terputus. Mencoba ulang (${attempt}/3)…`) });
+      const initData = await initResponse.json();
+      if (!initResponse.ok) throw new Error(responseError(initData, "Gagal menyiapkan upload PDF."));
+
+      if (initData.duplicate) {
+        removeResumeState(storageKey);
+        setMetadataGate(null); setMessage(initData.message); refreshPipeline();
+        if (initData.runId) await openRun(initData.runId, true, true);
+        return;
       }
-      setMetadataGate(null); setMessage(data.message); refreshPipeline(); if (data.runId) await openRun(data.runId, true, Boolean(data.duplicate));
+
+      const sessionId = String(initData.sessionId);
+      const resumeToken = String(initData.resumeToken);
+      const partSize = Number(initData.partSize);
+      const totalParts = Number(initData.totalParts);
+      const completedParts = new Set<number>((initData.completedParts ?? []).map(Number));
+      saveResumeState(storageKey, { sessionId, resumeToken });
+
+      for (let partNumber = 1; partNumber <= totalParts; partNumber += 1) {
+        if (completedParts.has(partNumber)) continue;
+        const start = (partNumber - 1) * partSize;
+        const chunk = file.slice(start, Math.min(file.size, start + partSize));
+        setUploadStatus(`Mengunggah bagian ${partNumber}/${totalParts} (${Math.round((start / file.size) * 100)}%)…`);
+        await withNetworkRetry(async () => {
+          const response = await fetch(`/api/pdf-extractions/uploads/${sessionId}/parts/${partNumber}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/octet-stream", "X-InvestAI-Resume-Token": resumeToken },
+            body: chunk,
+          });
+          if (response.status === 502 || response.status === 504) throw new TypeError(`Temporary Railway gateway failure (${response.status})`);
+          if (!response.ok) throw new Error(responseError(await response.json(), `Bagian ${partNumber} gagal diunggah.`));
+          return response;
+        }, { attempts: 3, baseDelayMs: 1_000, onRetry: (attempt) => setMessage(`Bagian ${partNumber}/${totalParts} terputus. Mencoba ulang (${attempt}/3)…`) });
+      }
+
+      setUploadStatus("Memverifikasi dan menyimpan job…");
+      const completeResponse = await withNetworkRetry(async () => {
+        const response = await fetch(`/api/pdf-extractions/uploads/${sessionId}/complete`, {
+          method: "POST",
+          headers: { "X-InvestAI-Resume-Token": resumeToken },
+        });
+        if (response.status === 502 || response.status === 504) throw new TypeError(`Temporary Railway gateway failure (${response.status})`);
+        return response;
+      }, { attempts: 3, baseDelayMs: 1_000, onRetry: (attempt) => setMessage(`Verifikasi akhir terputus. Mencoba ulang (${attempt}/3)…`) });
+      const data = await completeResponse.json();
+      if (!completeResponse.ok) throw new Error(responseError(data, "Gagal menyelesaikan upload PDF."));
+      removeResumeState(storageKey);
+      setMetadataGate(null); setMessage(data.message); refreshPipeline();
+      if (data.runId) await openRun(data.runId, true, Boolean(data.duplicate));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Upload gagal."); }
-    finally { setLoading(false); setUploadAttempt(0); }
+    finally { setLoading(false); setUploadStatus(""); }
   }
 
   async function submit(event: FormEvent) { event.preventDefault(); await uploadFile(); }
@@ -175,7 +237,7 @@ export function PdfExtractionPanel() {
   return <>
     <section className="card" style={{ marginBottom: 18 }}>
       <div className="header"><div><h2>PDF + AI Extraction — MVP 1.2D</h2><p>Upload laporan baru di sini. Pekerjaan lama tetap tersimpan di Financial Report Pipeline di bawah.</p></div><span className="badge success">AUTO QC + EXCEPTION REVIEW</span></div>
-      <form onSubmit={submit}><div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setMetadataGate(null); setMessage(""); }} required /></div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file}>{loading ? `Uploading PDF${uploadAttempt > 1 ? ` — retry ${uploadAttempt}/3` : ""}…` : "Upload & Extract PDF"}</button></form>
+      <form onSubmit={submit}><div className="field"><label>Financial Statement PDF</label><input type="file" accept="application/pdf,.pdf" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setMetadataGate(null); setMessage(""); }} required /></div><div style={{ height: 14 }} /><button className="btn" type="submit" disabled={loading || !file}>{loading ? uploadStatus || "Menyiapkan upload…" : "Upload & Extract PDF"}</button></form>
       {message && <div className="callout" style={{ marginTop: 14 }}>{message}</div>}
       {metadataGate && <div className="card" style={{ marginTop: 16 }}><h3>Review Metadata AI</h3><p><b>Detected issuer:</b> {metadataGate.detectedCompany?.ticker || "?"} — {metadataGate.detectedCompany?.name || "?"} · confidence {pct(metadataGate.detectedCompany?.confidence)}</p><p><b>Detected period:</b> {metadataGate.detectedPeriod?.periodType || "?"} {metadataGate.detectedPeriod?.year || "?"} · confidence {pct(metadataGate.detectedPeriod?.confidence)}</p>{metadataGate.code === "COMPANY_CONFIRMATION_REQUIRED" && metadataGate.suggestedCompany && <><p>Company Master terdekat: <b>{metadataGate.suggestedCompany.ticker} — {metadataGate.suggestedCompany.name}</b></p><button className="btn" type="button" disabled={loading} onClick={() => uploadFile(metadataGate.suggestedCompany!.id)}>Confirm Company & Continue</button></>}{metadataGate.code === "COMPANY_NOT_FOUND" && <div style={{ display: "grid", gap: 10 }}><div className="callout"><b>Emiten belum ada di Company Master.</b> AI hanya membuat draft. Periksa terutama ticker sebelum menambahkan.</div><div className="form-grid"><div className="field"><label>Ticker</label><input value={companyDraft.ticker} onChange={(e) => setCompanyDraft((v) => ({ ...v, ticker: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Legal Company Name</label><input value={companyDraft.name} onChange={(e) => setCompanyDraft((v) => ({ ...v, name: e.target.value }))} /></div><div className="field"><label>Sector</label><input value={companyDraft.sector} onChange={(e) => setCompanyDraft((v) => ({ ...v, sector: e.target.value }))} /></div><div className="field"><label>Subsector</label><input value={companyDraft.subsector} onChange={(e) => setCompanyDraft((v) => ({ ...v, subsector: e.target.value }))} /></div><div className="field"><label>Country</label><input value={companyDraft.country} maxLength={2} onChange={(e) => setCompanyDraft((v) => ({ ...v, country: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Currency</label><input value={companyDraft.currency} maxLength={3} onChange={(e) => setCompanyDraft((v) => ({ ...v, currency: e.target.value.toUpperCase() }))} /></div><div className="field"><label>Fiscal Year End Month</label><input type="number" min="1" max="12" value={companyDraft.fiscalYearEnd} onChange={(e) => setCompanyDraft((v) => ({ ...v, fiscalYearEnd: e.target.value }))} /></div></div><button className="btn" type="button" disabled={loading || !companyDraft.ticker || !companyDraft.name} onClick={addCompanyAndRetry}>Confirm & Add Company, Then Continue</button></div>}{metadataGate.code === "PERIOD_CONFIRMATION_REQUIRED" && <div className="callout">Periode belum cukup yakin untuk dilanjutkan. Jangan commit sampai periode dikenali jelas.</div>}</div>}
       <FinancialReportPipeline onOpen={(id) => openRun(id)} refreshKey={pipelineRefreshKey} />
