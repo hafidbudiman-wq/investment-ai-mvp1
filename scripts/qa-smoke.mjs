@@ -42,9 +42,9 @@ try {
   await stateFilter.selectOption({ label: "ALL" });
   await page.waitForFunction(() => document.querySelector(".qa-result-count")?.textContent?.includes("34 of 34 requirements"));
 
-  const evidenceSummary = page.locator(".qa-fact-card summary").filter({ hasText: "Evidence inspector" }).first();
-  await evidenceSummary.click();
-  const evidence = page.locator(".qa-fact-card details[open] .qa-evidence").first();
+  const evidenceCard = page.locator(".qa-fact-card").filter({ has: page.locator(".qa-evidence") }).first();
+  await evidenceCard.locator("summary").click();
+  const evidence = evidenceCard.locator("details[open] .qa-evidence").first();
   await evidence.waitFor({ state: "visible" });
   assert((await evidence.innerText()).includes("Raw value"), "evidence inspector did not expose evidence");
 
