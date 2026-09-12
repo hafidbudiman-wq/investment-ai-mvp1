@@ -6,6 +6,7 @@ import {
   type JobClaim,
   type JobLeasePolicy,
   type JobStatus,
+  type JobType,
 } from "@/lib/platform/jobs/job-types";
 
 type ClaimedJobRow = {
@@ -31,6 +32,7 @@ export class LostJobLeaseError extends Error {
 export async function claimNextJob(
   workerId: string,
   policy: JobLeasePolicy = DEFAULT_JOB_LEASE_POLICY,
+  jobType?: JobType,
 ): Promise<JobClaim | null> {
   if (!workerId.trim()) throw new Error("workerId is required.");
   assertValidJobLeasePolicy(policy);
@@ -49,6 +51,7 @@ export async function claimNextJob(
                AND "leaseExpiresAt" < CURRENT_TIMESTAMP - ($1 * INTERVAL '1 second')
              )
            )
+         AND ($2::text IS NULL OR "type" = $2)
          FOR UPDATE SKIP LOCKED
        ), failed AS (
          UPDATE "Job" AS job
@@ -67,6 +70,7 @@ export async function claimNextJob(
        )
        SELECT * FROM failed`,
       policy.reclaimGraceSeconds,
+      jobType ?? null,
     );
 
     for (const exhausted of exhaustedJobs) {
@@ -103,6 +107,7 @@ export async function claimNextJob(
            )
          )
          AND "attemptCount" < "maxAttempts"
+         AND ($5::text IS NULL OR "type" = $5)
          ORDER BY "priority" ASC, "availableAt" ASC, "createdAt" ASC
          FOR UPDATE SKIP LOCKED
          LIMIT 1
@@ -125,6 +130,7 @@ export async function claimNextJob(
       workerId,
       claimToken,
       policy.leaseSeconds,
+      jobType ?? null,
     );
 
     const claimed = rows[0];
@@ -170,6 +176,48 @@ export async function claimNextJob(
       leaseExpiresAt: claimed.leaseExpiresAt,
       attemptNumber: claimed.attemptCount,
     };
+  });
+}
+
+export async function markJobSubmissionUnknown(
+  claim: JobClaim,
+  detail: { providerRequestId?: string; providerResponseId?: string; errorMessage?: string },
+): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const changed = await tx.$executeRawUnsafe(
+      `UPDATE "Job"
+       SET "status"='SUBMISSION_UNKNOWN',
+           "providerResponseId"=COALESCE($4,"providerResponseId"),
+           "errorCode"='PROVIDER_SUBMISSION_UNKNOWN', "errorMessage"=$5,
+           "claimedBy"=NULL, "claimToken"=NULL, "claimedAt"=NULL,
+           "leaseExpiresAt"=NULL, "lastHeartbeatAt"=CURRENT_TIMESTAMP,
+           "updatedAt"=CURRENT_TIMESTAMP
+       WHERE "id"=$1 AND "claimToken"=$2 AND "claimedBy"=$3
+         AND "status"='RUNNING' AND "leaseExpiresAt" > CURRENT_TIMESTAMP`,
+      claim.jobId, claim.claimToken, claim.workerId,
+      detail.providerResponseId ?? null,
+      detail.errorMessage?.slice(0, 2000) ?? "Provider submission outcome is unknown; reconciliation required.",
+    );
+    if (changed !== 1) throw new LostJobLeaseError(claim.jobId);
+    await tx.$executeRawUnsafe(
+      `UPDATE "JobAttempt"
+       SET "status"='SUBMISSION_UNKNOWN', "finishedAt"=CURRENT_TIMESTAMP,
+           "durationMs"=GREATEST(0, FLOOR(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - "startedAt")) * 1000)::INTEGER),
+           "providerRequestId"=COALESCE($4,"providerRequestId"),
+           "providerResponseId"=COALESCE($5,"providerResponseId"),
+           "errorCode"='PROVIDER_SUBMISSION_UNKNOWN', "errorMessage"=$6
+       WHERE "jobId"=$1 AND "attemptNumber"=$2 AND "claimToken"=$3`,
+      claim.jobId, claim.attemptNumber, claim.claimToken,
+      detail.providerRequestId ?? null, detail.providerResponseId ?? null,
+      detail.errorMessage?.slice(0, 2000) ?? "Provider submission outcome is unknown; reconciliation required.",
+    );
+    await tx.$executeRawUnsafe(
+      `INSERT INTO "JobEvent" ("id","jobId","eventType","fromStatus","toStatus","stage","message","metadata")
+       VALUES ($1,$2,'SUBMISSION_UNKNOWN','RUNNING','SUBMISSION_UNKNOWN','PROVIDER_SUBMIT',$3,$4::jsonb)`,
+      randomUUID(), claim.jobId,
+      detail.errorMessage?.slice(0, 500) ?? "Provider submission requires reconciliation",
+      JSON.stringify({ providerRequestId: detail.providerRequestId ?? null, providerResponseId: detail.providerResponseId ?? null }),
+    );
   });
 }
 

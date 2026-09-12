@@ -3,6 +3,7 @@ export type PlatformFeatureFlags = {
   pdfUploadLegacy: boolean;
   genericJobWorker: boolean;
   metadataConfirmationV2: boolean;
+  investaiP0AShadow: boolean;
 };
 
 function readBoolean(name: string, fallback = false): boolean {
@@ -20,6 +21,9 @@ export function assertSafeUploadFlagCombination(flags: PlatformFeatureFlags): vo
   if (flags.pdfUploadV2 && !flags.genericJobWorker) {
     throw new Error("PDF_UPLOAD_V2 requires GENERIC_JOB_WORKER to be enabled.");
   }
+  if (flags.investaiP0AShadow && !flags.genericJobWorker) {
+    throw new Error("INVESTAI_P0A_SHADOW requires GENERIC_JOB_WORKER to be enabled.");
+  }
 }
 
 export function getPlatformFeatureFlags(): PlatformFeatureFlags {
@@ -28,6 +32,7 @@ export function getPlatformFeatureFlags(): PlatformFeatureFlags {
     pdfUploadLegacy: readBoolean("PDF_UPLOAD_LEGACY", true),
     genericJobWorker: readBoolean("GENERIC_JOB_WORKER", false),
     metadataConfirmationV2: readBoolean("METADATA_CONFIRMATION_V2", false),
+    investaiP0AShadow: readBoolean("INVESTAI_P0A_SHADOW", false),
   };
   assertSafeUploadFlagCombination(flags);
   return flags;

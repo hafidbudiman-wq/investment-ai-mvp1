@@ -81,21 +81,23 @@ enum ExtractionChunkType {
 }
 
 model Company {
-  id             String            @id @default(cuid())
-  ticker         String            @unique
-  name           String
-  sector         String?
-  subsector      String?
-  country        String            @default("ID")
-  ipoYear        Int?
-  currency       String            @default("IDR")
-  fiscalYearEnd  Int               @default(12)
-  isActive       Boolean           @default(true)
-  reports        FinancialReport[]
-  extractionRuns ExtractionRun[]
-  canonicalMappings CompanyAccountMapping[]
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  id                 String                  @id @default(cuid())
+  ticker             String                  @unique
+  name               String
+  sector             String?
+  subsector          String?
+  country            String                  @default("ID")
+  ipoYear            Int?
+  currency           String                  @default("IDR")
+  fiscalYearEnd      Int                     @default(12)
+  isActive           Boolean                 @default(true)
+  reports            FinancialReport[]
+  extractionRuns     ExtractionRun[]
+  canonicalMappings  CompanyAccountMapping[]
+  p0aReportRevisions P0AReportRevision[]
+  p0aFactAssertions  P0AFactAssertion[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
 }
 
 model FinancialReport {
@@ -142,8 +144,8 @@ model FinancialStatement {
 }
 
 model CanonicalAccount {
-  id                   String                @id @default(cuid())
-  code                 String                @unique
+  id                   String                  @id @default(cuid())
+  code                 String                  @unique
   name                 String
   displayNameId        String?
   description          String?
@@ -156,22 +158,22 @@ model CanonicalAccount {
   sectorNotes          Json?
   sourceRefs           Json?
   statementType        StatementType
-  valueNature          ValueNature           @default(FLOW)
+  valueNature          ValueNature             @default(FLOW)
   normalBalance        String?
   parentId             String?
-  parent               CanonicalAccount?     @relation("AccountHierarchy", fields: [parentId], references: [id])
-  children             CanonicalAccount[]    @relation("AccountHierarchy")
-  level                Int                   @default(1)
-  sortOrder            Int                   @default(0)
-  isCalculated         Boolean               @default(false)
+  parent               CanonicalAccount?       @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children             CanonicalAccount[]      @relation("AccountHierarchy")
+  level                Int                     @default(1)
+  sortOrder            Int                     @default(0)
+  isCalculated         Boolean                 @default(false)
   formula              String?
-  isActive             Boolean               @default(true)
+  isActive             Boolean                 @default(true)
   entries              FinancialEntry[]
   mappings             AccountMapping[]
   companyMappings      CompanyAccountMapping[]
   extractionCandidates ExtractionCandidate[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @default(now()) @updatedAt
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @default(now()) @updatedAt
 
   @@index([statementType, sortOrder])
   @@index([parentId])
@@ -482,6 +484,10 @@ model FinancialDocument {
   extractionRuns     ExtractionRun[]
   reviewedFacts      FinancialEntry[]
   metadataAssertions MetadataAssertion[]
+  p0aPages           P0ADocumentPage[]
+  p0aPasses          P0AExtractionPass[]
+  p0aReportRevisions P0AReportRevision[]
+  p0aEvidence        P0AFactEvidence[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -513,6 +519,7 @@ model Job {
   completedAt        DateTime?
   attempts           JobAttempt[]
   events             JobEvent[]
+  p0aExtractionTask  P0AExtractionTask?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -580,4 +587,206 @@ model MetadataAssertion {
 
   @@index([documentId, field])
   @@index([status])
+}
+
+model P0ADocumentPage {
+  id                String            @id @default(cuid())
+  documentId        String
+  document          FinancialDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  pageNumber        Int
+  pageWidth         Float
+  pageHeight        Float
+  parserVersion     String
+  text              String
+  textHash          String
+  layoutHash        String
+  printedPageLabel  String?
+  pageClass         String?
+  classifierVersion String?
+  extractionStatus  String
+  characterCount    Int
+  tokens            Json?
+  evidence          P0AFactEvidence[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([documentId, pageNumber, parserVersion])
+  @@index([documentId, pageClass])
+}
+
+model P0AExtractionPass {
+  id                   String                  @id @default(cuid())
+  documentId           String
+  document             FinancialDocument       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  contractVersion      String
+  parserVersion        String
+  routerVersion        String
+  applicabilityVersion String
+  plannerVersion       String
+  gapVersion           String
+  validationVersion    String
+  contextHash          String
+  sourceSha256         String
+  shadowMode           Boolean                 @default(true)
+  pageIndexCacheHit    Boolean                 @default(false)
+  status               String
+  primaryPages         Json
+  targetedPages        Json
+  selectedPages        Json
+  tasks                P0AExtractionTask[]
+  outcomes             P0ARequirementOutcome[]
+  reportRevision       P0AReportRevision?
+  startedAt            DateTime                @default(now())
+  completedAt          DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+
+  @@unique([documentId, contractVersion, parserVersion, routerVersion, plannerVersion, contextHash, shadowMode])
+  @@index([documentId, status])
+}
+
+model P0AExtractionTask {
+  id                  String            @id @default(cuid())
+  passId              String
+  pass                P0AExtractionPass @relation(fields: [passId], references: [id], onDelete: Cascade)
+  jobId               String?           @unique
+  job                 Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  stage               String
+  route               String
+  taskKey             String            @unique
+  requirementIds      Json
+  selectedPages       Json
+  selectedPageCount   Int
+  requirementCount    Int
+  documentPageCount   Int
+  validatedFactCount  Int               @default(0)
+  executionMode       String            @default("SCOPED_PAGE")
+  status              String
+  provider            String?
+  model               String?
+  providerRequestId   String?
+  providerResponseId  String?
+  retryCount          Int               @default(0)
+  inputTokens         Int?
+  outputTokens        Int?
+  processingLatencyMs Int?
+  estimatedCostUsd    Decimal?          @db.Decimal(18, 8)
+  billedCostUsd       Decimal?          @db.Decimal(18, 8)
+  providerCalls       Int               @default(0)
+  inputHash           String
+  outputHash          String?
+  errorCode           String?
+  errorMessage        String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([passId, stage])
+  @@index([provider, model])
+}
+
+model P0ARequirementOutcome {
+  id                  String            @id @default(cuid())
+  passId              String
+  pass                P0AExtractionPass @relation(fields: [passId], references: [id], onDelete: Cascade)
+  requirementId       String
+  applicability       String
+  state               String
+  reportedAssertionId String?           @unique
+  reportedAssertion   P0AFactAssertion? @relation(fields: [reportedAssertionId], references: [id], onDelete: SetNull)
+  attemptedRoutes     Json
+  attemptedPages      Json
+  reason              String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@unique([passId, requirementId])
+  @@index([passId, state])
+}
+
+model P0AReportRevision {
+  id             String             @id @default(cuid())
+  companyId      String
+  company        Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId     String
+  document       FinancialDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  passId         String             @unique
+  pass           P0AExtractionPass  @relation(fields: [passId], references: [id], onDelete: Cascade)
+  contextHash    String             @unique
+  periodStart    DateTime
+  periodEnd      DateTime
+  periodType     String
+  currency       String
+  documentScale  Decimal            @db.Decimal(38, 6)
+  consolidated   Boolean?
+  audited        Boolean?
+  status         String             @default("SHADOW")
+  factAssertions P0AFactAssertion[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([companyId, periodEnd])
+  @@index([documentId])
+}
+
+model P0AFactEvidence {
+  id               String                     @id @default(cuid())
+  documentId       String
+  document         FinancialDocument          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  pageId           String?
+  page             P0ADocumentPage?           @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  evidenceHash     String                     @unique
+  pageNumber       Int
+  printedPageLabel String?
+  statement        String
+  tableName        String?
+  rowLabel         String
+  columnLabel      String
+  rawValue         String
+  snippet          String
+  snippetHash      String
+  locatorHash      String
+  assertions       P0AFactAssertionEvidence[]
+  createdAt        DateTime                   @default(now())
+
+  @@index([documentId, pageNumber])
+  @@index([snippetHash])
+}
+
+model P0AFactAssertion {
+  id                String                     @id @default(cuid())
+  companyId         String
+  company           Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  reportRevisionId  String
+  reportRevision    P0AReportRevision          @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  requirementId     String
+  definitionVersion String
+  assertionKey      String                     @unique
+  origin            String                     @default("REPORTED")
+  valueState        String
+  decimalValue      Decimal?                   @db.Decimal(38, 6)
+  rawValue          String
+  currency          String
+  unitType          String
+  scale             Decimal                    @db.Decimal(38, 6)
+  lineageStatus     String                     @default("COMPLETE")
+  status            String                     @default("SHADOW")
+  evidence          P0AFactAssertionEvidence[]
+  outcome           P0ARequirementOutcome?
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+
+  @@unique([reportRevisionId, requirementId])
+  @@index([companyId, requirementId])
+}
+
+model P0AFactAssertionEvidence {
+  assertionId String
+  assertion   P0AFactAssertion @relation(fields: [assertionId], references: [id], onDelete: Cascade)
+  evidenceId  String
+  evidence    P0AFactEvidence  @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  ordinal     Int
+
+  @@id([assertionId, evidenceId])
+  @@unique([assertionId, ordinal])
+  @@index([evidenceId])
 }

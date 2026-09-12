@@ -10,12 +10,14 @@ test("legacy upload remains enabled by default", () => {
   delete process.env.PDF_UPLOAD_V2;
   delete process.env.PDF_UPLOAD_LEGACY;
   delete process.env.GENERIC_JOB_WORKER;
+  delete process.env.INVESTAI_P0A_SHADOW;
   try {
     assert.deepEqual(getPlatformFeatureFlags(), {
       pdfUploadV2: false,
       pdfUploadLegacy: true,
       genericJobWorker: false,
       metadataConfirmationV2: false,
+      investaiP0AShadow: false,
     });
   } finally {
     process.env = previous;
@@ -30,6 +32,7 @@ test("rejects disabling both upload paths", () => {
         pdfUploadLegacy: false,
         genericJobWorker: false,
         metadataConfirmationV2: false,
+        investaiP0AShadow: false,
       }),
     /At least one PDF upload path/,
   );
@@ -43,7 +46,21 @@ test("rejects V2 without the durable worker", () => {
         pdfUploadLegacy: true,
         genericJobWorker: false,
         metadataConfirmationV2: false,
+        investaiP0AShadow: false,
       }),
+    /requires GENERIC_JOB_WORKER/,
+  );
+});
+
+test("rejects P0-A shadow without the durable worker", () => {
+  assert.throws(
+    () => assertSafeUploadFlagCombination({
+      pdfUploadV2: false,
+      pdfUploadLegacy: true,
+      genericJobWorker: false,
+      metadataConfirmationV2: false,
+      investaiP0AShadow: true,
+    }),
     /requires GENERIC_JOB_WORKER/,
   );
 });
