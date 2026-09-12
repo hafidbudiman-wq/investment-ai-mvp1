@@ -1,0 +1,5 @@
+FROM mcr.microsoft.com/playwright:v1.55.0-noble
+WORKDIR /qa
+RUN npm init -y && npm install --omit=dev playwright-core@1.55.0
+COPY scripts/qa-smoke.mjs /qa/qa-smoke.mjs
+CMD ["node", "/qa/qa-smoke.mjs"]
