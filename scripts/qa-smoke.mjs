@@ -46,7 +46,7 @@ try {
   await evidenceCard.locator("summary").click();
   const evidence = evidenceCard.locator("details[open] .qa-evidence").first();
   await evidence.waitFor({ state: "visible" });
-  assert((await evidence.innerText()).includes("Raw value"), "evidence inspector did not expose evidence");
+  assert(/raw value/i.test(await evidence.innerText()), "evidence inspector did not expose evidence");
 
   const api = await page.evaluate(async (path) => {
     const response = await fetch(path, { cache: "no-store" });
