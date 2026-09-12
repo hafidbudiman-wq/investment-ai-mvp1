@@ -1,0 +1,4 @@
+FROM postgres:18-alpine
+COPY scripts/qa-db-init.sh /usr/local/bin/qa-db-init.sh
+RUN chmod 0555 /usr/local/bin/qa-db-init.sh
+ENTRYPOINT ["/usr/local/bin/qa-db-init.sh"]
