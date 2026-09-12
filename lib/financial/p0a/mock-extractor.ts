@@ -3,7 +3,7 @@ import type { P0AIndexedPage, P0AObservation, P0APlanTask } from "@/lib/financia
 
 export type P0AExtractor = (task: P0APlanTask, pages: readonly P0AIndexedPage[]) => Promise<P0AObservation[]>;
 
-type FixtureFact = {
+export type IcbpGoldFixtureFact = {
   code: string;
   page: number;
   value: string | null;
@@ -16,7 +16,7 @@ type FixtureFact = {
   state?: P0AObservation["state"];
 };
 
-const direct: FixtureFact[] = [
+export const ICBP_GOLD_DIRECT_FACTS: readonly IcbpGoldFixtureFact[] = [
   { code: "CASH", page: 4, value: "27296335", raw: "27.296.335", row: "Cash and cash equivalents", anchor: "27.296.335" },
   { code: "INV", page: 4, value: "6873859", raw: "6.873.859", row: "Inventories - net", anchor: "6.873.859" },
   { code: "CURRENT_ASSETS", page: 4, value: "49238213", raw: "49.238.213", row: "Total Current Assets", anchor: "49.238.213" },
@@ -48,7 +48,7 @@ const direct: FixtureFact[] = [
   { code: "EPS_DILUTED", page: 88, value: null, raw: "not calculated and presented", row: "Diluted earnings per share", anchor: "diluted earnings per share are calculated and", unit: "PER_SHARE", scale: "1", state: "NOT_APPLICABLE" },
 ];
 
-const aggregates: Array<FixtureFact & { components: string[] }> = [
+export const ICBP_GOLD_CALCULATED_ALTERNATIVES: ReadonlyArray<IcbpGoldFixtureFact & { components: string[] }> = [
   { code: "AR", page: 4, value: "10720256", raw: "4.966.484 + 5.753.772", row: "Trade accounts receivable", anchor: "4.966.484", origin: "STANDARDIZED_AGGREGATE", components: ["4.966.484", "5.753.772"] },
   { code: "AP", page: 5, value: "4353532", raw: "3.978.473 + 375.059", row: "Trade accounts payable", anchor: "3.978.473", origin: "STANDARDIZED_AGGREGATE", components: ["3.978.473", "375.059"] },
   { code: "SHORT_TERM_DEBT", page: 5, value: "621216", raw: "287.819 + 333.397", row: "Short-term debt aggregate", anchor: "287.819", origin: "STANDARDIZED_AGGREGATE", components: ["287.819", "333.397"] },
@@ -61,7 +61,7 @@ function snippet(text: string, anchor: string): string {
   return text.slice(Math.max(0, at - 100), Math.min(text.length, at + anchor.length + 100));
 }
 
-function observation(spec: FixtureFact, pages: ReadonlyMap<number, P0AIndexedPage>, allAnchors = [spec.anchor]): P0AObservation {
+function observation(spec: IcbpGoldFixtureFact, pages: ReadonlyMap<number, P0AIndexedPage>, allAnchors = [spec.anchor]): P0AObservation {
   const page = pages.get(spec.page);
   if (!page) throw new Error(`ICBP deterministic fixture requires selected page ${spec.page}.`);
   const requirementId = `${spec.code}_REPORTED`;
@@ -92,8 +92,8 @@ export function createIcbpDeterministicExtractor(): P0AExtractor {
   return async (task, indexedPages) => {
     const selected = new Map(indexedPages.filter((page) => task.selectedPages.includes(page.pageNumber)).map((page) => [page.pageNumber, page]));
     const required = new Set(task.requirementIds);
-    const facts = direct.filter((fact) => required.has(`${fact.code}_REPORTED`) && selected.has(fact.page)).map((fact) => observation(fact, selected));
-    const calculated = aggregates.filter((fact) => required.has(`${fact.code}_REPORTED`) && selected.has(fact.page)).map((fact) => observation(fact, selected, fact.components));
+    const facts = ICBP_GOLD_DIRECT_FACTS.filter((fact) => required.has(`${fact.code}_REPORTED`) && selected.has(fact.page)).map((fact) => observation(fact, selected));
+    const calculated = ICBP_GOLD_CALCULATED_ALTERNATIVES.filter((fact) => required.has(`${fact.code}_REPORTED`) && selected.has(fact.page)).map((fact) => observation(fact, selected, fact.components));
     return [...facts, ...calculated];
   };
 }

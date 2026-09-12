@@ -625,6 +625,8 @@ model P0AExtractionPass {
   plannerVersion       String
   gapVersion           String
   validationVersion    String
+  mappingVersion       String?
+  scopedPromptVersion  String?
   contextHash          String
   sourceSha256         String
   shadowMode           Boolean                 @default(true)
@@ -745,6 +747,8 @@ model P0AFactEvidence {
   snippet          String
   snippetHash      String
   locatorHash      String
+  rowIndex         Int?
+  columnIndex      Int?
   assertions       P0AFactAssertionEvidence[]
   createdAt        DateTime                   @default(now())
 
@@ -762,6 +766,10 @@ model P0AFactAssertion {
   definitionVersion String
   assertionKey      String                     @unique
   origin            String                     @default("REPORTED")
+  rawLabel          String?
+  statement         String?
+  readConfidence    Decimal?                   @db.Decimal(5, 4)
+  mappingConfidence Decimal?                   @db.Decimal(5, 4)
   valueState        String
   decimalValue      Decimal?                   @db.Decimal(38, 6)
   rawValue          String

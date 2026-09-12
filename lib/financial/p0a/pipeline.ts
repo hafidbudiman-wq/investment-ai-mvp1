@@ -7,6 +7,7 @@ import { zeroAiShadowUsage } from "@/lib/financial/p0a/metering";
 import type { P0AExtractor } from "@/lib/financial/p0a/mock-extractor";
 import { createLocalPageIndex } from "@/lib/financial/p0a/page-index";
 import { routePages } from "@/lib/financial/p0a/page-router";
+import { createNativeFinancialExtractor } from "@/lib/financial/p0a/native-extractor";
 import type { P0AIndexedPage, P0AIssuerContext, P0AObservation, P0APlanTask, P0AProviderUsage, P0ARequirementOutcome, P0ARoutedPage } from "@/lib/financial/p0a/types";
 import { validateP0AOutcomes, type P0AValidationCheck } from "@/lib/financial/p0a/validation";
 import { P0A_VERSION_SET } from "@/lib/financial/p0a/versions";
@@ -71,5 +72,23 @@ export async function runP0AShadowPipeline(input: { bytes: Buffer; context: P0AI
     shadowMode: true,
     realProviderExtractionPassed: false,
     pageIndexCacheHit: input.indexedPages !== undefined,
+  };
+}
+
+/** Phase 3 native-first entry point. No provider transport is reachable here. */
+export async function runP0ANativePipeline(input: { bytes: Buffer; context: P0AIssuerContext; indexedPages?: P0AIndexedPage[] }): Promise<P0APipelineResult> {
+  const started = Date.now();
+  const pageIndexCacheHit = input.indexedPages !== undefined;
+  const index = input.indexedPages ?? await createLocalPageIndex(input.bytes);
+  const routedPages = routePages(index);
+  const result = await runP0AShadowPipeline({
+    ...input,
+    indexedPages: index,
+    extractor: createNativeFinancialExtractor({ routedPages, context: input.context }),
+  });
+  return {
+    ...result,
+    usage: { ...result.usage, processingLatencyMs: Date.now() - started },
+    pageIndexCacheHit,
   };
 }

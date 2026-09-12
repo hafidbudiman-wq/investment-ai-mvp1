@@ -26,6 +26,7 @@ export function createEvidence(input: {
     rawValue: input.rawValue,
     snippet: input.snippet,
     snippetHash: sha(input.snippet),
+    evidenceHash: sha([input.requirementId, locator, input.snippet].join("|")),
     locatorHash: sha(locator),
   };
 }

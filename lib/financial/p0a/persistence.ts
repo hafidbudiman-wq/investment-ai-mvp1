@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import type { P0APipelineResult } from "@/lib/financial/p0a/pipeline";
-import type { P0AIssuerContext } from "@/lib/financial/p0a/types";
+import type { P0AIssuerContext, P0ANativeObservation, P0AProviderAttemptUsage } from "@/lib/financial/p0a/types";
 import type { P0AIndexedPage } from "@/lib/financial/p0a/types";
 
 const json = (value: unknown): Prisma.InputJsonValue => value as Prisma.InputJsonValue;
@@ -74,6 +74,8 @@ export async function persistP0AShadowResult(
         applicabilityVersion: result.versions.applicability,
         gapVersion: result.versions.gapDetector,
         validationVersion: result.versions.validation,
+        mappingVersion: result.versions.mapping,
+        scopedPromptVersion: result.versions.scopedPrompt,
         sourceSha256: result.documentSha256,
         pageIndexCacheHit: result.pageIndexCacheHit,
         status: "SUCCEEDED",
@@ -86,6 +88,8 @@ export async function persistP0AShadowResult(
         applicabilityVersion: result.versions.applicability,
         gapVersion: result.versions.gapDetector,
         validationVersion: result.versions.validation,
+        mappingVersion: result.versions.mapping,
+        scopedPromptVersion: result.versions.scopedPrompt,
         pageIndexCacheHit: result.pageIndexCacheHit,
         status: "SUCCEEDED",
         primaryPages: json(result.tasks.filter((task) => task.stage === "PRIMARY").flatMap((task) => task.selectedPages)),
@@ -139,19 +143,26 @@ export async function persistP0AShadowResult(
     const pageRows = await tx.p0ADocumentPage.findMany({ where: { documentId, parserVersion: result.versions.parser } });
     const pageIds = new Map(pageRows.map((page) => [page.pageNumber, page.id]));
     const assertionIds = new Map<string, string>();
-    for (const observation of result.observations.filter((item) => item.origin === "REPORTED")) {
+    for (const observation of result.observations.filter((item) => item.origin === "REPORTED" && ["VALUE", "ZERO", "NOT_APPLICABLE"].includes(item.state))) {
+      const native = observation as Partial<P0ANativeObservation>;
       const assertionKey = sha([revision.id, observation.requirementId, observation.state, observation.decimalValue, observation.rawValue, result.versions.contract].join("|"));
       const assertion = await tx.p0AFactAssertion.upsert({
         where: { reportRevisionId_requirementId: { reportRevisionId: revision.id, requirementId: observation.requirementId } },
         create: {
           companyId, reportRevisionId: revision.id, requirementId: observation.requirementId,
           definitionVersion: result.versions.contract, assertionKey, origin: "REPORTED",
+          rawLabel: native.rawLabel, statement: native.statement,
+          readConfidence: native.readConfidence === undefined ? undefined : new Prisma.Decimal(native.readConfidence),
+          mappingConfidence: native.mappingConfidence === undefined ? undefined : new Prisma.Decimal(native.mappingConfidence),
           valueState: observation.state, decimalValue: observation.decimalValue === null ? null : new Prisma.Decimal(observation.decimalValue),
           rawValue: observation.rawValue, currency: observation.currency, unitType: observation.unitType,
           scale: new Prisma.Decimal(observation.scale), lineageStatus: "COMPLETE", status: "SHADOW",
         },
         update: {
           assertionKey, valueState: observation.state,
+          rawLabel: native.rawLabel, statement: native.statement,
+          readConfidence: native.readConfidence === undefined ? undefined : new Prisma.Decimal(native.readConfidence),
+          mappingConfidence: native.mappingConfidence === undefined ? undefined : new Prisma.Decimal(native.mappingConfidence),
           decimalValue: observation.decimalValue === null ? null : new Prisma.Decimal(observation.decimalValue),
           rawValue: observation.rawValue, currency: observation.currency, unitType: observation.unitType,
           scale: new Prisma.Decimal(observation.scale), lineageStatus: "COMPLETE", status: "SHADOW",
@@ -169,8 +180,9 @@ export async function persistP0AShadowResult(
             statement: evidence.statement, tableName: evidence.table, rowLabel: evidence.rowLabel,
             columnLabel: evidence.columnLabel, rawValue: evidence.rawValue, snippet: evidence.snippet,
             snippetHash: evidence.snippetHash, locatorHash: evidence.locatorHash,
+            rowIndex: evidence.rowIndex, columnIndex: evidence.columnIndex,
           },
-          update: { pageId: pageIds.get(evidence.pageNumber), snippet: evidence.snippet },
+          update: { pageId: pageIds.get(evidence.pageNumber), snippet: evidence.snippet, rowIndex: evidence.rowIndex, columnIndex: evidence.columnIndex },
         });
         await tx.p0AFactAssertionEvidence.create({ data: { assertionId: assertion.id, evidenceId: stored.id, ordinal } });
       }
@@ -205,4 +217,37 @@ export async function persistP0AShadowResult(
       },
     };
   }, { timeout: 60_000 });
+}
+
+/**
+ * Records one approval-gated scoped provider attempt only on the existing P0-A
+ * shadow task. It has no code path to FinancialEntry or FinancialReport.
+ */
+export async function persistP0AScopedTaskUsage(
+  client: PrismaClient,
+  input: { taskKey: string; usage: P0AProviderAttemptUsage; errorCode?: string; errorMessage?: string },
+): Promise<void> {
+  await client.p0AExtractionTask.update({
+    where: { taskKey: input.taskKey },
+    data: {
+      status: input.usage.status,
+      provider: input.usage.provider,
+      model: input.usage.model,
+      selectedPageCount: input.usage.selectedPageCount,
+      requirementCount: input.usage.requirementCount,
+      providerRequestId: input.usage.providerRequestId,
+      providerResponseId: input.usage.providerResponseId,
+      retryCount: input.usage.retryCount,
+      inputTokens: input.usage.inputTokens,
+      outputTokens: input.usage.outputTokens,
+      processingLatencyMs: input.usage.processingLatencyMs,
+      estimatedCostUsd: input.usage.estimatedCostUsd === null ? null : new Prisma.Decimal(input.usage.estimatedCostUsd),
+      billedCostUsd: input.usage.billedCostUsd === null ? null : new Prisma.Decimal(input.usage.billedCostUsd),
+      providerCalls: input.usage.providerCalls,
+      inputHash: input.usage.inputHash,
+      outputHash: input.usage.outputHash,
+      errorCode: input.errorCode,
+      errorMessage: input.errorMessage?.slice(0, 2_000),
+    },
+  });
 }

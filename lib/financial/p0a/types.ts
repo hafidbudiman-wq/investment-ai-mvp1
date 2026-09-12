@@ -105,13 +105,16 @@ export type P0AEvidence = {
   rawValue: string;
   snippet: string;
   snippetHash: string;
+  evidenceHash?: string;
   locatorHash: string;
+  rowIndex?: number;
+  columnIndex?: number;
 };
 
 export type P0AObservation = {
   requirementId: string;
   origin: P0AFactOrigin;
-  state: "VALUE" | "ZERO" | "NOT_APPLICABLE";
+  state: P0AValueState;
   decimalValue: string | null;
   rawValue: string;
   currency: string;
@@ -119,6 +122,33 @@ export type P0AObservation = {
   scale: string;
   evidence: P0AEvidence[];
   sourceFactIds?: string[];
+};
+
+export type P0ANativeObservation = P0AObservation & {
+  rawLabel: string;
+  statement: P0AStatementType;
+  period: {
+    start: string;
+    end: string;
+    type: P0AIssuerContext["periodType"];
+    nature: P0APeriodNature;
+  };
+  consolidationScope: "CONSOLIDATED" | "STANDALONE" | "UNKNOWN";
+  readConfidence: number;
+  mappingConfidence: number;
+  versions: {
+    parser: string;
+    router: string;
+    mapping: string;
+    validation: string;
+  };
+};
+
+export type P0AProviderAttemptUsage = P0AProviderUsage & {
+  attemptNumber: number;
+  inputHash: string;
+  outputHash: string | null;
+  status: "CACHE_HIT" | "SUCCEEDED" | "FAILED" | "SUBMISSION_UNKNOWN";
 };
 
 export type P0ARequirementOutcome = {
