@@ -59,6 +59,17 @@ export type P0ARoutedPage = P0AIndexedPage & {
   matchedAnchors: string[];
 };
 
+export type P0ARoutingSnapshotEntry = Pick<
+  P0ARoutedPage,
+  | "pageNumber"
+  | "pageClass"
+  | "statementType"
+  | "confidence"
+  | "matchedAnchors"
+  | "textHash"
+  | "layoutHash"
+>;
+
 export type P0ARequirement = {
   id: string;
   legacyCode: string;

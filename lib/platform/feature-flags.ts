@@ -4,6 +4,7 @@ export type PlatformFeatureFlags = {
   genericJobWorker: boolean;
   metadataConfirmationV2: boolean;
   investaiP0AShadow: boolean;
+  investaiExtractionQa: boolean;
 };
 
 function readBoolean(name: string, fallback = false): boolean {
@@ -33,6 +34,7 @@ export function getPlatformFeatureFlags(): PlatformFeatureFlags {
     genericJobWorker: readBoolean("GENERIC_JOB_WORKER", false),
     metadataConfirmationV2: readBoolean("METADATA_CONFIRMATION_V2", false),
     investaiP0AShadow: readBoolean("INVESTAI_P0A_SHADOW", false),
+    investaiExtractionQa: readBoolean("INVESTAI_EXTRACTION_QA", false),
   };
   assertSafeUploadFlagCombination(flags);
   return flags;

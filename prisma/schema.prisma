@@ -625,8 +625,8 @@ model P0AExtractionPass {
   plannerVersion       String
   gapVersion           String
   validationVersion    String
-  mappingVersion       String?
-  scopedPromptVersion  String?
+  mappingVersion       String
+  scopedPromptVersion  String
   contextHash          String
   sourceSha256         String
   shadowMode           Boolean                 @default(true)
@@ -635,6 +635,7 @@ model P0AExtractionPass {
   primaryPages         Json
   targetedPages        Json
   selectedPages        Json
+  routingSnapshot      Json?
   tasks                P0AExtractionTask[]
   outcomes             P0ARequirementOutcome[]
   reportRevision       P0AReportRevision?
@@ -643,7 +644,7 @@ model P0AExtractionPass {
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
 
-  @@unique([documentId, contractVersion, parserVersion, routerVersion, plannerVersion, contextHash, shadowMode])
+  @@unique([documentId, contractVersion, parserVersion, routerVersion, applicabilityVersion, plannerVersion, gapVersion, validationVersion, mappingVersion, scopedPromptVersion, contextHash, shadowMode], name: "completeIdentity", map: "P0AExtractionPass_complete_identity_key")
   @@index([documentId, status])
 }
 
@@ -713,7 +714,7 @@ model P0AReportRevision {
   document       FinancialDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   passId         String             @unique
   pass           P0AExtractionPass  @relation(fields: [passId], references: [id], onDelete: Cascade)
-  contextHash    String             @unique
+  contextHash    String
   periodStart    DateTime
   periodEnd      DateTime
   periodType     String
@@ -728,6 +729,7 @@ model P0AReportRevision {
 
   @@index([companyId, periodEnd])
   @@index([documentId])
+  @@index([contextHash])
 }
 
 model P0AFactEvidence {

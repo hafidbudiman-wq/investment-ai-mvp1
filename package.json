@@ -20,6 +20,7 @@
     "test:platform:integration": "node --import tsx tests/platform/job-repository.integration.ts",
     "test:p0a:icbp-shadow": "node --import tsx scripts/p0a-icbp-shadow-acceptance.ts",
     "test:p0a:phase3-native": "node --import tsx scripts/p0a-phase3-icbp-native-acceptance.ts",
+    "test:p0a:phase4-roundtrip": "node --import tsx scripts/p0a-phase4-icbp-roundtrip.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

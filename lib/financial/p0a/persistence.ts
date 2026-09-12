@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import type { P0APipelineResult } from "@/lib/financial/p0a/pipeline";
+import {
+  assertRoutingSnapshotIdentity,
+  createRoutingSnapshot,
+} from "@/lib/financial/p0a/routing-snapshot";
 import type { P0AIssuerContext, P0ANativeObservation, P0AProviderAttemptUsage } from "@/lib/financial/p0a/types";
 import type { P0AIndexedPage } from "@/lib/financial/p0a/types";
 
@@ -63,33 +67,30 @@ export async function persistP0AShadowResult(
       contractVersion: result.versions.contract,
       parserVersion: result.versions.parser,
       routerVersion: result.versions.router,
+      applicabilityVersion: result.versions.applicability,
       plannerVersion: result.versions.planner,
+      gapVersion: result.versions.gapDetector,
+      validationVersion: result.versions.validation,
+      mappingVersion: result.versions.mapping,
+      scopedPromptVersion: result.versions.scopedPrompt,
       contextHash: result.contextHash,
       shadowMode: true,
     };
+    const routingSnapshot = createRoutingSnapshot(result.routedPages);
     const pass = await tx.p0AExtractionPass.upsert({
-      where: { documentId_contractVersion_parserVersion_routerVersion_plannerVersion_contextHash_shadowMode: identity },
+      where: { completeIdentity: identity },
       create: {
         ...identity,
-        applicabilityVersion: result.versions.applicability,
-        gapVersion: result.versions.gapDetector,
-        validationVersion: result.versions.validation,
-        mappingVersion: result.versions.mapping,
-        scopedPromptVersion: result.versions.scopedPrompt,
         sourceSha256: result.documentSha256,
         pageIndexCacheHit: result.pageIndexCacheHit,
         status: "SUCCEEDED",
         primaryPages: json(result.tasks.filter((task) => task.stage === "PRIMARY").flatMap((task) => task.selectedPages)),
         targetedPages: json(result.tasks.filter((task) => task.stage === "TARGETED").flatMap((task) => task.selectedPages)),
         selectedPages: json(result.selectedPages),
+        routingSnapshot: json(routingSnapshot),
         completedAt: new Date(),
       },
       update: {
-        applicabilityVersion: result.versions.applicability,
-        gapVersion: result.versions.gapDetector,
-        validationVersion: result.versions.validation,
-        mappingVersion: result.versions.mapping,
-        scopedPromptVersion: result.versions.scopedPrompt,
         pageIndexCacheHit: result.pageIndexCacheHit,
         status: "SUCCEEDED",
         primaryPages: json(result.tasks.filter((task) => task.stage === "PRIMARY").flatMap((task) => task.selectedPages)),
@@ -98,9 +99,10 @@ export async function persistP0AShadowResult(
         completedAt: new Date(),
       },
     });
+    assertRoutingSnapshotIdentity(pass.routingSnapshot, routingSnapshot);
 
     const revision = await tx.p0AReportRevision.upsert({
-      where: { contextHash: result.contextHash },
+      where: { passId: pass.id },
       create: {
         companyId, documentId, passId: pass.id, contextHash: result.contextHash,
         periodStart: new Date(context.periodStart), periodEnd: new Date(context.periodEnd),
@@ -108,7 +110,7 @@ export async function persistP0AShadowResult(
         documentScale: new Prisma.Decimal(context.documentScale),
         consolidated: context.consolidated, audited: context.audited, status: "SHADOW",
       },
-      update: { passId: pass.id, status: "SHADOW" },
+      update: { status: "SHADOW" },
     });
 
     for (const task of result.tasks) {
@@ -127,7 +129,8 @@ export async function persistP0AShadowResult(
           validatedFactCount: taskObservations.filter((item) => item.origin === "REPORTED").length,
           executionMode: "SCOPED_PAGE", status: "SUCCEEDED",
           provider: null, model: null, providerRequestId: null, providerResponseId: null,
-          retryCount: 0, inputTokens: null, outputTokens: null, processingLatencyMs: null,
+          retryCount: 0, inputTokens: null, outputTokens: null,
+          processingLatencyMs: task.stage === "PRIMARY" ? result.usage.processingLatencyMs : 0,
           estimatedCostUsd: null, billedCostUsd: null, providerCalls: 0,
           inputHash: task.cacheKey, outputHash: sha(JSON.stringify(taskObservations)),
         },
@@ -135,7 +138,9 @@ export async function persistP0AShadowResult(
           passId: pass.id, status: "SUCCEEDED", selectedPageCount: task.selectedPages.length,
           requirementCount: task.requirementIds.length, documentPageCount: result.routedPages.length,
           validatedFactCount: taskObservations.filter((item) => item.origin === "REPORTED").length,
-          executionMode: "SCOPED_PAGE", outputHash: sha(JSON.stringify(taskObservations)),
+          executionMode: "SCOPED_PAGE",
+          processingLatencyMs: task.stage === "PRIMARY" ? result.usage.processingLatencyMs : 0,
+          outputHash: sha(JSON.stringify(taskObservations)),
         },
       });
     }
@@ -182,7 +187,10 @@ export async function persistP0AShadowResult(
             snippetHash: evidence.snippetHash, locatorHash: evidence.locatorHash,
             rowIndex: evidence.rowIndex, columnIndex: evidence.columnIndex,
           },
-          update: { pageId: pageIds.get(evidence.pageNumber), snippet: evidence.snippet, rowIndex: evidence.rowIndex, columnIndex: evidence.columnIndex },
+          // Evidence is content-addressed and shared across compatible passes.
+          // Never move or rewrite an older evidence row when a newer parser or
+          // router pass cites the same immutable evidence hash.
+          update: {},
         });
         await tx.p0AFactAssertionEvidence.create({ data: { assertionId: assertion.id, evidenceId: stored.id, ordinal } });
       }
