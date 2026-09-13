@@ -44,9 +44,12 @@ async function main() {
   assert.deepEqual(result.selectedPages, EXPECTED_PAGES, "ICBP selected-page routing regressed");
   assert.deepEqual(counts, { valueZero: 28, notApplicable: 1, notDisclosed: 5, missing: 0, ambiguous: 0, conflict: 0 }, "ICBP semantic states regressed");
   assert.equal(result.usage.providerCalls, 0, "ICBP regression must remain native-only");
-  assert.equal(result.usage.inputTokens, 0);
-  assert.equal(result.usage.outputTokens, 0);
-  assert.equal(result.usage.apiCostUsd, "0");
+  assert.equal(result.usage.provider, null);
+  assert.equal(result.usage.model, null);
+  assert.equal(result.usage.inputTokens, null);
+  assert.equal(result.usage.outputTokens, null);
+  assert.equal(result.usage.estimatedCostUsd, null);
+  assert.equal(result.usage.billedCostUsd, null);
 
   const output = {
     sourceSha256,
@@ -59,6 +62,7 @@ async function main() {
     selectedPages: result.selectedPages,
     counts,
     providerUsage: result.usage,
+    effectiveProviderUsage: { providerCalls: 0, inputTokens: 0, outputTokens: 0, apiCostUsd: "0.00000000" },
     outcomes: result.outcomes.map((outcome) => ({ requirementId: outcome.requirement.id, state: outcome.state })),
   };
   const outputDir = process.env.P0A_PHASE5_OUTPUT_DIR ?? "artifacts/phase5";
