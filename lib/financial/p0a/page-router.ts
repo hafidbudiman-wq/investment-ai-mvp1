@@ -7,9 +7,7 @@ const PRIMARY_RULES: Array<{ pageClass: P0APageClass; statementType: P0AStatemen
   { pageClass: "PRIMARY_CASH_FLOW", statementType: "CASH_FLOW", anchors: ["laporan arus kas", "statement of cash flows"] },
 ];
 
-function normalize(value: string): string {
-  return value.normalize("NFKC").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, " ").replace(/\s+/g, " ").trim();
-}
+const NOTE_MARKERS = ["catatan atas laporan", "notes to the"] as const;
 
 function countAnchor(text: string, anchor: string): number {
   let count = 0;
@@ -21,47 +19,42 @@ function countAnchor(text: string, anchor: string): number {
   return count;
 }
 
-function topRegion(page: P0AIndexedPage): string {
-  if (!page.tokens.length) return page.normalizedText.slice(0, 1_200);
-  const threshold = page.height * 0.66;
-  return normalize(page.tokens.filter((token) => token.y >= threshold).map((token) => token.text).join(" "));
-}
-
-function hasNoteMasthead(page: P0AIndexedPage): boolean {
-  const top = topRegion(page);
-  const indonesian = top.includes("catatan") && top.includes("laporan") && top.includes("keuangan") && top.includes("konsolidasian");
-  const english = top.includes("notes") && top.includes("consolidated") && top.includes("financial") && top.includes("statements");
-
-  // Native PDFs carry token coordinates, so trust the physical top-of-page
-  // masthead only. This prevents primary-statement footers such as
-  // "accompanying notes" from turning a primary page into a note page.
-  if (page.tokens.length) return indonesian && english;
-
-  // Text-only fixtures/caches without coordinates use a deliberately small
-  // prefix and require both bilingual mastheads.
-  return indonesian && english;
+function earliest(text: string, anchors: readonly string[]): number | null {
+  const positions = anchors.map((anchor) => text.indexOf(anchor)).filter((position) => position >= 0);
+  return positions.length ? Math.min(...positions) : null;
 }
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
-  const header = page.normalizedText.slice(0, 4_500);
-  if (hasNoteMasthead(page)) {
+  const text = page.normalizedText;
+  const structuralWindow = text.slice(0, 6_000);
+  const notePosition = earliest(structuralWindow, NOTE_MARKERS);
+
+  const primaryMatches = PRIMARY_RULES.flatMap((rule) => rule.anchors.map((anchor) => ({ rule, anchor, position: structuralWindow.indexOf(anchor) })))
+    .filter((match) => match.position >= 0)
+    .sort((left, right) => left.position - right.position);
+  const firstPrimary = primaryMatches[0] ?? null;
+
+  // Use reading-order structure rather than broad page presence. Primary
+  // statements mention accompanying notes in their footer; note pages often
+  // quote primary-statement names in their body. The structural marker that
+  // appears first therefore identifies the actual page role without relying
+  // on issuer, page number, or PDF coordinate orientation.
+  if (notePosition !== null && (!firstPrimary || notePosition < firstPrimary.position)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
 
-  const toc = ["daftar isi", "table of contents"].filter((anchor) => header.includes(anchor));
+  const toc = ["daftar isi", "table of contents"].filter((anchor) => structuralWindow.includes(anchor));
   if (toc.length) return { pageClass: "TABLE_OF_CONTENTS", statementType: "OTHER", confidence: 0.99, matchedAnchors: toc };
 
-  const auditor = ["laporan auditor independen", "independent auditor s report"].filter((anchor) => header.includes(anchor));
+  const auditor = ["laporan auditor independen", "independent auditor s report"].filter((anchor) => structuralWindow.includes(anchor));
   if (auditor.length) return { pageClass: "AUDITOR_REPORT", statementType: "OTHER", confidence: 0.99, matchedAnchors: auditor };
 
-  for (const rule of PRIMARY_RULES) {
-    const matches = rule.anchors.filter((anchor) => header.includes(anchor));
-    if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
+  if (firstPrimary) {
+    const sameRuleAnchors = firstPrimary.rule.anchors.filter((anchor) => structuralWindow.includes(anchor));
+    return { pageClass: firstPrimary.rule.pageClass, statementType: firstPrimary.rule.statementType, confidence: 0.99, matchedAnchors: sameRuleAnchors };
   }
 
-  const noteAnchors = ["catatan atas laporan keuangan", "notes to the interim consolidated financial statements", "notes to the consolidated financial statements"];
-  const notes = noteAnchors.filter((anchor) => header.includes(anchor));
-  if (notes.length) return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: notes };
+  if (notePosition !== null) return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["notes masthead"] };
   return { pageClass: "OTHER", statementType: "OTHER", confidence: page.text ? 0.7 : 1, matchedAnchors: [] };
 }
 
@@ -77,9 +70,6 @@ function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anch
   const anchorScore = requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0);
   if (anchorScore === 0) return { anchorScore, score: 0 };
 
-  // EPS denominator must represent the total-period EPS table when both total
-  // and continuing/discontinued-operation tables repeat the same denominator.
-  // This is presentation-scope logic, not issuer-specific routing.
   if (requirement.id === "WEIGHTED_AVG_SHARES_REPORTED") {
     const scoped = /(?:continuing operations?|discontinued operations?|operasi yang dilanjutkan|operasi yang dihentikan)/.test(page.normalizedText);
     return { anchorScore, score: anchorScore - (scoped ? 1_000 : 0) };

@@ -1,6 +1,6 @@
 export const P0A_CONTRACT_VERSION = "investai-canonical-v1.0-final:p0-a";
 export const P0A_PARSER_VERSION = "p0a-native-page-index-v1";
-export const P0A_ROUTER_VERSION = "p0a-page-router-v3-physical-masthead-scope";
+export const P0A_ROUTER_VERSION = "p0a-page-router-v4-structural-order";
 export const P0A_APPLICABILITY_VERSION = "p0a-applicability-v1";
 export const P0A_PLANNER_VERSION = "p0a-fact-planner-v2-route-metadata";
 export const P0A_GAP_DETECTOR_VERSION = "p0a-gap-detector-v1";
