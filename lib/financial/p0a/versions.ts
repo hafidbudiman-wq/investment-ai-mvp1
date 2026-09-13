@@ -5,7 +5,7 @@ export const P0A_APPLICABILITY_VERSION = "p0a-applicability-v1";
 export const P0A_PLANNER_VERSION = "p0a-fact-planner-v1";
 export const P0A_GAP_DETECTOR_VERSION = "p0a-gap-detector-v1";
 export const P0A_VALIDATION_VERSION = "p0a-validation-v1";
-export const P0A_NATIVE_MAPPING_VERSION = "p0a-native-financial-mapping-v1";
+export const P0A_NATIVE_MAPPING_VERSION = "p0a-native-financial-mapping-v2-cross-issuer";
 export const P0A_SCOPED_PROMPT_VERSION = "p0a-scoped-openai-prompt-v1";
 
 export const P0A_VERSION_SET = Object.freeze({
