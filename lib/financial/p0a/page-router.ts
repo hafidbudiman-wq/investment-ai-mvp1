@@ -18,19 +18,22 @@ function countAnchor(text: string, anchor: string): number {
   return count;
 }
 
-function topPhysicalRegion(page: P0AIndexedPage): string {
-  if (!page.tokens.length) return page.normalizedText.slice(0, 2_200);
-  // PDF.js page-space Y increases from bottom to top for the standard
-  // unrotated financial-statement pages handled by P0-A.
-  const high = page.height * 0.68;
-  return normalize(page.tokens.filter((token) => token.y >= high).map((token) => token.text).join(" "));
+function edgeRegions(page: P0AIndexedPage): string[] {
+  if (!page.tokens.length) return [page.normalizedText.slice(0, 1_200)];
+  const low = page.height * 0.15;
+  const high = page.height * 0.85;
+  const lowEdge = normalize(page.tokens.filter((token) => token.y <= low).map((token) => token.text).join(" "));
+  const highEdge = normalize(page.tokens.filter((token) => token.y >= high).map((token) => token.text).join(" "));
+  return [lowEdge, highEdge].filter(Boolean);
 }
 
 function noteMasthead(page: P0AIndexedPage): boolean {
-  const top = topPhysicalRegion(page);
-  const indonesian = top.includes("catatan") && top.includes("laporan") && top.includes("keuangan") && top.includes("konsolidasian");
-  const english = top.includes("notes") && top.includes("consolidated") && top.includes("financial") && top.includes("statements");
-  return indonesian && english;
+  return edgeRegions(page).some((edge) => {
+    const noteIdentity = (edge.includes("catatan") && edge.includes("laporan") && edge.includes("keuangan"))
+      || (edge.includes("notes") && edge.includes("financial") && edge.includes("statements"));
+    const periodIdentity = edge.includes("tanggal") || edge.includes("as of") || edge.includes("periode") || edge.includes("period ended") || edge.includes("year ended");
+    return noteIdentity && periodIdentity;
+  });
 }
 
 function epsCalculationPage(text: string): boolean {
@@ -44,9 +47,6 @@ function epsCalculationPage(text: string): boolean {
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 6_000);
-  // Use only the physical top region for note identity. This excludes the
-  // "accompanying notes" footer on primary statements while retaining note
-  // continuation pages whose page masthead is repeated above the body table.
   if (noteMasthead(page)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
@@ -61,6 +61,9 @@ function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPag
     if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
   }
 
+  // Some issuers repeat the note masthead only on the first page of a note.
+  // A continuation page containing both an EPS calculation label and its
+  // weighted-average denominator is still a deterministic targeted-note page.
   if (epsCalculationPage(page.normalizedText)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps calculation table"] };
   }
