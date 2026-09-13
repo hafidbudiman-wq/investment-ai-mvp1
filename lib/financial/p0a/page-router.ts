@@ -22,7 +22,7 @@ function countAnchor(text: string, anchor: string): number {
 }
 
 function topRegion(page: P0AIndexedPage): string {
-  if (!page.tokens.length) return page.normalizedText.slice(0, 2_000);
+  if (!page.tokens.length) return page.normalizedText.slice(0, 1_200);
   const threshold = page.height * 0.66;
   return normalize(page.tokens.filter((token) => token.y >= threshold).map((token) => token.text).join(" "));
 }
@@ -31,19 +31,19 @@ function hasNoteMasthead(page: P0AIndexedPage): boolean {
   const top = topRegion(page);
   const indonesian = top.includes("catatan") && top.includes("laporan") && top.includes("keuangan") && top.includes("konsolidasian");
   const english = top.includes("notes") && top.includes("consolidated") && top.includes("financial") && top.includes("statements");
-  if (indonesian && english) return true;
 
-  // Fallback for PDFs whose text tokens do not retain stable coordinates.
-  const header = page.normalizedText.slice(0, 4_500);
-  const bilingual = header.includes("catatan atas laporan") && header.includes("notes to the")
-    && header.includes("konsolidasian") && header.includes("financial statements");
-  return bilingual;
+  // Native PDFs carry token coordinates, so trust the physical top-of-page
+  // masthead only. This prevents primary-statement footers such as
+  // "accompanying notes" from turning a primary page into a note page.
+  if (page.tokens.length) return indonesian && english;
+
+  // Text-only fixtures/caches without coordinates use a deliberately small
+  // prefix and require both bilingual mastheads.
+  return indonesian && english;
 }
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 4_500);
-  // Notes frequently quote primary-statement names in their body. Detect the
-  // actual page masthead by its physical top-of-page tokens before body text.
   if (hasNoteMasthead(page)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
