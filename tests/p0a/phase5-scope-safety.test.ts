@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createPhase5GenericNativeExtractor } from "../../lib/financial/p0a/phase5-generic-extractor";
+import { createPhase5AcceptanceNativeExtractor } from "../../lib/financial/p0a/phase5-acceptance-extractor";
 import type { P0AIssuerContext, P0APageToken, P0ARoutedPage, P0AStatementType } from "../../lib/financial/p0a/types";
 
 const context: P0AIssuerContext = {
@@ -31,7 +31,7 @@ function page(statementType: P0AStatementType, text: string, rows: Array<[string
 }
 
 async function run(pages: P0ARoutedPage[], ids: string[], route: "PRIMARY" | "NOTE" = "PRIMARY") {
-  const extractor = createPhase5GenericNativeExtractor({ routedPages: pages, context });
+  const extractor = createPhase5AcceptanceNativeExtractor({ routedPages: pages, context });
   return extractor({ stage: route === "NOTE" ? "TARGETED" : "PRIMARY", route, selectedPages: pages.map((item) => item.pageNumber), requirementIds: ids, cacheKey: "scope-safety" }, pages);
 }
 
