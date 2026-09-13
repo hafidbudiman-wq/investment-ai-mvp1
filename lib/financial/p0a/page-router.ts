@@ -1,3 +1,4 @@
+import { parseFinancialDecimal } from "@/lib/financial/p0a/decimal";
 import type { P0AIndexedPage, P0APageClass, P0ARequirement, P0ARoutedPage, P0AStatementType } from "@/lib/financial/p0a/types";
 
 const PRIMARY_RULES: Array<{ pageClass: P0APageClass; statementType: P0AStatementType; anchors: string[] }> = [
@@ -36,13 +37,43 @@ function noteMasthead(page: P0AIndexedPage): boolean {
   });
 }
 
-function epsCalculationPage(text: string): boolean {
-  const basic = text.includes("basic earnings per share") || text.includes("laba per saham dasar");
+function containsWords(text: string, words: readonly string[]): boolean {
+  const tokens = new Set(text.split(" ").filter(Boolean));
+  return words.every((word) => tokens.has(word));
+}
+
+function epsNumericStructure(page: P0AIndexedPage): boolean {
+  let hasLarge = false;
+  let hasPerShare = false;
+  for (const match of page.text.matchAll(/\(?[-−–—]?\d[\d.,]*\)?/g)) {
+    const parsed = parseFinancialDecimal(match[0]);
+    if (!parsed) continue;
+    const value = Math.abs(Number(parsed.decimal));
+    if (!Number.isFinite(value)) continue;
+    if (value >= 1_000_000) hasLarge = true;
+    if (value > 0 && value < 1 && /[.,]/.test(match[0])) hasPerShare = true;
+    if (hasLarge && hasPerShare) return true;
+  }
+  return false;
+}
+
+/**
+ * Narrow issuer-agnostic recognition of a genuine EPS denominator table.
+ * Narrative accounting-policy pages can mention the same concepts but do not
+ * contain the numerator/large-share-denominator/per-share numeric structure.
+ */
+function epsCalculationPage(page: P0AIndexedPage): boolean {
+  const text = page.normalizedText;
+  const basic = text.includes("basic earnings per share") || text.includes("laba per saham dasar")
+    || containsWords(text, ["basic", "earnings", "share"])
+    || containsWords(text, ["laba", "saham", "dasar"]);
   const weighted = text.includes("weighted average number of shares")
     || text.includes("weighted average number of ordinary outstanding share")
     || text.includes("jumlah rata rata tertimbang saham")
-    || text.includes("rata rata tertimbang saham biasa yang beredar");
-  return basic && weighted;
+    || text.includes("rata rata tertimbang saham biasa yang beredar")
+    || containsWords(text, ["weighted", "average", "ordinary", "share"])
+    || containsWords(text, ["rata", "tertimbang", "saham", "beredar"]);
+  return basic && weighted && epsNumericStructure(page);
 }
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
@@ -61,11 +92,10 @@ function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPag
     if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
   }
 
-  // Some issuers repeat the note masthead only on the first page of a note.
-  // A continuation page containing both an EPS calculation label and its
-  // weighted-average denominator is still a deterministic targeted-note page.
-  if (epsCalculationPage(page.normalizedText)) {
-    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps calculation table"] };
+  // A continuation page containing a genuine EPS denominator table can be
+  // selected deterministically even when text ordering fragments its masthead.
+  if (epsCalculationPage(page)) {
+    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps denominator table"] };
   }
 
   const noteAnchors = ["catatan atas laporan keuangan", "notes to the interim consolidated financial statements", "notes to the consolidated financial statements"];
@@ -79,11 +109,12 @@ export function primaryPages(routed: readonly P0ARoutedPage[]): number[] { retur
 
 function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anchorScore: number; score: number } {
   const anchorScore = requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0);
-  if (anchorScore === 0) return { anchorScore, score: 0 };
   if (requirement.id === "WEIGHTED_AVG_SHARES_REPORTED") {
+    const semanticTable = epsCalculationPage(page);
     const scoped = /(?:continuing operations?|discontinued operations?|operasi yang dilanjutkan|operasi yang dihentikan)/.test(page.normalizedText);
-    return { anchorScore, score: anchorScore - (scoped ? 1_000 : 0) };
+    return { anchorScore, score: (semanticTable ? 10_000 : 0) + anchorScore - (scoped ? 1_000 : 0) };
   }
+  if (anchorScore === 0) return { anchorScore, score: 0 };
   return { anchorScore, score: anchorScore };
 }
 
@@ -93,7 +124,7 @@ export function selectTargetedPages(routed: readonly P0ARoutedPage[], requiremen
   for (const requirement of requirements) {
     if (!requirement.targetedAnchors.length) continue;
     const candidates = notePages.map((page) => ({ page: page.pageNumber, ...targetedScore(page, requirement) }))
-      .filter((candidate) => candidate.anchorScore > 0)
+      .filter((candidate) => requirement.id === "WEIGHTED_AVG_SHARES_REPORTED" ? candidate.score > 0 : candidate.anchorScore > 0)
       .sort((left, right) => right.score - left.score || right.anchorScore - left.anchorScore || left.page - right.page);
     if (candidates.length) selected.set(requirement.id, [candidates[0].page]);
   }

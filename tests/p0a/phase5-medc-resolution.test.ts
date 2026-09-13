@@ -98,12 +98,58 @@ test("weighted-average routing prefers total EPS table over scoped operation tab
     pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 1, matchedAnchors: ["notes masthead"],
   });
   const pages = [
-    base(218, "Laba per saham dasar Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share"),
-    base(219, "continuing operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share discontinued operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share"),
+    base(218, "Laba per saham dasar Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.188.257 24.766.734.214 0,00150"),
+    base(219, "continuing operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.365.000 24.766.734.214 0,00151 discontinued operations"),
     base(220, "The weighted average number of shares takes into account treasury shares"),
   ];
   const requirement = P0A_REQUIREMENT_BY_ID.get("WEIGHTED_AVG_SHARES_REPORTED");
   assert.ok(requirement);
   const selected = selectTargetedPages(pages, [requirement]);
   assert.deepEqual(selected.get("WEIGHTED_AVG_SHARES_REPORTED"), [218]);
+});
+
+test("fragmented EPS denominator table is recognized generically as targeted note", () => {
+  const tokens = [
+    tok("Laba per saham dasar", 40, 500), tok("Rata-rata Tertimbang", 220, 540), tok("Saham Biasa yang", 220, 520), tok("Beredar", 220, 500),
+    tok("Profit for the Period", 40, 470), tok("Weighted Average", 220, 470), tok("Number of Ordinary", 220, 450), tok("Outstanding Share", 220, 430),
+    tok("37.188.257", 80, 380), tok("24.766.734.214", 250, 380), tok("0,00150", 430, 380), tok("Basic earnings per share", 470, 380),
+  ];
+  const text = tokens.map((token) => token.text).join("\n");
+  const page: P0AIndexedPage = {
+    pageNumber: 500, width: 600, height: 800, text, normalizedText: text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
+    textHash: "c".repeat(64), layoutHash: "d".repeat(64), printedPageLabel: null, tokens, extractionStatus: "NATIVE_TEXT",
+  };
+  const routed = routePages([page]);
+  assert.equal(routed[0].pageClass, "TARGETED_NOTE");
+  assert.equal(routed[0].statementType, "NOTE");
+  const requirement = P0A_REQUIREMENT_BY_ID.get("WEIGHTED_AVG_SHARES_REPORTED");
+  assert.ok(requirement);
+  assert.deepEqual(selectTargetedPages(routed, [requirement]).get(requirement.id), [500]);
+});
+
+test("ordinary primary balance-sheet page is not reclassified by EPS fallback", () => {
+  const page = statementPage("BALANCE_SHEET", [["TOTAL ASSETS", "8.073.314.788", "7.900.000.000"]], 501);
+  const routed = routePages([page]);
+  assert.equal(routed[0].pageClass, "PRIMARY_BALANCE_SHEET");
+  assert.equal(routed[0].statementType, "BALANCE_SHEET");
+});
+
+test("ordinary primary income-statement page remains primary even with EPS-like numeric content", () => {
+  const page = statementPage("INCOME_STATEMENT", [
+    ["PROFIT FOR THE PERIOD", "42.420.559", "212.618.589"],
+    ["BASIC EARNINGS PER SHARE", "0,00150", "0,00803"],
+  ], 502);
+  const routed = routePages([page]);
+  assert.equal(routed[0].pageClass, "PRIMARY_INCOME_STATEMENT");
+  assert.equal(routed[0].statementType, "INCOME_STATEMENT");
+});
+
+test("accounting-policy EPS narrative without denominator numbers is not promoted to EPS table", () => {
+  const text = "Basic earnings per share amounts are computed by dividing profit attributable to owners by the weighted average number of ordinary shares outstanding during the period.";
+  const page: P0AIndexedPage = {
+    pageNumber: 503, width: 600, height: 800, text, normalizedText: text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
+    textHash: "e".repeat(64), layoutHash: "f".repeat(64), printedPageLabel: null, tokens: [], extractionStatus: "NATIVE_TEXT",
+  };
+  const routed = routePages([page]);
+  assert.equal(routed[0].pageClass, "OTHER");
 });
