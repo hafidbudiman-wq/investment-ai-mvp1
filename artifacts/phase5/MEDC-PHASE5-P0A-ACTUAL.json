@@ -15,31 +15,36 @@
     "scale": "1"
   },
   "summary": {
-    "passId": "cmtzfnx9i00iu4268va7q78zl",
-    "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+    "passId": "cmtzfqsdj00iu425vc7de6wpn",
+    "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
     "ticker": "MEDC",
     "company": "PT Medco Energi Internasional Tbk",
     "period": "H1 2025",
     "documentPages": 333,
     "selectedPages": [
+      9,
       10,
+      11,
+      12,
+      13,
+      14,
       39,
       45,
       70,
       193,
       220
     ],
-    "valueZeroCount": 1,
+    "valueZeroCount": 9,
     "notApplicableCount": 1,
     "notDisclosedCount": 10,
-    "missingCount": 22,
+    "missingCount": 14,
     "ambiguousCount": 0,
     "conflictCount": 0,
     "providerCalls": 0,
     "inputTokens": 0,
     "outputTokens": 0,
     "apiCostUsd": "0.00000000",
-    "nativeLatencyMs": 2364,
+    "nativeLatencyMs": 2795,
     "shadowOnly": true,
     "routingClassificationStatus": "AVAILABLE"
   },
@@ -69,7 +74,12 @@
   },
   "routing": {
     "selectedPages": [
+      9,
       10,
+      11,
+      12,
+      13,
+      14,
       39,
       45,
       70,
@@ -78,15 +88,76 @@
     ],
     "selectedRoutingEvidence": [
       {
-        "pageNumber": 10,
-        "pageClass": "TARGETED_NOTE",
-        "statementType": "NOTE",
-        "confidence": 0.995,
+        "pageNumber": 9,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
         "matchedAnchors": [
-          "notes masthead"
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "0a81168d5f47b3a425e62c8edd774ba8ea116dda70e9649f0fd1b0061b3870af",
+        "layoutHash": "f07643852044fd27e732b95de0f69d05f1ec0df6a83d71db56044d62fe028ee0"
+      },
+      {
+        "pageNumber": 10,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
         ],
         "textHash": "418dd21625eeae5acc228200a70e7c1c8fd3ad3faf47e4780b8ec63941164bd1",
         "layoutHash": "6832b5fedf2e4db8701107694ceaef4fa8087d007010c9c86b3b24c7f9a087ee"
+      },
+      {
+        "pageNumber": 11,
+        "pageClass": "PRIMARY_CHANGES_IN_EQUITY",
+        "statementType": "CHANGES_IN_EQUITY",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan perubahan ekuitas",
+          "statement of changes in equity"
+        ],
+        "textHash": "d2b9e0bc3024de0438c8382910d76385ceb902637681985ea728de1a583d4d37",
+        "layoutHash": "769b1d4cc0e5cd9c5d820998a712b6393d780c5822cd4c3247438638b28896f8"
+      },
+      {
+        "pageNumber": 12,
+        "pageClass": "PRIMARY_CHANGES_IN_EQUITY",
+        "statementType": "CHANGES_IN_EQUITY",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan perubahan ekuitas",
+          "statement of changes in equity"
+        ],
+        "textHash": "b99f7976116f5efc7b7c2f31973e409c28abec9d834b22ac762153658017681d",
+        "layoutHash": "0baeec5e5a757c60fe736dc3f974ed859eb2252731828fe672edf28f86510d30"
+      },
+      {
+        "pageNumber": 13,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "bd6a7658d5cfa133ac64b93bfa1686aa8c614fe2125c9a3854406d980312c613",
+        "layoutHash": "761bca0d3066e8c2ef0008663d404a4bbd90fa6d56187aefed66d53002a9c62f"
+      },
+      {
+        "pageNumber": 14,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "b89f3011cc7b7bb6e3d65bf8bf0013399265f0f3fa96290ed39d8f97c5df841c",
+        "layoutHash": "f33298bd7e876fd2331dee4eee9e2825c87138e63413caab35479c5c54c147c5"
       },
       {
         "pageNumber": 39,
@@ -172,22 +243,22 @@
     "before": {
       "pages": 333,
       "passes": 1,
-      "tasks": 7,
+      "tasks": 6,
       "outcomes": 34,
       "revisions": 1,
-      "assertions": 2,
-      "evidence": 2,
-      "assertionEvidence": 2
+      "assertions": 10,
+      "evidence": 10,
+      "assertionEvidence": 10
     },
     "after": {
       "pages": 333,
       "passes": 1,
-      "tasks": 7,
+      "tasks": 6,
       "outcomes": 34,
       "revisions": 1,
-      "assertions": 2,
-      "evidence": 2,
-      "assertionEvidence": 2
+      "assertions": 10,
+      "evidence": 10,
+      "assertionEvidence": 10
     }
   },
   "legacyMutationProof": {
@@ -201,7 +272,7 @@
         "chunks": 0,
         "candidates": 0
       },
-      "fingerprint": "bdb20cbc43ffafdb2b976dcb6b26696dc6bba180b5a48bca77f6d1ab54b468c9"
+      "fingerprint": "5a02a349de50787a98c98f0cb358b6f0ecbf5e098fe16eb4ce178c20dc198acb"
     },
     "after": {
       "counts": {
@@ -213,7 +284,7 @@
         "chunks": 0,
         "candidates": 0
       },
-      "fingerprint": "bdb20cbc43ffafdb2b976dcb6b26696dc6bba180b5a48bca77f6d1ab54b468c9"
+      "fingerprint": "5a02a349de50787a98c98f0cb358b6f0ecbf5e098fe16eb4ce178c20dc198acb"
     },
     "unchanged": true
   },
@@ -248,7 +319,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -256,7 +327,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -295,7 +373,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -303,7 +381,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -342,7 +427,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -350,7 +435,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -364,13 +456,13 @@
       "canonicalCode": "CFF",
       "definition": "Reported signed net financing cash flow.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "-164452170",
+      "rawValue": "(164.452.170)",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "CASH_FLOW",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -379,29 +471,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 14,
+      "rowLabel": "Kas neto digunakan untuk Net cash used in financing aktivitas pendanaan activities",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "84.654.393) Other long-term debt - - Pinjaman bank 55 (408.235.354) (248.693.886) Bank loans - Kas neto digunakan untuk\naktivitas pendanaan (164.452.170) (282.455.098) Net cash used in financing\nactivities KENAIKAN NETO KAS DAN\nSETARA KAS DARI OPERASI\nYANG DILANJUTKAN 187.114.688 237.005.408 ",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "d6c58af1e7f1478b69d64b4f5d37fdbb8f06f5149d7c666ac716449311e28878",
+          "snippetHash": "44b4603fbf297479dfa706da6eda05e726c0fa5286d6156ded9355184a11ff13",
+          "locatorHash": "3de545207795f5d4c0978c33374ec1c33de1450387f485e7b424329602539b17"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsoh00ja425vurakxnx0",
+        "assertionKey": "82144fac16dc02c167c5cdd0d2d601b3c6f35fc6b58add0c8829a7af8a85ba80",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 14,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "b89f3011cc7b7bb6e3d65bf8bf0013399265f0f3fa96290ed39d8f97c5df841c",
+        "layoutHash": "f33298bd7e876fd2331dee4eee9e2825c87138e63413caab35479c5c54c147c5"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -436,7 +552,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -444,7 +560,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -483,7 +606,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -491,7 +614,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -530,7 +660,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -538,7 +668,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -552,13 +689,13 @@
       "canonicalCode": "EPS_BASIC",
       "definition": "Reported basic EPS with per-share scale one.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "0.0015",
+      "rawValue": "0,00150",
+      "currency": "USD_PER_SHARE",
       "unit": "PER_SHARE",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -567,32 +704,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 10,
+      "rowLabel": "LABA PER SAHAM DASAR\nYANG DAPAT DIATRIBUSIKAN\nKEPADA PEMILIK ENTITAS\nINDUK",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": "a kepentingan\nnonpengendali 2,30 3.150.578 6.859.326 Comprehensive income for the\nperiod/year attributable to non-\ncontrolling interests 17.127.773 198.228.286\nLABA PER SAHAM DASAR\nYANG DAPAT DIATRIBUSIKAN\nKEPADA PEMILIK ENTITAS\nINDUK 2,40 0,00150 0,00803 BASIC EARNINGS PER SHARE\nATTRIBUTABLE TO EQUITY\nHOLDERS OF THE PARENT\nCOMPANY LABA PER SAHAM DASAR\nDARI OPERASI YANG\nDILANJUTKAN YANG DAPAT\nDIATRIBUSIKAN KEPADA\nPEMILIK ENTITAS INDUK 2,40 0,00151 0,00808 BASIC E",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "6d3c6e30ff100885d61889a60d9afe46b2cf9d74bab296b8afdbe59edafba860",
+          "snippetHash": "8902623591734d1513ba5711c925ad3c7128daf70c07de9d51daca95d8ab5dca",
+          "locatorHash": "b16850c97f586f968b6b450ba1b15b2c15321180e4ec635eeb2ab00e73740fe9"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsp100jq425v772800sl",
+        "assertionKey": "72ce2d75ffbcc3ac844cf39bb4f85b7d695df698443cade0c7aaafc030899128",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
-        "PRIMARY",
-        "NOTE"
+        "PRIMARY"
       ],
       "attemptedPages": [
-        10
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
       ],
-      "routingEvidence": null,
+      "routingEvidence": {
+        "pageNumber": 10,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "418dd21625eeae5acc228200a70e7c1c8fd3ad3faf47e4780b8ec63941164bd1",
+        "layoutHash": "6832b5fedf2e4db8701107694ceaef4fa8087d007010c9c86b3b24c7f9a087ee"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -623,7 +781,7 @@
       "sourceSnippet": "ABA (RUGI) PER SAHAM (lanjutan) 40. EARNINGS (LOSS) PER SHARE (continued) Untuk periode enam bulan yang berakhir pada\ntanggal 30 Juni 2025 dan 2024, Perusahaan tidak\nmenghitung laba per saham dilusian karena tidak\nterdapat saham biasa yang berpotensi dilutif (anti\ndilutif). For the six-month periods ended June 30, 2025\nand 2024, the Company did not calculate diluted\nearnings per share since there was no potentially\ndilutive ordinary shares (anti dilutive). Jumlah rata-rata ",
       "evidenceHashes": [
         {
-          "evidenceHash": "a56891fc457eedf532e2a15333c96a5b85c473c9eb64c715833eb919908bfafd",
+          "evidenceHash": "5be65b26d2c98af8963ab95322daaa08f2d7cbcf4a1fe23a6a83e7428edb37fa",
           "snippetHash": "44b08599392a964e0e5813522434b2abb6f258f80ffa957a964f5c1c9f879bd1",
           "locatorHash": "fe83a63b1f876f6de386701d4a2bc849e89821dda5c71a578ead0372f58f7016"
         }
@@ -633,9 +791,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": "cmtzfnxho00jg4268jl1xy3uz",
-        "assertionKey": "92110f2679b34bf7b2db2b23cfb1baa92269ffd45ada70d54b7782a0dc4122b4",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsph00ka425vwpu984m9",
+        "assertionKey": "eb1a37e96f393d03b0aa8de719db10619bb34bbd7da7fb99e845f06add6e219b",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -643,6 +801,12 @@
         "NOTE"
       ],
       "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
         220
       ],
       "routingEvidence": {
@@ -693,7 +857,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -701,7 +865,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -740,7 +911,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -748,7 +919,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -787,7 +965,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -795,7 +973,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -834,7 +1019,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -842,7 +1027,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -856,13 +1048,13 @@
       "canonicalCode": "FX_EFFECT_CASH",
       "definition": "Reported FX effect on cash, separate from P&L and OCI FX.",
       "applicability": "OPTIONAL",
-      "semanticState": "NOT_DISCLOSED",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "157920",
+      "rawValue": "157.920",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "CASH_FLOW",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -871,29 +1063,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 14,
+      "rowLabel": "PERBEDAAN NILAI TUKAR\nNETO",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": "NS PENURUNAN NETO KAS DAN\nSETARA KAS DARI OPERASI\nYANG DIHENTIKAN 39 (9.781) (3.933.466) NET DECREASE IN CASH AND\nCASH EQUIVALENTS FROM\nDISCONTINUED OPERATIONS PERBEDAAN NILAI TUKAR\nNETO 157.920 (3.116.312) NET FOREIGN EXCHANGE\nDIFFERENCE KAS DAN SETARA KAS PADA\nAWAL TAHUN 4 637.024.448 353.948.953 CASH AND CASH\nEQUIVALENTS AT BEGINNING\nOF YEAR KAS DAN SETARA KAS PADA\nAKHIR TAHUN 4 824.287.275 583.904.583 CASH ",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "efd8996b6dc3b51a5763e747eefd76c9d094ad0ba64207daacb71502c6a33ce3",
+          "snippetHash": "3b86cd119c3920c1a0868a0f825ab73460e365f906afa66a1f6decef723c492b",
+          "locatorHash": "ece0d18441d6631a8dab79a1e15787f797414faed6062da42b954dddc484bf64"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsp800jy425vevxy9blb",
+        "assertionKey": "64eb8c329af2d5608573c856eeb30835556b5a756a1a0fde523cee37cf95cd0b",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 14,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "b89f3011cc7b7bb6e3d65bf8bf0013399265f0f3fa96290ed39d8f97c5df841c",
+        "layoutHash": "f33298bd7e876fd2331dee4eee9e2825c87138e63413caab35479c5c54c147c5"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -928,7 +1144,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -936,7 +1152,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -950,13 +1173,13 @@
       "canonicalCode": "ICF",
       "definition": "Reported signed net investing cash flow.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "-46783511",
+      "rawValue": "(46.783.511)",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "CASH_FLOW",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -965,29 +1188,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 13,
+      "rowLabel": "Kas neto digunakan untuk Net cash used in investing aktivitas investasi activities",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "ther assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim consolidated financial statements included\nh",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "01d75a9dd0b02ede5d10ebb2322a1a423027995cc4ef8a82f00483dd4eb71abf",
+          "snippetHash": "967f1583ad9590a940f6baaa1e1581efaeaee37a9511adefce31fc861e463fc0",
+          "locatorHash": "355cc36446635a75e3c2b7a06a59692d2f7cf6dce2d373a4154f38f6386627a0"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsoq00je425vtq6fxhy4",
+        "assertionKey": "df43f977bad4583df1bd0680a9e898a7369d39d1d9e61af94e1a6cfc78b9e59e",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 13,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "bd6a7658d5cfa133ac64b93bfa1686aa8c614fe2125c9a3854406d980312c613",
+        "layoutHash": "761bca0d3066e8c2ef0008663d404a4bbd90fa6d56187aefed66d53002a9c62f"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -1022,7 +1269,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1030,7 +1277,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1069,7 +1323,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1077,7 +1331,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1116,7 +1377,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1124,7 +1385,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1138,7 +1406,7 @@
       "canonicalCode": "NET_CHANGE_CASH",
       "definition": "Reported net change in cash; bridge calculation remains separate.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
+      "semanticState": "NOT_DISCLOSED",
       "normalizedValue": null,
       "rawValue": null,
       "currency": null,
@@ -1163,7 +1431,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1171,7 +1439,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1185,13 +1460,13 @@
       "canonicalCode": "NET_PROFIT_PARENT",
       "definition": "Profit attributable to owners of the parent.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "37188257",
+      "rawValue": "37.188.257",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -1200,29 +1475,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 10,
+      "rowLabel": "Laba periode/tahun berjalan yang\ndiatribusikan kepada pemilik\nentitas induk",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": "ntinuing operations Rugi periode/tahun berjalan dari\noperasi yang tidak dilanjutkan (177.775) (1.274.402) Loss for the period/year from\ndiscontinued operations Laba periode/tahun berjalan yang\ndiatribusikan kepada pemilik\nentitas induk 37.188.257 200.996.060 Profit for the period/year\nattributable to equity holders of\nthe parent company Laba periode/tahun berjalan yang\ndiatribusikan kepada\nkepentingan nonpengendali 2,30 5.232.302 11.622.529 Profit for the period",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "04c0302ff2bcdf1e0030fc2e4576e3258e6b381bacc65c6506a8e11219e508dc",
+          "snippetHash": "e33202dcf7f9c6cde2463d49732a729f96de796e604d71855e8b7e9136a00735",
+          "locatorHash": "8c9d7799cedabc604f5c6cc2dbfa258307b5381b2923c0a71eaa402aead58fd5"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsox00jm425v12x1c0fv",
+        "assertionKey": "9021e564bde01bb7ff5ce58a10724b480c25cd589f7f87c4dfa47dc7e47fe792",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 10,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "418dd21625eeae5acc228200a70e7c1c8fd3ad3faf47e4780b8ec63941164bd1",
+        "layoutHash": "6832b5fedf2e4db8701107694ceaef4fa8087d007010c9c86b3b24c7f9a087ee"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -1232,13 +1531,13 @@
       "canonicalCode": "NET_PROFIT",
       "definition": "Total group profit including parent and NCI attribution.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "42420559",
+      "rawValue": "42.420.559",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -1247,29 +1546,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 9,
+      "rowLabel": "LABA PERIODE/TAHUN\nBERJALAN",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": "PERATIONS Rugi setelah beban pajak\npenghasilan dari operasi yang\ndihentikan 39 (177.775) (1.274.402) Loss after income tax expense\nfrom discontinued operations LABA PERIODE/TAHUN\nBERJALAN 42.420.559 212.618.589 PROFIT FOR THE PERIOD/\nYEAR PENGHASILAN\nKOMPREHENSIF LAIN OTHER COMPREHENSIVE\nINCOME PENGHASILAN\nKOMPREHENSIF LAIN YANG\nAKAN DIREKLASIFIKASI KE\nLABA RUGI OTHER COMPREHENSIVE\nINCOME THAT WILL BE\nRECLASSIFIED ",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "48f7031343170107149d41fa4744109b2cd323ad8f9d5f65331abb99fe296c06",
+          "snippetHash": "c73710f9205d80b68cc31d17aaa1caac9174237912f6ebac2279b5eec1aa4697",
+          "locatorHash": "4c42c4080df4510e5c4f2eaef4a3ad313324b03627f754b78735725f15df39dc"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsot00ji425vj5ghw8u5",
+        "assertionKey": "bc8d10c21bc1f347cbcd4ddfac79a418ae8d361482a3a74ec14df962f25fc493",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 9,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "0a81168d5f47b3a425e62c8edd774ba8ea116dda70e9649f0fd1b0061b3870af",
+        "layoutHash": "f07643852044fd27e732b95de0f69d05f1ec0df6a83d71db56044d62fe028ee0"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -1279,13 +1602,13 @@
       "canonicalCode": "OCF",
       "definition": "Reported net cash from operating activities.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "398350369",
+      "rawValue": "398.350.369",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "CASH_FLOW",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -1294,29 +1617,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 13,
+      "rowLabel": "Kas neto diperoleh dari aktivitas\noperasi",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": " dihasilkan dari kegiatan\nusaha 562.894.804 773.941.928 Cash generated from operations Pembayaran pajak penghasilan (164.544.435) (180.425.289) Income tax paid Kas neto diperoleh dari aktivitas\noperasi 398.350.369 593.516.639 Net cash used in operating\nactivities ARUS KAS DARI AKTIVITAS\nINVESTASI CASH FLOWS FROM INVESTING\nACTIVITIES Penerimaan dari pelepasan Entitas\nAnak atau asosiasi 39,48 – 116.577.272 Proceeds from disposal of",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "6a8a1232fc9e3f59efc64c0c8e6921e8a81649f6abf277f3e8c157d6d307194e",
+          "snippetHash": "bd48e2d06c1aa924d5b35367f5794023216e54c564dd963c1ad7c0ce8664d632",
+          "locatorHash": "cec78006a38b510be8d5b460eaf441e5219c787ab5df3f17faab1fa288c24f84"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqsp400ju425vrnwnjjqz",
+        "assertionKey": "c3657324a5f6ea4e602b6cf6ace5fe346da91e99d76c4f23b247a709bc86991b",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 13,
+        "pageClass": "PRIMARY_CASH_FLOW",
+        "statementType": "CASH_FLOW",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan arus kas",
+          "statement of cash flows"
+        ],
+        "textHash": "bd6a7658d5cfa133ac64b93bfa1686aa8c614fe2125c9a3854406d980312c613",
+        "layoutHash": "761bca0d3066e8c2ef0008663d404a4bbd90fa6d56187aefed66d53002a9c62f"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -1351,7 +1698,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1361,6 +1708,12 @@
         "NOTE"
       ],
       "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
         39
       ],
       "routingEvidence": null,
@@ -1401,7 +1754,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1409,7 +1762,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1448,7 +1808,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1456,7 +1816,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1495,7 +1862,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1503,7 +1870,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1542,7 +1916,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1552,6 +1926,12 @@
         "NOTE"
       ],
       "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
         45
       ],
       "routingEvidence": null,
@@ -1592,7 +1972,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1600,7 +1980,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1614,13 +2001,13 @@
       "canonicalCode": "TAX_EXPENSE",
       "definition": "Reported income-tax expense with its stated scope.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "-177775",
+      "rawValue": "(177.775)",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -1629,29 +2016,53 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 9,
+      "rowLabel": "OPERASI YANG DIHENTIKAN DISCONTINUED OPERATIONS Rugi setelah beban pajak penghasilan dari operasi yang Loss after income tax expense dihentikan from discontinued operations",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "OPERASI YANG DIHENTIKAN DISCONTINUED OPERATIONS Rugi setelah beban pajak\npenghasilan dari operasi yang\ndihentikan 39 (177.775) (1.274.402) Loss after income tax expense\nfrom discontinued operations LABA PERIODE/TAHUN\nBERJALAN 42.420.559 212.618.589 PROFIT FOR THE PERIOD/\nYEAR PENGHASILAN\nKOMPREHENSIF LAIN OTHER COMPREHENSIVE\nINCOME PENGHASILAN\n",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "6a4b7b1a268b708b6040d16004feb6be6a0f8a98e551658ebbddb3b1e54e548d",
+          "snippetHash": "1b354949ae32b430a16f2055d2d111bb326c91d5df9f917c8f47244f2e53fc47",
+          "locatorHash": "35b8a5b0c67faba5a489a7e8b17d12fdfd60414d7cdb940c92dda9caab5d04af"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.998"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqspb00k2425vladcggjo",
+        "assertionKey": "43a95644681b7984742de53e8933568cf924ab4967c361ef4034f676d59a34e0",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
-      "routingEvidence": null,
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "routingEvidence": {
+        "pageNumber": 9,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "0a81168d5f47b3a425e62c8edd774ba8ea116dda70e9649f0fd1b0061b3870af",
+        "layoutHash": "f07643852044fd27e732b95de0f69d05f1ec0df6a83d71db56044d62fe028ee0"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -1686,7 +2097,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1694,7 +2105,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1733,7 +2151,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1741,7 +2159,14 @@
       "attemptedRoutes": [
         "PRIMARY"
       ],
-      "attemptedPages": [],
+      "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
       "routingEvidence": null,
       "legacyComparison": {
         "state": "NOT_COMPARABLE",
@@ -1776,7 +2201,7 @@
       "sourceSnippet": "tahun 1999 139.908.988 139.908.988 Issuance of 321,730,290 shares\nthrough rights offering I to\nshareholders in 1999 Penurunan modal disetor dari saham\ntreasuri (79.679.102) (55.117.723) Deduction of additional paid-in capital\non treasury stock Penjualan kembali saham treasuri 74.812.936 74.812.936 Resale of treasury stock Pembayar",
       "evidenceHashes": [
         {
-          "evidenceHash": "7df4c5b4d0aba5948c59c4c6475074542e9d0e85651f738e04a20003994f5851",
+          "evidenceHash": "8ee99d890fbf92799d71d627a4b3db96eb99b9704e7701ceb1c89856a25cc611",
           "snippetHash": "3c3c9e52953bc3b7a460c00239114804bddeca4d33aefff8f78804c86fb2b5a4",
           "locatorHash": "02c62b6eb29136c2f4d191769c09cca7251bf798b318e417e4919964d25f37d5"
         }
@@ -1786,9 +2211,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
-        "assertionId": "cmtzfnxhf00jc4268066vv6ju",
-        "assertionKey": "ea4c2b0b97ec011db955b7a1a4f7968a36cb9105c63561b24921321acf435590",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
+        "assertionId": "cmtzfqspe00k6425vhpcmqvtw",
+        "assertionKey": "d56f6cab7d059a2e59e20a4de3317acd82c71624b5761641f56ed8d1e58e5085",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1796,6 +2221,12 @@
         "NOTE"
       ],
       "attemptedPages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
         193
       ],
       "routingEvidence": {
@@ -1846,7 +2277,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzfnxa200iw4268p998bfoz",
+        "reportRevisionId": "cmtzfqsfv00iw425vqx99w1g8",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
