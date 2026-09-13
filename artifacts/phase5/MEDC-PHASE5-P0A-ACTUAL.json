@@ -15,8 +15,8 @@
     "scale": "1"
   },
   "summary": {
-    "passId": "cmtzc9z1l00iu42g5l5ok77g5",
-    "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+    "passId": "cmtzdy35500iu42ckai8efaxm",
+    "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
     "ticker": "MEDC",
     "company": "PT Medco Energi Internasional Tbk",
     "period": "H1 2025",
@@ -32,7 +32,6 @@
       12,
       13,
       14,
-      26,
       28,
       29,
       31,
@@ -51,16 +50,13 @@
       65,
       67,
       71,
-      72,
       99,
       100,
       101,
       114,
       130,
-      138,
       187,
       188,
-      193,
       205,
       206,
       207,
@@ -68,8 +64,8 @@
       209,
       210,
       216,
+      219,
       220,
-      223,
       224,
       228,
       230,
@@ -78,40 +74,40 @@
       274,
       322
     ],
-    "valueZeroCount": 23,
+    "valueZeroCount": 27,
     "notApplicableCount": 1,
     "notDisclosedCount": 4,
-    "missingCount": 6,
+    "missingCount": 2,
     "ambiguousCount": 0,
     "conflictCount": 0,
     "providerCalls": 0,
     "inputTokens": 0,
     "outputTokens": 0,
     "apiCostUsd": "0.00000000",
-    "nativeLatencyMs": 4424,
+    "nativeLatencyMs": 3965,
     "shadowOnly": true,
     "routingClassificationStatus": "AVAILABLE"
   },
   "versions": {
     "contractVersion": "investai-canonical-v1.0-final:p0-a",
     "parserVersion": "p0a-native-page-index-v1",
-    "routerVersion": "p0a-page-router-v1",
+    "routerVersion": "p0a-page-router-v2-note-masthead",
     "applicabilityVersion": "p0a-applicability-v1",
-    "plannerVersion": "p0a-fact-planner-v1",
+    "plannerVersion": "p0a-fact-planner-v2-route-metadata",
     "gapVersion": "p0a-gap-detector-v1",
     "validationVersion": "p0a-validation-v1",
-    "mappingVersion": "p0a-native-financial-mapping-v2-cross-issuer",
+    "mappingVersion": "p0a-native-financial-mapping-v3-scope-safe",
     "scopedPromptVersion": "p0a-scoped-openai-prompt-v1"
   },
   "fullVersionIdentity": {
     "contract": "investai-canonical-v1.0-final:p0-a",
     "parser": "p0a-native-page-index-v1",
-    "router": "p0a-page-router-v1",
+    "router": "p0a-page-router-v2-note-masthead",
     "applicability": "p0a-applicability-v1",
-    "planner": "p0a-fact-planner-v1",
+    "planner": "p0a-fact-planner-v2-route-metadata",
     "gapDetector": "p0a-gap-detector-v1",
     "validation": "p0a-validation-v1",
-    "mapping": "p0a-native-financial-mapping-v2-cross-issuer",
+    "mapping": "p0a-native-financial-mapping-v3-scope-safe",
     "scopedPrompt": "p0a-scoped-openai-prompt-v1",
     "contextHash": "92217af5f56d1bcf0ef199d59bae42f7c0b729901b2f198e78f1ffb8c4548da3",
     "documentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e"
@@ -128,7 +124,6 @@
       12,
       13,
       14,
-      26,
       28,
       29,
       31,
@@ -147,16 +142,13 @@
       65,
       67,
       71,
-      72,
       99,
       100,
       101,
       114,
       130,
-      138,
       187,
       188,
-      193,
       205,
       206,
       207,
@@ -164,8 +156,8 @@
       209,
       210,
       216,
+      219,
       220,
-      223,
       224,
       228,
       230,
@@ -294,18 +286,6 @@
         ],
         "textHash": "b89f3011cc7b7bb6e3d65bf8bf0013399265f0f3fa96290ed39d8f97c5df841c",
         "layoutHash": "f33298bd7e876fd2331dee4eee9e2825c87138e63413caab35479c5c54c147c5"
-      },
-      {
-        "pageNumber": 26,
-        "pageClass": "PRIMARY_CASH_FLOW",
-        "statementType": "CASH_FLOW",
-        "confidence": 0.99,
-        "matchedAnchors": [
-          "laporan arus kas",
-          "statement of cash flows"
-        ],
-        "textHash": "e6d69488098d7f5b4830ee27f31b21d5b0f1cef50c74435c421457cd35d1e499",
-        "layoutHash": "360ade4d5c0f91aa91ac901b552694963b0d459c6ea54b1744e7e74f6613b069"
       },
       {
         "pageNumber": 28,
@@ -512,17 +492,6 @@
         "layoutHash": "9af6743d3877967ea8e0a767c07ebdf1f7cb8cfe05d596f58b2c8d8507631f0a"
       },
       {
-        "pageNumber": 72,
-        "pageClass": "PRIMARY_INCOME_STATEMENT",
-        "statementType": "INCOME_STATEMENT",
-        "confidence": 0.99,
-        "matchedAnchors": [
-          "laporan laba rugi"
-        ],
-        "textHash": "1d3cf4706d6f4109ffdb68a873fb84a90e4f5aeb34fd72fedac02d45a60a3eea",
-        "layoutHash": "16c78f40864beda22a44425fdd6ed0bb15745b559410dd5b6b3076a559eba707"
-      },
-      {
         "pageNumber": 99,
         "pageClass": "PRIMARY_INCOME_STATEMENT",
         "statementType": "INCOME_STATEMENT",
@@ -582,18 +551,6 @@
         "layoutHash": "105763c36845841eaaa1fbf22ec55ef7952503961ddc9795c2462632d628e750"
       },
       {
-        "pageNumber": 138,
-        "pageClass": "PRIMARY_INCOME_STATEMENT",
-        "statementType": "INCOME_STATEMENT",
-        "confidence": 0.99,
-        "matchedAnchors": [
-          "laporan laba rugi",
-          "statement of profit or loss"
-        ],
-        "textHash": "9ad69e6dad3bac25aaa71def3c6e98ae69d9c6da31e1bef22b35f9b58ce8e0fc",
-        "layoutHash": "c2c354b86e260ea3dc9d1783d09fa9c6968c73c58b0c459cce219b56d84c6cd4"
-      },
-      {
         "pageNumber": 187,
         "pageClass": "PRIMARY_BALANCE_SHEET",
         "statementType": "BALANCE_SHEET",
@@ -616,18 +573,6 @@
         ],
         "textHash": "9fcfba4494c10787932cb1b2253e56fda3e5a1ca58d5a53fb0a071cac827045c",
         "layoutHash": "0bae4fae9e64ae8c9b1024666a2a19ccfd3af8a22cdb0177d829260efec0c392"
-      },
-      {
-        "pageNumber": 193,
-        "pageClass": "TARGETED_NOTE",
-        "statementType": "NOTE",
-        "confidence": 0.98,
-        "matchedAnchors": [
-          "catatan atas laporan keuangan",
-          "notes to the interim consolidated financial statements"
-        ],
-        "textHash": "61f1ead93631ec1fec22186b1a3e247af19bd985dc0e50f9932fbc0b54e3ab12",
-        "layoutHash": "8bc705c1cf1931a8efbbe0c1e96f0d839e02f33b75634dedc4ce9c1d190e1778"
       },
       {
         "pageNumber": 205,
@@ -707,6 +652,18 @@
         "layoutHash": "eadb85f3fdf731bfa3372a2421771f7a3cbe670bf0ad9316e8c5355146839dd9"
       },
       {
+        "pageNumber": 219,
+        "pageClass": "TARGETED_NOTE",
+        "statementType": "NOTE",
+        "confidence": 0.98,
+        "matchedAnchors": [
+          "catatan atas laporan keuangan",
+          "notes to the interim consolidated financial statements"
+        ],
+        "textHash": "d9d133d57c3e5dc5ce1665fa899fcd68b587eafa683cdfa78e67e4d903a2dbd8",
+        "layoutHash": "f3f0f40b0a762651654f9c670caf4a19ba0e661cd9d4967c6a9140104babd7c4"
+      },
+      {
         "pageNumber": 220,
         "pageClass": "TARGETED_NOTE",
         "statementType": "NOTE",
@@ -717,17 +674,6 @@
         ],
         "textHash": "25ba7c2e45ca77feca2e3ad71f727e70d0d046deab480ec80dc0235de96ea25f",
         "layoutHash": "977910dd55b3c391b3625d67a100bf7ecf0ab12c4a4b45e93cc2558ba19ee523"
-      },
-      {
-        "pageNumber": 223,
-        "pageClass": "PRIMARY_BALANCE_SHEET",
-        "statementType": "BALANCE_SHEET",
-        "confidence": 0.99,
-        "matchedAnchors": [
-          "laporan posisi keuangan"
-        ],
-        "textHash": "57ad75c2d35f24dd5212cd84671a49dd703833e96e3455dfffc10072b0c99f0e",
-        "layoutHash": "b7d8de57afcbae4a8fdb189d8e97faf7930fc2981b174c155fa23080e6e39299"
       },
       {
         "pageNumber": 224,
@@ -819,8 +765,8 @@
   "controls": {
     "balanceSheet": {
       "id": "BALANCE_SHEET_IDENTITY",
-      "passed": false,
-      "detail": "Required reported inputs are unavailable."
+      "passed": true,
+      "detail": "8073314788 = 8073314788"
     },
     "cashFlow": {
       "id": "CASH_FLOW_BRIDGE",
@@ -839,9 +785,9 @@
       "tasks": 3,
       "outcomes": 34,
       "revisions": 1,
-      "assertions": 24,
-      "evidence": 24,
-      "assertionEvidence": 24
+      "assertions": 28,
+      "evidence": 28,
+      "assertionEvidence": 28
     },
     "after": {
       "pages": 333,
@@ -849,9 +795,9 @@
       "tasks": 3,
       "outcomes": 34,
       "revisions": 1,
-      "assertions": 24,
-      "evidence": 24,
-      "assertionEvidence": 24
+      "assertions": 28,
+      "evidence": 28,
+      "assertionEvidence": 28
     }
   },
   "legacyMutationProof": {
@@ -865,7 +811,7 @@
         "chunks": 0,
         "candidates": 0
       },
-      "fingerprint": "aa2151ea6feee9f8e44504cce2567c1b20069baf8fcb8b5220041a58406d9442"
+      "fingerprint": "72c1f073faa163586771085ca5c7e4e5a36920cb174d341ea3da158aebc0bdd2"
     },
     "after": {
       "counts": {
@@ -877,7 +823,7 @@
         "chunks": 0,
         "candidates": 0
       },
-      "fingerprint": "aa2151ea6feee9f8e44504cce2567c1b20069baf8fcb8b5220041a58406d9442"
+      "fingerprint": "72c1f073faa163586771085ca5c7e4e5a36920cb174d341ea3da158aebc0bdd2"
     },
     "unchanged": true
   },
@@ -912,7 +858,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -931,7 +877,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -950,13 +895,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -966,7 +909,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1013,7 +955,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -1032,7 +974,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1051,13 +992,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1067,7 +1006,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1110,7 +1048,7 @@
       "sourceSnippet": "atatan/ Notes 30 Juni 2025/ June 30, 2025 31 Desember 2024/ December 31, 2024 ASET ASSETS ASET LANCAR CURRENT ASSETS Kas dan setara kas 2,4 824.287.275 637.024.448 Cash and cash equivalents Investasi jangka pendek 2,5 11.025.599 11.025.523 Short-term investments Deposito dan rekening bank y",
       "evidenceHashes": [
         {
-          "evidenceHash": "5682416e86983722dcdb80e805a4c05330a5440ded27d97d7c25e2c8e3390c62",
+          "evidenceHash": "b67bcd5f174018bacf26d1057c405d2b1c7f687bb521aead89e1f10fc7f34092",
           "snippetHash": "7a3d3445dd06deff61eb824d2f6405824ed242f196a345c4182d4a2dd4fe860b",
           "locatorHash": "4d0384d6f67cba536dea02015f5db51dafab3a27492e8cc04cb594ca4e4fec41"
         }
@@ -1120,9 +1058,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zdt00jg42g5876jgdbw",
-        "assertionKey": "7bc39723a0ebc081dd2e5194eb1a9607aedd175637dbb7596724bcf0a607e546",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3hu00jg42ck7fwbemtb",
+        "assertionKey": "272e49812e85fd32b1201e8287e94a24c7650f0ee3feddba862fb8fc15e835b9",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1139,7 +1077,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1158,13 +1095,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1174,7 +1109,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1228,7 +1162,7 @@
       "sourceSnippet": "84.654.393) Other long-term debt - - Pinjaman bank 55 (408.235.354) (248.693.886) Bank loans - Kas neto digunakan untuk\naktivitas pendanaan (164.452.170) (282.455.098) Net cash used in financing\nactivities KENAIKAN NETO KAS DAN\nSETARA KAS DARI OPERASI\nYANG DILANJUTKAN 187.114.688 237.005.408 ",
       "evidenceHashes": [
         {
-          "evidenceHash": "dc37a2a702bce6cb2972dedf6e71d44d887a811095b9d901e8496baec734b179",
+          "evidenceHash": "908b325549b5807d8db30a3ccedd9386247c52e665a71464e4e1fdb569da1c38",
           "snippetHash": "44b4603fbf297479dfa706da6eda05e726c0fa5286d6156ded9355184a11ff13",
           "locatorHash": "3de545207795f5d4c0978c33374ec1c33de1450387f485e7b424329602539b17"
         }
@@ -1238,9 +1172,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zei00k442g5dj3wk4gz",
-        "assertionKey": "cdbd29e50e1cab6f61da3ea61f690dbf297a12e77e1a54af81fb1b65435cc3e6",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3iq00k442ck1evb8o8a",
+        "assertionKey": "472ba4681f3de882dc89526d6d8617b5bbdda957da377fb745e7d76a9f5e539a",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1257,7 +1191,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1276,13 +1209,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1292,7 +1223,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1346,7 +1276,7 @@
       "sourceSnippet": "18.016.083 12.579.374 Cost of services Beban eksplorasi 2,35 11.319.789 3.271.341 Exploration expenses JUMLAH BEBAN POKOK\nPENDAPATAN DAN BIAYA\nLANGSUNG LAINNYA 702.600.099 714.021.880 TOTAL COST OF REVENUES\nAND OTHER DIRECT COSTS LABA KOTOR 435.789.928 451.346.641 GROSS PROFIT Beban penjualan, umum dan\nadministrasi 2,36 (97.976.2",
       "evidenceHashes": [
         {
-          "evidenceHash": "b23f274bda83fe720b7f423d9451b5904b3337658e316f015e59dfe5fa6ce9d2",
+          "evidenceHash": "fffa70a73d2b01b74f188f885d6e78dfa3498694bbb17bf1b188f033ee5f2edf",
           "snippetHash": "e67aacbfa3e00a1439f62cc0093d30f296546454493f3e4961d3801c38b4c2b4",
           "locatorHash": "bd5068c91e0dfac3a9d92a79c4c0b6dcbb376f681c907c2600c4c9bf6559472c"
         }
@@ -1356,9 +1286,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zer00kc42g54xkfmmdr",
-        "assertionKey": "c657452d7f0007945d4305395dd998efdd2ef03a98ba2e9de062fa6f35c195e3",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3iy00kc42ck3mpg0d67",
+        "assertionKey": "2c32393474bf6f9b5c0359fb12e2fbd731521e9a0c05109fc886d64a72e3160e",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1375,7 +1305,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1394,13 +1323,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1410,7 +1337,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1464,7 +1390,7 @@
       "sourceSnippet": "al 2,39 28.468.322 43.461.065 Assets held for sale Aset lancar lain-lain 20 124.612.490 122.179.138 Other current assets Jumlah Aset Lancar 2.104.499.133 1.816.976.250 Total Current Assets ASET TIDAK LANCAR NON-CURRENT ASSETS Piutang lain-lain 2,7 Other receivables - Pihak berelasi 637.369 50",
       "evidenceHashes": [
         {
-          "evidenceHash": "01bfd7059763e68851b5589cd6da6c1fc61983eed639452439ed969f1f7ce2db",
+          "evidenceHash": "10809a53011df6d826a5d94271a4ded23cc2f16ed4afc370000d0f0e92c0c542",
           "snippetHash": "a7f1f4392a4def9592d5988c19f9891612aff5b8b3be8cfe718d46b6cc5ddf97",
           "locatorHash": "d523169840b65e537438594e763ca3c517c1f6bf99dcfc5c16890f24071d0944"
         }
@@ -1474,9 +1400,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zdx00jk42g5leieylbz",
-        "assertionKey": "702c6e6bbe25bf5f8b5f3b8cf149d6b911786fc927f6086ef231d6832bc6d0f3",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3i200jk42ckgjnqpchg",
+        "assertionKey": "847098ffddf1e24a0007fbc9c19ffe01f2d1e133fdf15e097657f5cd12a14fb8",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1493,7 +1419,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1512,13 +1437,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1528,7 +1451,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1582,7 +1504,7 @@
       "sourceSnippet": "105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagia",
       "evidenceHashes": [
         {
-          "evidenceHash": "cd067dd0202f808e8d231a2583a52e2af6a91f4ae7fca0510f5fd0c5226ad7c7",
+          "evidenceHash": "8ed1180a9b2f5d0b9444eede4802a1c54c31779599d482c89e647d00ec826e1e",
           "snippetHash": "7baa410cc268382789d0e5a5563a33e3305de3e51bf75dd613e5a182e200f14c",
           "locatorHash": "d4ac31d64d508ca4af783248875c979dfe0262db93d799cfa4247e8525521d09"
         }
@@ -1592,9 +1514,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9ze600js42g500o14w3f",
-        "assertionKey": "242e870cbd32681bfac775fdf0c9a84608ecfaa4005241561f5b05e8fbe54bf8",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3id00js42ckq2flem9g",
+        "assertionKey": "9f766eae7e5109eed8240bc801dfa2f152c38eafc1356d6a3dcb4304fe11d2ae",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1611,7 +1533,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1630,13 +1551,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1646,7 +1565,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1700,7 +1618,7 @@
       "sourceSnippet": "a kepentingan\nnonpengendali 2,30 3.150.578 6.859.326 Comprehensive income for the\nperiod/year attributable to non-\ncontrolling interests 17.127.773 198.228.286\nLABA PER SAHAM DASAR\nYANG DAPAT DIATRIBUSIKAN\nKEPADA PEMILIK ENTITAS\nINDUK 2,40 0,00150 0,00803 BASIC EARNINGS PER SHARE\nATTRIBUTABLE TO EQUITY\nHOLDERS OF THE PARENT\nCOMPANY LABA PER SAHAM DASAR\nDARI OPERASI YANG\nDILANJUTKAN YANG DAPAT\nDIATRIBUSIKAN KEPADA\nPEMILIK ENTITAS INDUK 2,40 0,00151 0,00808 BASIC E",
       "evidenceHashes": [
         {
-          "evidenceHash": "39e41726ad3381a98843e289308a9ca49b9ca1ceb3f51a13b53b5de9d529e4a6",
+          "evidenceHash": "a10144077d9675730e1c5921958d7d5df6fe0d1487549a3d057afc791a41ef33",
           "snippetHash": "8902623591734d1513ba5711c925ad3c7128daf70c07de9d51daca95d8ab5dca",
           "locatorHash": "b16850c97f586f968b6b450ba1b15b2c15321180e4ec635eeb2ab00e73740fe9"
         }
@@ -1710,9 +1628,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zfh00l042g5vvqolc7h",
-        "assertionKey": "9b49cbd224f50d1b26dd98138f3719952d4d725a54be6de261abffe77ea534e0",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3jp00l042ckcxfatpts",
+        "assertionKey": "bfc0ab2bf70d8974b2505b04d59adc01c3591b42ad50a1b79d5e910bd5cbbdb9",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1729,7 +1647,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1748,13 +1665,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1764,7 +1679,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -1818,7 +1732,7 @@
       "sourceSnippet": "ABA (RUGI) PER SAHAM (lanjutan) 40. EARNINGS (LOSS) PER SHARE (continued) Untuk periode enam bulan yang berakhir pada\ntanggal 30 Juni 2025 dan 2024, Perusahaan tidak\nmenghitung laba per saham dilusian karena tidak\nterdapat saham biasa yang berpotensi dilutif (anti\ndilutif). For the six-month periods ended June 30, 2025\nand 2024, the Company did not calculate diluted\nearnings per share since there was no potentially\ndilutive ordinary shares (anti dilutive). Jumlah rata-rata ",
       "evidenceHashes": [
         {
-          "evidenceHash": "034f09524996ce7483dea4bfd7a4de153212c2d01bd286cbb9c127adbf79d4d9",
+          "evidenceHash": "8e6b7b90f626509b9e79902055059837dff8e0c2eeb4e7f822ce8da8e27db79a",
           "snippetHash": "44b08599392a964e0e5813522434b2abb6f258f80ffa957a964f5c1c9f879bd1",
           "locatorHash": "fe83a63b1f876f6de386701d4a2bc849e89821dda5c71a578ead0372f58f7016"
         }
@@ -1828,9 +1742,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zg600lo42g598cmokga",
-        "assertionKey": "aed9cd2a33a53c098891b3f2f46dded73846a50282ff6e4c301c8fd014b97e14",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3kv00m442ck5awfm0vm",
+        "assertionKey": "bdfb07ec5dd9f38891ad8d58868408e0763f30c989baf7a2c4816bc91dc0e716",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1848,7 +1762,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1867,13 +1780,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -1884,7 +1795,6 @@
         210,
         216,
         220,
-        223,
         224,
         228,
         230,
@@ -1938,7 +1848,7 @@
       "sourceSnippet": "Retained earnings - Ditentukan penggunaannya 10.435.835 10.435.835 Appropriated - - Tidak ditentukan penggunaannya 1.533.457.586 1.534.193.218 Unappropriated - Jumlah ekuitas yang dapat\ndiatribusikan kepada pemilik\nentitas induk 2.071.197.306 2.118.726.151 Total equity attributable to the\nequity holders of the parent\ncompany Kepentingan nonpengendali 30 233.475.996 232.305.418 Non-controlling interests Jumlah Ekuitas 2.304.673.302 2.351.031.569 Total Equity ",
       "evidenceHashes": [
         {
-          "evidenceHash": "ea8cce72e592b5c28ac5a56c99630b9a8f06f3ca50a054ed3eefc0559d4fc6df",
+          "evidenceHash": "badea7707561cc4dc1c7de07157c5963341f2328ff137a1e2cacecc24074ff33",
           "snippetHash": "4813ca75d608a7a9cfe124f43e2243f7a32fe4dd8c9950e8b4afd8a783d6c78e",
           "locatorHash": "42154d6a91273ac397e6aed89fe62f7c4cd8d2bbc3bfd2c96c563abb127a589f"
         }
@@ -1948,9 +1858,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zfl00l442g5iy2pryqa",
-        "assertionKey": "159c6726515e77adfb5a54fce84e66000d3f92c938cc9ebd681f678c1fde0904",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3jt00l442ck3bzwbu0v",
+        "assertionKey": "222ff4038b3505cb70d5ea811ef139c8e50f618d33b7d4e94fbfbbd16dd8ac85",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -1967,7 +1877,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -1986,13 +1895,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2002,7 +1909,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2035,13 +1941,13 @@
       "canonicalCode": "EQUITY",
       "definition": "Total equity including NCI.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "2304673302",
+      "rawValue": "2.304.673.302",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "BALANCE_SHEET",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -2050,20 +1956,26 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 7,
+      "rowLabel": "Jumlah Ekuitas Total Equity",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "6 2.118.726.151 Total equity attributable to the\nequity holders of the parent\ncompany Kepentingan nonpengendali 30 233.475.996 232.305.418 Non-controlling interests Jumlah Ekuitas 2.304.673.302 2.351.031.569 Total Equity JUMLAH LIABILITAS DAN\nEKUITAS 8.073.314.788 7.926.890.365 TOTAL LIABILITIES AND\nEQUITY Catatan/ Notes 30 Juni 2025/ June 30, 2025 31 Desember 2024/ December 31, 2024 The original interim conso",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "a9458bc9c4c3e17d32a27ca5222eb602096a75ca98dec1391c4e3c27a1fa5f41",
+          "snippetHash": "3d88b20638204805848f673f55edbe4aac61e8fb460396df58bf3e0618ce67ff",
+          "locatorHash": "130557aeb2d58bb0419644f42899097466b9ba615fe9d8bb9706300cefba48ae"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.998"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3k600lg42ckxapdutim",
+        "assertionKey": "905d7bbf62a3bce612594162f185a5460987eaf548b56b151d86bc6cbe62d74a",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
@@ -2079,7 +1991,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2098,13 +2009,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2114,7 +2023,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2123,10 +2031,21 @@
         274,
         322
       ],
-      "routingEvidence": null,
+      "routingEvidence": {
+        "pageNumber": 7,
+        "pageClass": "PRIMARY_BALANCE_SHEET",
+        "statementType": "BALANCE_SHEET",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan posisi keuangan",
+          "statement of financial position"
+        ],
+        "textHash": "186cf56d3c093eecf3402b81c323f9cfd0487575a242d56ded01251018df1727",
+        "layoutHash": "86856c89f99ca35443f0e7f15387fdbc2cfcb9756acd6ca6040bd0ba178a754a"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -2157,7 +2076,7 @@
       "sourceSnippet": "Beban penjualan, umum dan\nadministrasi 2,36 (97.976.286) (96.223.137) Selling, general and administrative\nexpenses Beban pendanaan 24,28,29 (169.426.281) (142.768.173) Finance costs Kerugian penyesuaian nilai wajar\naset keuangan 2,14 (20.590.500) (1.738.000) Loss on fair value adjustment of\nf",
       "evidenceHashes": [
         {
-          "evidenceHash": "8664d08a7864100781b9c3d7b038610d001ced74c38d1cd4c9bf9677c7723acb",
+          "evidenceHash": "bc933300c70513a6839cd3eb6a4ea53f4a6b2a4d8aada5165c48a56a55a7dc67",
           "snippetHash": "896d52459ddbf35f27cdbc94045142bbf379c42a0477a0fbe95385422e30436f",
           "locatorHash": "5830a2d705961217b67b6d77e039cb1f43b85fc5e77a880092e796f75d7ea6cc"
         }
@@ -2167,9 +2086,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zdo00jc42g50p78nuta",
-        "assertionKey": "2b779d53a6092a0f55fd5478ecff18b18885bcfcb58c218744a3a471d8ca7f4f",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3hp00jc42ckxad69evp",
+        "assertionKey": "dd11008296639c37130f49b1df7c2a154ad3370e4bf7507f7e98e7a608d23e9b",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2186,7 +2105,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2205,13 +2123,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2221,7 +2137,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2275,7 +2190,7 @@
       "sourceSnippet": "ES Pendapatan dari kontrak dengan\npelanggan 2,34 1.114.760.027 1.141.062.168 Revenue from contracts with\ncustomers Pendapatan keuangan 2,34 23.630.000 24.306.353 Finance income JUMLAH PENDAPATAN 1.138.390.027 1.165.368.521 TOTAL REVENUES BEBAN POKOK PENDAPATAN\nDAN BIAYA LANGSUNG\nLAINNYA CO",
       "evidenceHashes": [
         {
-          "evidenceHash": "53f33413b96e3ca6285044f50c807fcfe5a70b84b2d1dfa63cf0f02c65b71ee4",
+          "evidenceHash": "25e782b3f87cdb5cfd1e34378d1bb19e9f8e25c348a9e9c4e83c9ff4f3553371",
           "snippetHash": "2c815a94ee2b0b3789d8f1e23372bd07329d6d65894fbd4a38b1df3420e9b3a5",
           "locatorHash": "cce5e58ae700e1a99bc8b89f018f08d903147601097384a831c553b7cfc73591"
         }
@@ -2285,9 +2200,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zdk00j842g5qso6m1g9",
-        "assertionKey": "c47f155dfeaea51ffd0f22e332c6c84115b4087f897de2211a56cb196619dbc5",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3hl00j842ckequp9ldz",
+        "assertionKey": "a623efe0794d1e7f8547893af18d1496469086760086ffbdb1a7b69d97a832c6",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2304,7 +2219,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2323,13 +2237,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2339,7 +2251,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2393,7 +2304,7 @@
       "sourceSnippet": "NS PENURUNAN NETO KAS DAN\nSETARA KAS DARI OPERASI\nYANG DIHENTIKAN 39 (9.781) (3.933.466) NET DECREASE IN CASH AND\nCASH EQUIVALENTS FROM\nDISCONTINUED OPERATIONS PERBEDAAN NILAI TUKAR\nNETO 157.920 (3.116.312) NET FOREIGN EXCHANGE\nDIFFERENCE KAS DAN SETARA KAS PADA\nAWAL TAHUN 4 637.024.448 353.948.953 CASH AND CASH\nEQUIVALENTS AT BEGINNING\nOF YEAR KAS DAN SETARA KAS PADA\nAKHIR TAHUN 4 824.287.275 583.904.583 CASH ",
       "evidenceHashes": [
         {
-          "evidenceHash": "ccfd46d1ed55b2eefe85906d7dd0fd25d50d9ab5ccb4825c8c649b49ca53f9e2",
+          "evidenceHash": "194ae8f439b7b53c7d1153a31cc2c7b9c36d34d2c4a477e08df3d9f899638c55",
           "snippetHash": "3b86cd119c3920c1a0868a0f825ab73460e365f906afa66a1f6decef723c492b",
           "locatorHash": "ece0d18441d6631a8dab79a1e15787f797414faed6062da42b954dddc484bf64"
         }
@@ -2403,9 +2314,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zfx00lg42g5x61gqrmd",
-        "assertionKey": "4d12b4a5c5628c7d83f2069b2d1ebf47574d8e1ae881470d7fae4e73c0c3c61b",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3k200lc42ckbjbeawjf",
+        "assertionKey": "f97b230e3664eb067fdd0a3759a320c090a3296de2844cb47423c3560eedde0d",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2422,7 +2333,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2441,13 +2351,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2457,7 +2365,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2511,7 +2418,7 @@
       "sourceSnippet": "s JUMLAH BEBAN POKOK\nPENDAPATAN DAN BIAYA\nLANGSUNG LAINNYA 702.600.099 714.021.880 TOTAL COST OF REVENUES\nAND OTHER DIRECT COSTS LABA KOTOR 435.789.928 451.346.641 GROSS PROFIT Beban penjualan, umum dan\nadministrasi 2,36 (97.976.286) (96.223.137) Selling, general and administrative\nexpenses",
       "evidenceHashes": [
         {
-          "evidenceHash": "82a47341a6b247c76f9c632fc1272e8f21f06d80a72cb87d2e977ccfc301bf89",
+          "evidenceHash": "38f9cd9ff7002e69fcdf2921136ac3c6761110504eeccc0d63b18b2f7468db84",
           "snippetHash": "f38e92637dcdfc1d730be9c8b8b68a9d2020b06d46041734e3e2a1f228c4bf6e",
           "locatorHash": "3e296dfb370f12328f29da0f7a45f61ad2440344a9440b8788695728ee4c13dc"
         }
@@ -2521,9 +2428,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zd900j442g5lyjaac09",
-        "assertionKey": "35ca04b8f93cc683b47dac26f971712e9a0490959ab27c7e2c825603abc7722d",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ha00j442ckndz4pf4e",
+        "assertionKey": "43311e6c8e7cf90f0e0c18d32da7ed2ed664f2dd53696498471d247c22efc7d8",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2540,7 +2447,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2559,13 +2465,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2575,7 +2479,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2629,7 +2532,7 @@
       "sourceSnippet": "ther assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim consolidated financial statements included\nh",
       "evidenceHashes": [
         {
-          "evidenceHash": "8add851842259ca258ce2aa3e98e6967ce5ad93c62488c720c5d482b90622b7c",
+          "evidenceHash": "0b165e934d24b8dec4c214bf1d0098f028930a9464ef1ebbdef21a0c9f5babbb",
           "snippetHash": "967f1583ad9590a940f6baaa1e1581efaeaee37a9511adefce31fc861e463fc0",
           "locatorHash": "355cc36446635a75e3c2b7a06a59692d2f7cf6dce2d373a4154f38f6386627a0"
         }
@@ -2639,9 +2542,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zf300ko42g510kr1f9y",
-        "assertionKey": "332c2fc5a9df19c1cc43bee67e7d735b06211bf6150ff68457904cdfcf5206db",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ja00ko42ckvsy8zxeq",
+        "assertionKey": "0419801748c6ed46fba3aeb02aed68c73709f5db5adc23e272a72025ceec1090",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2658,7 +2561,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2677,13 +2579,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2693,7 +2593,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2747,7 +2646,7 @@
       "sourceSnippet": "ies Aset keuangan konsesi - bagian\nyang jatuh tempo dalam satu\ntahun 2,9 35.288.113 33.383.537 Concession financial assets -\ncurrent maturities Persediaan 2,10 155.743.076 156.124.598 Inventories Pajak dibayar di muka 2,11 4.675.621 2.260.789 Prepaid taxes Estimasi pengembalian pajak 2,11 2.508.818 1.776.473 Estimated claim for t",
       "evidenceHashes": [
         {
-          "evidenceHash": "1762a0e41b62936837f8e7dae7ab264f9f76500c16ae89764909cf2ba07ab587",
+          "evidenceHash": "333ede97177f43ae26392fcb5b734e9f59e94d2015248afe9600483861c297e7",
           "snippetHash": "0a516600d3ed917a86b3c3ab5e8d54e584fdfe4f764b5f89958d829f2bd80685",
           "locatorHash": "8af4536ebb094815ffc0368d49f2743fb3afe8ff865788675a7e1f1063ac41a5"
         }
@@ -2757,9 +2656,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zev00kg42g50lkqfpmz",
-        "assertionKey": "1915060131aad421412b3db5ec8904b87eb085971c7a3ee11959469c08863090",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3j200kg42cki0oukk5a",
+        "assertionKey": "d53c0d2b01cc4de2024cd7c65d6afcc0d5a3eddc1ca81c2713fa05cf48da4d05",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2776,7 +2675,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2795,13 +2693,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2811,7 +2707,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2869,7 +2764,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -2888,7 +2783,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -2907,13 +2801,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -2923,7 +2815,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -2946,8 +2837,8 @@
       "definition": "NCI within equity, distinct from NCI earnings.",
       "applicability": "OPTIONAL",
       "semanticState": "VALUE",
-      "normalizedValue": "6400562",
-      "rawValue": "6.400.562",
+      "normalizedValue": "233475996",
+      "rawValue": "233.475.996",
       "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
       "scale": "1",
@@ -2961,24 +2852,24 @@
       },
       "consolidationScope": "CONSOLIDATED",
       "sourcePdfPage": 7,
-      "rowLabel": "kepentingan nonpengendali",
-      "columnLabel": "2025-06-30",
-      "sourceSnippet": "nilai wajar atas\ninstrumen lindung nilai arus kas 2 (7.617.094) 11.809.109 Fair value adjustment on cash flow\nhedging instruments Selisih nilai transaksi dengan\nkepentingan nonpengendali 2 6.400.562 6.400.562 Difference in value of transactions\nwith non-controlling interests Bagian laba komprehensif lain dari\nentitas asosiasi dan ventura\nbersama 14 3.200.140 6.296.231 Share of other comprehensive\nincome of associat",
+      "rowLabel": "Kepentingan nonpengendali Non-controlling interests",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "ang dapat\ndiatribusikan kepada pemilik\nentitas induk 2.071.197.306 2.118.726.151 Total equity attributable to the\nequity holders of the parent\ncompany Kepentingan nonpengendali 30 233.475.996 232.305.418 Non-controlling interests Jumlah Ekuitas 2.304.673.302 2.351.031.569 Total Equity JUMLAH LIABILITAS DAN\nEKUITAS 8.073.314.788 7.926.890.365 TOTAL LIABILITIES AND\nEQUITY Catatan/ Notes 30 Juni 2025/ June 30, ",
       "evidenceHashes": [
         {
-          "evidenceHash": "901711f0bcfaae48b022fa6940bc946680199bd3b93ed705791555c08203d89d",
-          "snippetHash": "a04ba8ca5a8a50c80cca43763a7caed95f110b0c0d218dbc87689c75a515adbd",
-          "locatorHash": "f598991e9c6e7ad47386e00234b0f806c2bdfcf31f7c6a9d1f2de822355e5f23"
+          "evidenceHash": "9660ad81791c9490edfadc14bb2105767d99c288d7ee91cda435eea5903bd1e8",
+          "snippetHash": "8b89c8743bb27d90bcdf3244b6e8ccbe4a0aa3dd29ffbfed8482d8b3734f08ea",
+          "locatorHash": "f04caabe4ab42b9d6d91c48800ea974ce96b8e56ac1cb68d42a736fca26cf3f2"
         }
       ],
       "confidence": {
         "read": "1",
-        "mapping": "0.995"
+        "mapping": "0.998"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zfp00l842g5lr78e9o3",
-        "assertionKey": "7fef6a2b8c2a7f1432a43e7d38942cb1cdee7bb9a3a4f335b54a28ef1510349c",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ka00lk42ck3gf85o38",
+        "assertionKey": "05603c1db08822e982715799e667086fe70f1be2bac7415a3e46c5ed0eeb99e1",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -2995,7 +2886,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3014,13 +2904,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3030,7 +2918,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3088,7 +2975,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -3107,7 +2994,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3126,13 +3012,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3142,7 +3026,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3185,7 +3068,7 @@
       "sourceSnippet": "ntinuing operations Rugi periode/tahun berjalan dari\noperasi yang tidak dilanjutkan (177.775) (1.274.402) Loss for the period/year from\ndiscontinued operations Laba periode/tahun berjalan yang\ndiatribusikan kepada pemilik\nentitas induk 37.188.257 200.996.060 Profit for the period/year\nattributable to equity holders of\nthe parent company Laba periode/tahun berjalan yang\ndiatribusikan kepada\nkepentingan nonpengendali 2,30 5.232.302 11.622.529 Profit for the period",
       "evidenceHashes": [
         {
-          "evidenceHash": "63f8c19d00192bf039947c67b9deb72cb993af500b5e9ef6033e1b6651fd52ee",
+          "evidenceHash": "2ebf878eb857e347a4824018fcfd3007815da8774d1b068e3f27adccadcb7e79",
           "snippetHash": "e33202dcf7f9c6cde2463d49732a729f96de796e604d71855e8b7e9136a00735",
           "locatorHash": "8c9d7799cedabc604f5c6cc2dbfa258307b5381b2923c0a71eaa402aead58fd5"
         }
@@ -3195,9 +3078,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zfb00kw42g5uy2rmzgt",
-        "assertionKey": "46ff2a9dde6dddeedfd9bcf1917257922cf87c35b4fba905218a19535929d60d",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3jj00kw42ck6s8xaikh",
+        "assertionKey": "865c149ff6afda7ed21453a3b82328bcc6d9e7889e8667be24125a5e9090dd6c",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -3214,7 +3097,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3233,13 +3115,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3249,7 +3129,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3303,7 +3182,7 @@
       "sourceSnippet": "PERATIONS Rugi setelah beban pajak\npenghasilan dari operasi yang\ndihentikan 39 (177.775) (1.274.402) Loss after income tax expense\nfrom discontinued operations LABA PERIODE/TAHUN\nBERJALAN 42.420.559 212.618.589 PROFIT FOR THE PERIOD/\nYEAR PENGHASILAN\nKOMPREHENSIF LAIN OTHER COMPREHENSIVE\nINCOME PENGHASILAN\nKOMPREHENSIF LAIN YANG\nAKAN DIREKLASIFIKASI KE\nLABA RUGI OTHER COMPREHENSIVE\nINCOME THAT WILL BE\nRECLASSIFIED ",
       "evidenceHashes": [
         {
-          "evidenceHash": "2ce2e71b44114b16ce36e636f8173a6ea3aa553acc32ffd201b5ca86a0a8ae48",
+          "evidenceHash": "420cb4a6a22a3487478a3bfcf185049e87280bdc26ed814203693525e082b985",
           "snippetHash": "c73710f9205d80b68cc31d17aaa1caac9174237912f6ebac2279b5eec1aa4697",
           "locatorHash": "4c42c4080df4510e5c4f2eaef4a3ad313324b03627f754b78735725f15df39dc"
         }
@@ -3313,9 +3192,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zf700ks42g5mbs1gg11",
-        "assertionKey": "10656cdab55ebe467305d69a2f9ae81542fe91388df237fbac67849377e96162",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3je00ks42ckq7rbksi4",
+        "assertionKey": "cb223dc1c9cb84aa23de1cfa877c795153df84b34aea7ab7dda62016554bb5aa",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -3332,7 +3211,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3351,13 +3229,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3367,7 +3243,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3421,7 +3296,7 @@
       "sourceSnippet": " dihasilkan dari kegiatan\nusaha 562.894.804 773.941.928 Cash generated from operations Pembayaran pajak penghasilan (164.544.435) (180.425.289) Income tax paid Kas neto diperoleh dari aktivitas\noperasi 398.350.369 593.516.639 Net cash used in operating\nactivities ARUS KAS DARI AKTIVITAS\nINVESTASI CASH FLOWS FROM INVESTING\nACTIVITIES Penerimaan dari pelepasan Entitas\nAnak atau asosiasi 39,48 – 116.577.272 Proceeds from disposal of",
       "evidenceHashes": [
         {
-          "evidenceHash": "b3bb4d670d69f725c7234ef4ab1e11b7f05956a0200d04aedcde6517073e95a9",
+          "evidenceHash": "2813b82af31d0c590658d28cfb844ed350d35d0068b6b537db8588e15e9e3489",
           "snippetHash": "bd48e2d06c1aa924d5b35367f5794023216e54c564dd963c1ad7c0ce8664d632",
           "locatorHash": "cec78006a38b510be8d5b460eaf441e5219c787ab5df3f17faab1fa288c24f84"
         }
@@ -3431,9 +3306,9 @@
         "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zft00lc42g519qmikdn",
-        "assertionKey": "8b47dd6cc92cf7408887ce41b986addc77ec90c93b4f96923ead67223e4c879d",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3jx00l842ckaks0e82m",
+        "assertionKey": "28f6681b70bf28b92c14a47de40fae56d8d743b2e8e8b2632765ee4e2b4b9965",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -3450,7 +3325,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3469,13 +3343,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3485,7 +3357,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3543,7 +3414,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -3562,7 +3433,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3581,13 +3451,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3597,7 +3465,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3640,7 +3507,7 @@
       "sourceSnippet": "set pajak tangguhan 2,38 113.134.493 130.565.420 Deferred tax assets Investasi pada saham 2,14 1.758.914.429 1.819.827.099 Investment in shares Aset tetap 2,15 109.862.248 109.403.217 Property, plant and equipment Aset hak guna 2,16 207.496.646 235.228.298 Right-of-use assets Aset eksplorasi dan evaluasi 2,17 245.851.476 241.560.",
       "evidenceHashes": [
         {
-          "evidenceHash": "7b66a7b166519c37959ab2e5a7c0e4a2b8807c0b0ff71117bc5638345492f814",
+          "evidenceHash": "1ce26ff47b5f2733b51e074aa2ac08f5fbbe6adcaa7be85200cded2ea444b9a0",
           "snippetHash": "7e76ae2065fb1bc4494e938c76ca5c2e83914b93c1cc440a37a2b5f1d43200f3",
           "locatorHash": "e2d09402dc3b203bdde5c1b321fb605f2e1ed0563553d6f95c4ddfba5862dd1e"
         }
@@ -3650,9 +3517,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zez00kk42g5w8sr96k1",
-        "assertionKey": "fd6efc3262a41d606814fc59ff54a20d876afb4f450df6a6b3be1894e3e60af2",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3j600kk42ckmip2fjwq",
+        "assertionKey": "3a2ce6783c9b525035e5d5305ca454383b5d5c0387b896768457b4cfd2b6168d",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -3669,7 +3536,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3688,13 +3554,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3704,7 +3568,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3737,13 +3600,13 @@
       "canonicalCode": "PRETAX_PROFIT",
       "definition": "Profit before income tax for the stated duration and scope.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "-261406110",
+      "rawValue": "(261.406.110)",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -3752,20 +3615,26 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 205,
+      "rowLabel": "Laba sebelum beban pajak Profit before income tax expense of penghasilan entitas anak subsidiaries",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "an dari operasi\nyang dilanjutkan 182.471.257 350.771.100 Consolidated profit before income\ntax expense from continuing\noperations Laba sebelum beban pajak\npenghasilan entitas anak (261.406.110) (289.243.338) Profit before income tax expense of\nsubsidiaries Laba (rugi) sebelum pajak -\nPerusahaan (78.934.853) 61.527.762 Profit (loss) before income tax - the\nCompany Jumlah laba (rugi) sebelum pajak -\nPerusahaan (",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "40405d48cf88bf92ce521687ff7ff3382cab0bca224d6e048e456abf6d5b602a",
+          "snippetHash": "ef81ee0bd7a67fd36238d02e9faa6a37c06c5de385be2cf8206f155470a4c780",
+          "locatorHash": "95b1584c1a03de82e12f16a12f58b30056d9600735593d6648e8ef70efcf3f9a"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.998"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ke00lo42ckctytdqnx",
+        "assertionKey": "9ec4033adb50221304795b6473c2e93aa8605156f7877e3b8ba46c09ab94554f",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
@@ -3781,7 +3650,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3800,13 +3668,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3816,7 +3682,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3825,10 +3690,20 @@
         274,
         322
       ],
-      "routingEvidence": null,
+      "routingEvidence": {
+        "pageNumber": 205,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi"
+        ],
+        "textHash": "cfd7c1805b960da0b011f94cd2297fa862b33471476e65468379251e3e817f7c",
+        "layoutHash": "3cdea0d9e6399733f95e7d2d048aa395cdb274e7841e5ce75876ea32b64c7526"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -3859,7 +3734,7 @@
       "sourceSnippet": "elanggan 2,34 1.114.760.027 1.141.062.168 Revenue from contracts with\ncustomers Pendapatan keuangan 2,34 23.630.000 24.306.353 Finance income JUMLAH PENDAPATAN 1.138.390.027 1.165.368.521 TOTAL REVENUES BEBAN POKOK PENDAPATAN\nDAN BIAYA LANGSUNG\nLAINNYA COST OF REVENUES AND\nOTHER DIRECT COSTS Penyusutan, deplesi dan\namortisasi\n2,15,",
       "evidenceHashes": [
         {
-          "evidenceHash": "ef918197153cdb389d6bd95be08d1684eed55e517a3024e98763ca1d15421616",
+          "evidenceHash": "2a30904561fdf441e3af08ba816f1e920cf44249303d4d30620340f8d8f6d30b",
           "snippetHash": "3d8033bce843b45789fa38d80c6bb3d98711d9be46c100574a2bb02120f6a2a0",
           "locatorHash": "d7aff57d28d136f192a822eff2c8745b0d94f225db5d605978515c4d93ee23ea"
         }
@@ -3869,9 +3744,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zen00k842g573cdm0ld",
-        "assertionKey": "ddb3f9516f0b6c3e50bc5b20b75bf7412ac0797eddc0ce42487916571f731a84",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3iu00k842ckve0ad1ol",
+        "assertionKey": "d023be7313c4f4745312975ba93493343c0c7a0c239dd454d749706053c9a169",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -3888,7 +3763,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -3907,13 +3781,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -3923,7 +3795,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -3977,7 +3848,7 @@
       "sourceSnippet": "an 31\nDesember 2024 55,000,000,000 shares as of\nJune 30, 2025 and December\n31, 2024 - Diterbitkan dan disetor penuh Issued and fully paid - 25.136.231.252 saham pada\ntanggal 30 Juni 2025 dan 31\nDesember 2024 121.798.946 121.798.946 25,136,231,252 shares as of\nJune 30, 2025 and December\n31, 202",
       "evidenceHashes": [
         {
-          "evidenceHash": "316a2a49e86212c33bbd0a15695776ad228b0a8c746715e2fc09c60a038c2808",
+          "evidenceHash": "ed7bb58e2985768462c86f72909b65da285e5fe8a28e47642b582cec35d12ae2",
           "snippetHash": "e3a0a28917c9a990e5a703050b2b094bd43f21a910657ca0faf1a44444ef8f78",
           "locatorHash": "693ce0be5fb4ac71e4750d641f3352e7d2bf41071623186a5f3ad01d4ef99c53"
         }
@@ -3987,9 +3858,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zee00k042g5rs3wjxua",
-        "assertionKey": "6b3c0bc0b1fd7f7a608226d145f0efa7981b9b5aa40791cffcd3952f5c010653",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3im00k042ckbw4b9463",
+        "assertionKey": "bf798aec1bf1fce9f719cc68e7c0bdf4519af958fc0d7b9ecda0175cdd8701a9",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -4006,7 +3877,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -4025,13 +3895,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -4041,7 +3909,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -4099,7 +3966,7 @@
         "mapping": null
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
         "assertionId": null,
         "assertionKey": null,
         "definitionVersion": null
@@ -4118,7 +3985,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -4137,13 +4003,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -4153,7 +4017,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -4175,13 +4038,13 @@
       "canonicalCode": "TAX_EXPENSE",
       "definition": "Reported income-tax expense with its stated scope.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "-139872923",
+      "rawValue": "(139.872.923)",
+      "currency": "USD",
       "unit": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "origin": null,
+      "scale": "1",
+      "origin": "REPORTED",
       "statement": "INCOME_STATEMENT",
       "reportingPeriod": {
         "start": "2025-01-01",
@@ -4190,20 +4053,26 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 8,
+      "rowLabel": "BEBAN PAJAK PENGHASILAN INCOME TAX EXPENSE",
+      "columnLabel": "CURRENT_PERIOD_LEFT_COLUMN",
+      "sourceSnippet": "Other income LABA SEBELUM PAJAK\nPENGHASILAN DARI OPERASI\nYANG DILANJUTKAN 182.471.257 350.771.100 INCOME BEFORE TAX\nEXPENSE FROM CONTINUING\nOPERATIONS BEBAN PAJAK PENGHASILAN 2,38 (139.872.923) (136.878.109) INCOME TAX EXPENSE LABA PERIODE/TAHUN\nBERJALAN DARI OPERASI\nYANG DILANJUTKAN 42.598.334 213.892.991 PROFIT FOR THE PERIOD/YEAR\nENDED FROM CONTINUING\nOPERATION 30 Juni/ June 30, Catatan/ Notes 2025 2024 The",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "796f869f3731f490511e2308a9eeedfad2f7e6d843b13827b8a842841ee38897",
+          "snippetHash": "c2bed869e7ec3f5349ea868b8ea93e8a16cf161dc8f59235a42862ed9121bdd6",
+          "locatorHash": "24ad752d3ef05ac789b83267db46be6d1036782b6ae49291b45a42c453eb7a89"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.998"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ki00ls42ck1hqm849d",
+        "assertionKey": "ad5fdec4367233186056218e36fe1bcfb48f9060134d3c20e50cf501c062a74f",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "PRIMARY"
@@ -4219,7 +4088,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -4238,13 +4106,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -4254,7 +4120,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -4263,10 +4128,21 @@
         274,
         322
       ],
-      "routingEvidence": null,
+      "routingEvidence": {
+        "pageNumber": 8,
+        "pageClass": "PRIMARY_INCOME_STATEMENT",
+        "statementType": "INCOME_STATEMENT",
+        "confidence": 0.99,
+        "matchedAnchors": [
+          "laporan laba rugi",
+          "statement of profit or loss"
+        ],
+        "textHash": "17891f6dbc8e7470c6d7d6fdc0c79dc74809df261a1c0de503e4b8a3ae23f21d",
+        "layoutHash": "91b0f11681258f4d42457853167ad8e62916fa2d9f65894a8a649a1f32eaf9ac"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
@@ -4297,7 +4173,7 @@
       "sourceSnippet": "lain-lain 20 154.251.807 148.468.539 Other assets Jumlah Aset Tidak Lancar 5.968.815.655 6.109.914.115 Total Non-current Assets JUMLAH ASET 8.073.314.788 7.926.890.365 TOTAL ASSETS The original interim consolidated financial statements\nincluded herein are in the Indonesian language. PT MEDCO ",
       "evidenceHashes": [
         {
-          "evidenceHash": "ce998276b4ed246d6216bbc0e055c8c3b311a8b5d78fe9efb5dded891f990f3c",
+          "evidenceHash": "95ef2c8de8b091973cd729669bd12aea76c4d375bf89c88245293d1bef322f4f",
           "snippetHash": "68c509c22565d4f26bc9ac6307429ae5b856e24cce3ca623d7d7f2e4a38bda1f",
           "locatorHash": "74c30b5d462428fcd9bd1894fd6202b60b8077a3798d14909769e50e327759bc"
         }
@@ -4307,9 +4183,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9ze200jo42g5c8l70zrt",
-        "assertionKey": "4bf7e33f6e9669289ef8536469a911477e0918e388592eed73234ab9e235471d",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3i900jo42ck3fpzvsq2",
+        "assertionKey": "1049979d742cf0902dcf9d94f050a6b99b6977a3b0bfe5e41c7901d19fa771cb",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -4326,7 +4202,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -4345,13 +4220,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -4361,7 +4234,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -4415,7 +4287,7 @@
       "sourceSnippet": "ligations and other\nprovisions Jumlah Liabilitas Jangka Panjang 4.302.643.871 4.070.473.153 Total Non-current Liabilities Jumlah Liabilitas 5.768.641.486 5.575.858.796 Total Liabilities Catatan/ Notes 30 Juni 2025/ June 30, 2025 31 Desember 2024/ December 31, 2024 The original interim consoli",
       "evidenceHashes": [
         {
-          "evidenceHash": "78b37eced9c5e7b87bfa1b2984883af4faddb179898d8ecef121abf96791985c",
+          "evidenceHash": "c8343723d9eae5d7ff87bed378f929ffd1b86024002d1d3c8c8869175c3b2c7f",
           "snippetHash": "79f341518e20114c0143fe8e1c45130da176a465598a91a9b9dced6c690c9ddf",
           "locatorHash": "84951e96233b2641193fa3fa854dd237e8eefe6908a1f7aa4d7917dc54f3b887"
         }
@@ -4425,9 +4297,9 @@
         "mapping": "0.99"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zea00jw42g50orinfx5",
-        "assertionKey": "97a6fd5ce5a99c8579f9751751ecc6d10be92a24f0d372da6d12608553081ed3",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3ii00jw42ckfl4j2s4j",
+        "assertionKey": "091f0a95b9643120af9d9c1f2cc7ff7b2289bdd3bc1b4a71cb17dad1d95555c2",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
@@ -4444,7 +4316,6 @@
         12,
         13,
         14,
-        26,
         28,
         29,
         31,
@@ -4463,13 +4334,11 @@
         65,
         67,
         71,
-        72,
         99,
         100,
         101,
         114,
         130,
-        138,
         187,
         188,
         205,
@@ -4479,7 +4348,6 @@
         209,
         210,
         216,
-        223,
         224,
         228,
         230,
@@ -4513,13 +4381,13 @@
       "definition": "Treasury-share count; zero requires evidence.",
       "applicability": "OPTIONAL",
       "semanticState": "VALUE",
-      "normalizedValue": "-79679102",
-      "rawValue": "(79.679.102)",
+      "normalizedValue": "453229508",
+      "rawValue": "453.229.508",
       "currency": "SHARES",
       "unit": "SHARES",
       "scale": "1",
       "origin": "REPORTED",
-      "statement": "NOTE",
+      "statement": "BALANCE_SHEET",
       "reportingPeriod": {
         "start": "2025-01-01",
         "end": "2025-06-30",
@@ -4527,44 +4395,92 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": 193,
-      "rowLabel": "treasuri (79.679.102) (55.117.723) on treasury stock",
+      "sourcePdfPage": 7,
+      "rowLabel": "Treasury share count",
       "columnLabel": "2025-06-30",
-      "sourceSnippet": "tahun 1999 139.908.988 139.908.988 Issuance of 321,730,290 shares\nthrough rights offering I to\nshareholders in 1999 Penurunan modal disetor dari saham\ntreasuri (79.679.102) (55.117.723) Deduction of additional paid-in capital\non treasury stock Penjualan kembali saham treasuri 74.812.936 74.812.936 Resale of treasury stock Pembayar",
+      "sourceSnippet": "mber 2024 121.798.946 121.798.946 25,136,231,252 shares as of\nJune 30, 2025 and December\n31, 2024 - Saham treasuri Treasury shares - 453.229.508 saham pada tanggal\n30 Juni 2025 dan 71.453.088\nsaham pada tanggal 31 Desember\n2024 (2.196.148) (346.230) 453,229,508 shares as of June\n30,",
       "evidenceHashes": [
         {
-          "evidenceHash": "11589357ecdd1aaec48fad1c54957c681754fe152240be025bee243ca14a0b07",
-          "snippetHash": "3c3c9e52953bc3b7a460c00239114804bddeca4d33aefff8f78804c86fb2b5a4",
-          "locatorHash": "02c62b6eb29136c2f4d191769c09cca7251bf798b318e417e4919964d25f37d5"
+          "evidenceHash": "b09de9d9c62ea822bc242bd085c1b35333cf3231d10b2e3cc032e5ba1fc7ba11",
+          "snippetHash": "57dab8f4c9e2d72e9f0cfb14e94dbc01c58a4643f6d97a639cc14606bb8f3ced",
+          "locatorHash": "1975902ac96f17327ea266fd98a07e5de356a1c9e8822790076a73f59fab0ce0"
         }
       ],
       "confidence": {
         "read": "1",
-        "mapping": "0.995"
+        "mapping": "1"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": "cmtzc9zg100lk42g5773vfa7q",
-        "assertionKey": "59b6b985cf73b7a8f2e8d32c58f706be6e300a3758f89f2cf46bd1c0b642c589",
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3km00lw42ckba75hyoy",
+        "assertionKey": "b72e8ebc2566bca540d7a7fa46e7a4c3c8ecb4dbee5eb20291c32c5027da1b10",
         "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
-        "NOTE"
+        "PRIMARY"
       ],
       "attemptedPages": [
-        193
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        28,
+        29,
+        31,
+        34,
+        36,
+        37,
+        39,
+        40,
+        44,
+        45,
+        46,
+        51,
+        57,
+        63,
+        64,
+        65,
+        67,
+        71,
+        99,
+        100,
+        101,
+        114,
+        130,
+        187,
+        188,
+        205,
+        206,
+        207,
+        208,
+        209,
+        210,
+        216,
+        224,
+        228,
+        230,
+        246,
+        272,
+        274,
+        322
       ],
       "routingEvidence": {
-        "pageNumber": 193,
-        "pageClass": "TARGETED_NOTE",
-        "statementType": "NOTE",
-        "confidence": 0.98,
+        "pageNumber": 7,
+        "pageClass": "PRIMARY_BALANCE_SHEET",
+        "statementType": "BALANCE_SHEET",
+        "confidence": 0.99,
         "matchedAnchors": [
-          "catatan atas laporan keuangan",
-          "notes to the interim consolidated financial statements"
+          "laporan posisi keuangan",
+          "statement of financial position"
         ],
-        "textHash": "61f1ead93631ec1fec22186b1a3e247af19bd985dc0e50f9932fbc0b54e3ab12",
-        "layoutHash": "8bc705c1cf1931a8efbbe0c1e96f0d839e02f33b75634dedc4ce9c1d190e1778"
+        "textHash": "186cf56d3c093eecf3402b81c323f9cfd0487575a242d56ded01251018df1727",
+        "layoutHash": "86856c89f99ca35443f0e7f15387fdbc2cfcb9756acd6ca6040bd0ba178a754a"
       },
       "legacyComparison": {
         "state": "NO_LEGACY_VALUE",
@@ -4578,14 +4494,14 @@
       "canonicalCode": "WEIGHTED_AVG_SHARES",
       "definition": "Duration denominator used for EPS; not period-end shares.",
       "applicability": "EXPECTED",
-      "semanticState": "MISSING",
-      "normalizedValue": null,
-      "rawValue": null,
-      "currency": null,
+      "semanticState": "VALUE",
+      "normalizedValue": "25042271375",
+      "rawValue": "25.042.271.375",
+      "currency": "SHARES",
       "unit": "SHARES",
-      "scale": null,
-      "origin": null,
-      "statement": "INCOME_STATEMENT",
+      "scale": "1",
+      "origin": "REPORTED",
+      "statement": "NOTE",
       "reportingPeriod": {
         "start": "2025-01-01",
         "end": "2025-06-30",
@@ -4593,31 +4509,48 @@
         "consolidationScope": "CONSOLIDATED"
       },
       "consolidationScope": "CONSOLIDATED",
-      "sourcePdfPage": null,
-      "rowLabel": null,
-      "columnLabel": null,
-      "sourceSnippet": null,
-      "evidenceHashes": [],
+      "sourcePdfPage": 219,
+      "rowLabel": "Laba per saham dasar",
+      "columnLabel": "2025-06-30",
+      "sourceSnippet": "s of the Parent\nCompany Rata-rata Tertimbang\nSaham Biasa yang\nBeredar/ Weighted Average\nNumber of Ordinary\nOutstanding Share Laba per Saham/ Earnings per Share Laba per saham dasar 37.366.032 24.766.734.214 0,00151 Basic earnings per share 30 Juni 2024/ June 30, 2024 Laba Periode\nBerjalan dari Operasi\nyang Dilanjutkan\nyang Diatribusikan\nKepada Pemilik\nEntitas Induk/ Profit for the Period\nfrom Continuing\nOperation\nAttributable to Equity\nHolders of the Parent\nCompany Rata-rata Tertimbang\nSaham Biasa yang\nBeredar/ Weighted Average\nNumber of Ordinary\nOutstanding Share Laba per Saham/ Earnings per Share Laba per saham dasar 202.270.462 25.042.271.375 0,00808 Basic earnings per share c. Rugi per saham dari operasi yang dihentikan c. Loss per share from discontinued operation 30 Juni 2025/ June 30, 2025 Rugi Periode Berjalan\ndari Operasi yang\nDihentikan yang\nDiatribus",
+      "evidenceHashes": [
+        {
+          "evidenceHash": "a69eec052f633de9ab9657e0f90471b68abd7af7bd274388edb00da1ab49ed30",
+          "snippetHash": "353e1dbb0fcb9aecb601f8f3e10131f3454b66d354e9aad2d18ac69b50eddaee",
+          "locatorHash": "5266e1a70ab85967d694275a48ba8c5b06e4cf62fb6ea3f3dff39d8a0c229825"
+        }
+      ],
       "confidence": {
-        "read": null,
-        "mapping": null
+        "read": "1",
+        "mapping": "0.995"
       },
       "lineage": {
-        "reportRevisionId": "cmtzc9z2e00iw42g56w8z7m2n",
-        "assertionId": null,
-        "assertionKey": null,
-        "definitionVersion": null
+        "reportRevisionId": "cmtzdy35w00iw42ckolns5wi6",
+        "assertionId": "cmtzdy3kr00m042ckr6pvcadf",
+        "assertionKey": "3fd6f523a3e208dd85f589eeb42f990f396171261e14bb752b649e2f145a7537",
+        "definitionVersion": "investai-canonical-v1.0-final:p0-a"
       },
       "attemptedRoutes": [
         "NOTE"
       ],
       "attemptedPages": [
-        220
+        219
       ],
-      "routingEvidence": null,
+      "routingEvidence": {
+        "pageNumber": 219,
+        "pageClass": "TARGETED_NOTE",
+        "statementType": "NOTE",
+        "confidence": 0.98,
+        "matchedAnchors": [
+          "catatan atas laporan keuangan",
+          "notes to the interim consolidated financial statements"
+        ],
+        "textHash": "d9d133d57c3e5dc5ce1665fa899fcd68b587eafa683cdfa78e67e4d903a2dbd8",
+        "layoutHash": "f3f0f40b0a762651654f9c670caf4a19ba0e661cd9d4967c6a9140104babd7c4"
+      },
       "legacyComparison": {
-        "state": "NOT_COMPARABLE",
-        "reason": "The shadow outcome is not a numeric VALUE/ZERO fact.",
+        "state": "NO_LEGACY_VALUE",
+        "reason": "No legacy report exists for the requested company and period.",
         "value": null
       },
       "source": "NATIVE"
