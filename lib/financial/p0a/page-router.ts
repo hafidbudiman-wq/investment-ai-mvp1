@@ -36,11 +36,17 @@ function noteMasthead(page: P0AIndexedPage): boolean {
   });
 }
 
+function epsCalculationPage(text: string): boolean {
+  const basic = text.includes("basic earnings per share") || text.includes("laba per saham dasar");
+  const weighted = text.includes("weighted average number of shares")
+    || text.includes("weighted average number of ordinary outstanding share")
+    || text.includes("jumlah rata rata tertimbang saham")
+    || text.includes("rata rata tertimbang saham biasa yang beredar");
+  return basic && weighted;
+}
+
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 6_000);
-  // Coordinate orientation differs between PDFs. Inspect only the outer 15%
-  // at both physical edges and require date/period context. This isolates a
-  // genuine note masthead from primary-statement footers and body tables.
   if (noteMasthead(page)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
@@ -53,6 +59,13 @@ function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPag
   for (const rule of PRIMARY_RULES) {
     const matches = rule.anchors.filter((anchor) => header.includes(anchor));
     if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
+  }
+
+  // Some issuers repeat the note masthead only on the first page of a note.
+  // A continuation page containing both an EPS calculation label and its
+  // weighted-average denominator is still a deterministic targeted-note page.
+  if (epsCalculationPage(page.normalizedText)) {
+    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps calculation table"] };
   }
 
   const noteAnchors = ["catatan atas laporan keuangan", "notes to the interim consolidated financial statements", "notes to the consolidated financial statements"];
