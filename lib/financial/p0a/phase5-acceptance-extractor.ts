@@ -1,8 +1,9 @@
+import { Prisma } from "@prisma/client";
 import { createEvidence } from "@/lib/financial/p0a/evidence";
 import { parseFinancialDecimal } from "@/lib/financial/p0a/decimal";
 import { createPhase5GenericNativeExtractor } from "@/lib/financial/p0a/phase5-generic-extractor";
 import { P0A_REQUIREMENT_BY_ID } from "@/lib/financial/p0a/requirements";
-import type { P0AIndexedPage, P0AIssuerContext, P0ANativeObservation, P0APageToken, P0APlanTask, P0ARoutedPage, P0AStatementType } from "@/lib/financial/p0a/types";
+import type { P0AIndexedPage, P0AIssuerContext, P0ANativeObservation, P0APageToken, P0APlanTask, P0ARoutedPage } from "@/lib/financial/p0a/types";
 import { P0A_NATIVE_MAPPING_VERSION, P0A_PARSER_VERSION, P0A_ROUTER_VERSION, P0A_VALIDATION_VERSION } from "@/lib/financial/p0a/versions";
 
 type LayoutRow = { rowIndex: number; y: number; tokens: P0APageToken[]; text: string; normalized: string };
@@ -156,6 +157,22 @@ function unitMetadata(requirementId: string, context: P0AIssuerContext) {
   } as const;
 }
 
+function evidenceForRow(requirementId: string, page: P0ARoutedPage, row: LayoutRow, rawValue: string, columnLabel: string) {
+  return {
+    ...createEvidence({
+      requirementId,
+      page,
+      statement: P0A_REQUIREMENT_BY_ID.get(requirementId)?.statementType ?? "OTHER",
+      table: null,
+      rowLabel: row.text,
+      columnLabel,
+      rawValue,
+      snippet: page.text.slice(Math.max(0, page.text.indexOf(rawValue) - 180), Math.min(page.text.length, page.text.indexOf(rawValue) + rawValue.length + 220)),
+    }),
+    rowIndex: row.rowIndex,
+  };
+}
+
 function exactObservation(rule: ExactRule, page: P0ARoutedPage, context: P0AIssuerContext): P0ANativeObservation | null {
   if (page.statementType !== rule.statement) return null;
   const requirement = P0A_REQUIREMENT_BY_ID.get(rule.requirementId);
@@ -202,7 +219,7 @@ function treasuryShareCount(page: P0ARoutedPage, context: P0AIssuerContext): P0A
   const match = /(?:Saham\s+treasuri|Treasury\s+shares?)[\s\S]{0,180}?(\d[\d.,]*)\s+(?:saham|shares)\s+(?:pada\s+tanggal|as\s+of)\b/i.exec(page.text);
   if (!match || match.index === undefined) return null;
   const parsed = parseFinancialDecimal(match[1]);
-  if (!parsed || Math.abs(Number(parsed.decimal)) < 1_000_000) return null;
+  if (!parsed || new Prisma.Decimal(parsed.decimal).abs().lessThan("1000000")) return null;
   const requirement = P0A_REQUIREMENT_BY_ID.get("TREASURY_SHARES_REPORTED");
   if (!requirement) return null;
   const evidence = createEvidence({
@@ -233,6 +250,48 @@ function treasuryShareCount(page: P0ARoutedPage, context: P0AIssuerContext): P0A
     mappingConfidence: 1,
     versions: { parser: P0A_PARSER_VERSION, router: P0A_ROUTER_VERSION, mapping: P0A_NATIVE_MAPPING_VERSION, validation: P0A_VALIDATION_VERSION },
   };
+}
+
+function precedingYear(rows: readonly LayoutRow[], rowIndex: number): string | null {
+  for (let index = rowIndex - 1; index >= 0; index -= 1) {
+    const years = rows[index].text.match(/\b(?:19|20)\d{2}\b/g);
+    if (years?.length) return years[0];
+  }
+  return null;
+}
+
+function weightedAverageSharesObservation(page: P0ARoutedPage, context: P0AIssuerContext): P0ANativeObservation | null {
+  if (page.statementType !== "NOTE") return null;
+  const requirement = P0A_REQUIREMENT_BY_ID.get("WEIGHTED_AVG_SHARES_REPORTED");
+  if (!requirement) return null;
+  const rows = layoutRows(page);
+  const currentYear = context.periodEnd.slice(0, 4);
+  for (const [index, row] of rows.entries()) {
+    if (!/\b(?:laba per saham dasar|basic earnings per share)\b/.test(row.normalized)) continue;
+    if (precedingYear(rows, index) !== currentYear) continue;
+    const candidates = numericRuns(row).filter((run) => new Prisma.Decimal(run.decimal).abs().greaterThanOrEqualTo("1000000"));
+    if (!candidates.length) continue;
+    const selected = [...candidates].sort((left, right) => new Prisma.Decimal(right.decimal).abs().comparedTo(new Prisma.Decimal(left.decimal).abs()))[0];
+    return {
+      requirementId: "WEIGHTED_AVG_SHARES_REPORTED",
+      origin: "REPORTED",
+      state: selected.decimal === "0" ? "ZERO" : "VALUE",
+      decimalValue: selected.decimal,
+      rawValue: selected.raw,
+      currency: "SHARES",
+      unitType: "SHARES",
+      scale: "1",
+      evidence: [evidenceForRow("WEIGHTED_AVG_SHARES_REPORTED", page, row, selected.raw, context.periodEnd)],
+      rawLabel: row.text,
+      statement: "NOTE",
+      period: { start: context.periodStart, end: context.periodEnd, type: context.periodType, nature: requirement.periodNature },
+      consolidationScope: scope(page, context),
+      readConfidence: 1,
+      mappingConfidence: 0.999,
+      versions: { parser: P0A_PARSER_VERSION, router: P0A_ROUTER_VERSION, mapping: P0A_NATIVE_MAPPING_VERSION, validation: P0A_VALIDATION_VERSION },
+    };
+  }
+  return null;
 }
 
 function notDisclosedObservation(input: { requirementId: string; page: P0ARoutedPage; context: P0AIssuerContext; reason: string; snippet: string }): P0ANativeObservation {
@@ -295,7 +354,8 @@ function netChangeCashNotDisclosed(pages: readonly P0ARoutedPage[], context: P0A
     const patterns = [/(?:net (?:increase|decrease|change) in cash(?: and cash equivalents)?)/g, /(?:(?:kenaikan|penurunan|perubahan) neto kas(?: dan setara kas)?)/g];
     for (const pattern of patterns) {
       for (const match of text.matchAll(pattern)) {
-        const segment = text.slice(match.index ?? 0, (match.index ?? 0) + 190);
+        const start = match.index ?? 0;
+        const segment = text.slice(Math.max(0, start - 180), start + 240);
         if (/(?:continuing operations|discontinued operations|operasi yang dilanjutkan|operasi yang dihentikan)/.test(segment)) scoped += 1;
         else unscoped += 1;
       }
@@ -303,13 +363,12 @@ function netChangeCashNotDisclosed(pages: readonly P0ARoutedPage[], context: P0A
   }
   if (scoped === 0 || unscoped > 0) return null;
   const page = cashPages[cashPages.length - 1];
-  const bridgeAt = page.normalizedText.search(/(?:net (?:increase|decrease) in cash|(?:kenaikan|penurunan) neto kas)/);
   return notDisclosedObservation({
     requirementId: "NET_CHANGE_CASH_REPORTED",
     page,
     context,
     reason: "Cash-flow statement reports scoped cash movements but no unscoped reported net-change scalar.",
-    snippet: bridgeAt >= 0 ? page.text.slice(Math.max(0, bridgeAt - 220), Math.min(page.text.length, bridgeAt + 900)) : page.text.slice(-1200),
+    snippet: cashPages.map((item) => item.text).join("\n").slice(-1600),
   });
 }
 
@@ -333,6 +392,12 @@ export function createPhase5AcceptanceNativeExtractor(input: { routedPages: read
     if (task.requirementIds.includes("TREASURY_SHARES_REPORTED")) {
       for (const page of selected) {
         const found = treasuryShareCount(page, input.context);
+        if (found) { replacements.push(found); break; }
+      }
+    }
+    if (task.requirementIds.includes("WEIGHTED_AVG_SHARES_REPORTED")) {
+      for (const page of selected) {
+        const found = weightedAverageSharesObservation(page, input.context);
         if (found) { replacements.push(found); break; }
       }
     }

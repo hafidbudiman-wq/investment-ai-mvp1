@@ -75,25 +75,31 @@ test("scoped continuing/discontinued cash movements are not promoted to group ne
   assert.equal(fact?.decimalValue, null);
 });
 
-test("note masthead wins over quoted primary-statement names", () => {
-  const text = "PT TEST CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN INTERIM NOTES TO THE INTERIM CONSOLIDATED FINANCIAL STATEMENTS statement of profit or loss statement of cash flows";
+test("physical note masthead wins over quoted primary-statement names", () => {
+  const tokens = [
+    tok("PT TEST", 40, 780), tok("CATATAN ATAS LAPORAN", 40, 750), tok("KEUANGAN KONSOLIDASIAN INTERIM", 40, 730),
+    tok("NOTES TO THE INTERIM CONSOLIDATED", 320, 750), tok("FINANCIAL STATEMENTS", 320, 730),
+    tok("statement of profit or loss", 40, 300), tok("statement of cash flows", 40, 260),
+  ];
+  const text = tokens.map((token) => token.text).join("\n");
   const page: P0AIndexedPage = {
     pageNumber: 26, width: 600, height: 800, text, normalizedText: text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
-    textHash: "a".repeat(64), layoutHash: "b".repeat(64), printedPageLabel: "23", tokens: [], extractionStatus: "NATIVE_TEXT",
+    textHash: "a".repeat(64), layoutHash: "b".repeat(64), printedPageLabel: "23", tokens, extractionStatus: "NATIVE_TEXT",
   };
   const routed = routePages([page]);
   assert.equal(routed[0].pageClass, "TARGETED_NOTE");
   assert.equal(routed[0].statementType, "NOTE");
 });
 
-test("weighted-average-share routing recognizes ordinary-outstanding-share wording", () => {
+test("weighted-average routing prefers total EPS table over scoped operation tables", () => {
   const base = (pageNumber: number, text: string): P0ARoutedPage => ({
     pageNumber, width: 600, height: 800, text, normalizedText: text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
     textHash: String(pageNumber).padStart(64, "a").slice(-64), layoutHash: String(pageNumber).padStart(64, "b").slice(-64), printedPageLabel: String(pageNumber), tokens: [], extractionStatus: "NATIVE_TEXT",
     pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 1, matchedAnchors: ["notes masthead"],
   });
   const pages = [
-    base(218, "Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share"),
+    base(218, "Laba per saham dasar Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share"),
+    base(219, "continuing operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share discontinued operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share"),
     base(220, "The weighted average number of shares takes into account treasury shares"),
   ];
   const requirement = P0A_REQUIREMENT_BY_ID.get("WEIGHTED_AVG_SHARES_REPORTED");

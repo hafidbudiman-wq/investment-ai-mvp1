@@ -7,6 +7,10 @@ const PRIMARY_RULES: Array<{ pageClass: P0APageClass; statementType: P0AStatemen
   { pageClass: "PRIMARY_CASH_FLOW", statementType: "CASH_FLOW", anchors: ["laporan arus kas", "statement of cash flows"] },
 ];
 
+function normalize(value: string): string {
+  return value.normalize("NFKC").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function countAnchor(text: string, anchor: string): number {
   let count = 0;
   let cursor = 0;
@@ -17,18 +21,31 @@ function countAnchor(text: string, anchor: string): number {
   return count;
 }
 
+function topRegion(page: P0AIndexedPage): string {
+  if (!page.tokens.length) return page.normalizedText.slice(0, 2_000);
+  const threshold = page.height * 0.66;
+  return normalize(page.tokens.filter((token) => token.y >= threshold).map((token) => token.text).join(" "));
+}
+
+function hasNoteMasthead(page: P0AIndexedPage): boolean {
+  const top = topRegion(page);
+  const indonesian = top.includes("catatan") && top.includes("laporan") && top.includes("keuangan") && top.includes("konsolidasian");
+  const english = top.includes("notes") && top.includes("consolidated") && top.includes("financial") && top.includes("statements");
+  if (indonesian && english) return true;
+
+  // Fallback for PDFs whose text tokens do not retain stable coordinates.
+  const header = page.normalizedText.slice(0, 4_500);
+  const bilingual = header.includes("catatan atas laporan") && header.includes("notes to the")
+    && header.includes("konsolidasian") && header.includes("financial statements");
+  return bilingual;
+}
+
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 4_500);
-  const masthead = page.normalizedText.slice(0, 1_800);
-  // A note page can quote primary-statement names in its body. Identify the
-  // bilingual note masthead first using normalized text and tolerant spacing.
-  const noteMasthead = (
-    masthead.includes("catatan atas laporan") && masthead.includes("keuangan konsolidasian")
-  ) || (
-    masthead.includes("notes to the interim consolidated") && masthead.includes("financial statements")
-  ) || masthead.includes("notes to the consolidated financial statements");
-  if (noteMasthead) {
-    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.99, matchedAnchors: ["notes masthead"] };
+  // Notes frequently quote primary-statement names in their body. Detect the
+  // actual page masthead by its physical top-of-page tokens before body text.
+  if (hasNoteMasthead(page)) {
+    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
 
   const toc = ["daftar isi", "table of contents"].filter((anchor) => header.includes(anchor));
@@ -56,6 +73,20 @@ export function primaryPages(routed: readonly P0ARoutedPage[]): number[] {
   return routed.filter((page) => page.pageClass.startsWith("PRIMARY_")).map((page) => page.pageNumber);
 }
 
+function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anchorScore: number; score: number } {
+  const anchorScore = requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0);
+  if (anchorScore === 0) return { anchorScore, score: 0 };
+
+  // EPS denominator must represent the total-period EPS table when both total
+  // and continuing/discontinued-operation tables repeat the same denominator.
+  // This is presentation-scope logic, not issuer-specific routing.
+  if (requirement.id === "WEIGHTED_AVG_SHARES_REPORTED") {
+    const scoped = /(?:continuing operations?|discontinued operations?|operasi yang dilanjutkan|operasi yang dihentikan)/.test(page.normalizedText);
+    return { anchorScore, score: anchorScore - (scoped ? 1_000 : 0) };
+  }
+  return { anchorScore, score: anchorScore };
+}
+
 export function selectTargetedPages(
   routed: readonly P0ARoutedPage[],
   requirements: readonly P0ARequirement[],
@@ -64,11 +95,9 @@ export function selectTargetedPages(
   const selected = new Map<string, number[]>();
   for (const requirement of requirements) {
     if (!requirement.targetedAnchors.length) continue;
-    const candidates = notePages.map((page) => ({
-      page: page.pageNumber,
-      score: requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0),
-    })).filter((candidate) => candidate.score > 0)
-      .sort((left, right) => right.score - left.score || left.page - right.page);
+    const candidates = notePages.map((page) => ({ page: page.pageNumber, ...targetedScore(page, requirement) }))
+      .filter((candidate) => candidate.anchorScore > 0)
+      .sort((left, right) => right.score - left.score || right.anchorScore - left.anchorScore || left.page - right.page);
     if (candidates.length) selected.set(requirement.id, [candidates[0].page]);
   }
   return selected;
