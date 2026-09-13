@@ -77,8 +77,8 @@ test("scoped continuing/discontinued cash movements are not promoted to group ne
 
 test("physical note masthead wins over quoted primary-statement names", () => {
   const tokens = [
-    tok("PT TEST", 40, 780), tok("CATATAN ATAS LAPORAN", 40, 750), tok("KEUANGAN KONSOLIDASIAN INTERIM", 40, 730),
-    tok("NOTES TO THE INTERIM CONSOLIDATED", 320, 750), tok("FINANCIAL STATEMENTS", 320, 730),
+    tok("PT TEST", 40, 780), tok("CATATAN ATAS LAPORAN", 40, 750), tok("KEUANGAN KONSOLIDASIAN INTERIM", 40, 730), tok("Tanggal 30 Juni 2025", 40, 710),
+    tok("NOTES TO THE INTERIM CONSOLIDATED", 320, 750), tok("FINANCIAL STATEMENTS", 320, 730), tok("As of June 30, 2025", 320, 710),
     tok("statement of profit or loss", 40, 300), tok("statement of cash flows", 40, 260),
   ];
   const text = tokens.map((token) => token.text).join("\n");
@@ -98,8 +98,8 @@ test("weighted-average routing prefers total EPS table over scoped operation tab
     pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 1, matchedAnchors: ["notes masthead"],
   });
   const pages = [
-    base(218, "Laba per saham dasar Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.188.257 24.766.734.214 0,00150"),
-    base(219, "continuing operations Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.365.000 24.766.734.214 0,00151 discontinued operations"),
+    base(218, "discontinued operations cash flows from the preceding note unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text unrelated text LABA PER SAHAM DASAR Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.188.257 24.766.734.214 0,00150 Basic earnings per share"),
+    base(219, "earnings per share from continuing operation Profit for the Period from Continuing Operation Rata-rata Tertimbang Saham Biasa yang Beredar Weighted Average Number of Ordinary Outstanding Share 37.366.032 24.766.734.214 0,00151 Basic earnings per share"),
     base(220, "The weighted average number of shares takes into account treasury shares"),
   ];
   const requirement = P0A_REQUIREMENT_BY_ID.get("WEIGHTED_AVG_SHARES_REPORTED");

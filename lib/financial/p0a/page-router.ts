@@ -57,23 +57,49 @@ function epsNumericStructure(page: P0AIndexedPage): boolean {
   return false;
 }
 
-/**
- * Narrow issuer-agnostic recognition of a genuine EPS denominator table.
- * Narrative accounting-policy pages can mention the same concepts but do not
- * contain the numerator/large-share-denominator/per-share numeric structure.
- */
-function epsCalculationPage(page: P0AIndexedPage): boolean {
-  const text = page.normalizedText;
-  const basic = text.includes("basic earnings per share") || text.includes("laba per saham dasar")
+function hasBasicEpsSemantics(text: string): boolean {
+  return text.includes("basic earnings per share") || text.includes("laba per saham dasar")
     || containsWords(text, ["basic", "earnings", "share"])
     || containsWords(text, ["laba", "saham", "dasar"]);
-  const weighted = text.includes("weighted average number of shares")
+}
+
+function hasWeightedShareSemantics(text: string): boolean {
+  return text.includes("weighted average number of shares")
     || text.includes("weighted average number of ordinary outstanding share")
     || text.includes("jumlah rata rata tertimbang saham")
     || text.includes("rata rata tertimbang saham biasa yang beredar")
     || containsWords(text, ["weighted", "average", "ordinary", "share"])
     || containsWords(text, ["rata", "tertimbang", "saham", "beredar"]);
-  return basic && weighted && epsNumericStructure(page);
+}
+
+/** Narrow issuer-agnostic recognition of a genuine EPS denominator table. */
+function epsCalculationPage(page: P0AIndexedPage): boolean {
+  return hasBasicEpsSemantics(page.normalizedText) && hasWeightedShareSemantics(page.normalizedText) && epsNumericStructure(page);
+}
+
+const SCOPED_EPS = /(?:continuing operations?|discontinued operations?|continuing operation|discontinued operation|operasi yang dilanjutkan|operasi yang dihentikan|dari operasi yang dilanjutkan|dari operasi yang dihentikan)/;
+
+/**
+ * Scope is evaluated around the actual EPS calculation, not across the whole
+ * physical page. A page may end one unrelated discontinued-operation note and
+ * then begin the total EPS note; that earlier text must not taint the EPS table.
+ */
+function epsCalculationIsScoped(page: P0AIndexedPage): boolean {
+  const text = page.normalizedText;
+  const anchors = ["basic earnings per share", "laba per saham dasar"];
+  const qualifyingWindows: string[] = [];
+  for (const anchor of anchors) {
+    let cursor = 0;
+    while ((cursor = text.indexOf(anchor, cursor)) >= 0) {
+      const window = text.slice(Math.max(0, cursor - 520), Math.min(text.length, cursor + anchor.length + 520));
+      if (hasWeightedShareSemantics(window)) qualifyingWindows.push(window);
+      cursor += anchor.length;
+    }
+  }
+  if (!qualifyingWindows.length) return false;
+  // If at least one qualifying table has no local operation scope, the page
+  // contains a total EPS denominator and must outrank scoped alternatives.
+  return qualifyingWindows.every((window) => SCOPED_EPS.test(window));
 }
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
@@ -92,10 +118,8 @@ function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPag
     if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
   }
 
-  // A continuation page containing a genuine EPS denominator table can be
-  // selected deterministically even when text ordering fragments its masthead.
   if (epsCalculationPage(page)) {
-    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps denominator table"] };
+    return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["eps calculation table"] };
   }
 
   const noteAnchors = ["catatan atas laporan keuangan", "notes to the interim consolidated financial statements", "notes to the consolidated financial statements"];
@@ -111,8 +135,8 @@ function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anch
   const anchorScore = requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0);
   if (requirement.id === "WEIGHTED_AVG_SHARES_REPORTED") {
     const semanticTable = epsCalculationPage(page);
-    const scoped = /(?:continuing operations?|discontinued operations?|operasi yang dilanjutkan|operasi yang dihentikan)/.test(page.normalizedText);
-    return { anchorScore, score: (semanticTable ? 10_000 : 0) + anchorScore - (scoped ? 1_000 : 0) };
+    const scoped = semanticTable && epsCalculationIsScoped(page);
+    return { anchorScore, score: (semanticTable ? 10_000 : 0) + anchorScore - (scoped ? 5_000 : 0) };
   }
   if (anchorScore === 0) return { anchorScore, score: 0 };
   return { anchorScore, score: anchorScore };
