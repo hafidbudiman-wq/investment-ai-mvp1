@@ -19,12 +19,18 @@ function countAnchor(text: string, anchor: string): number {
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 4_500);
-  // Notes frequently quote primary-statement names.  Detect the actual,
-  // upper-case note-page masthead before considering those body references.
-  const noteMasthead = /(?:CATATAN ATAS LAPORAN KEUANGAN|NOTES TO THE (?:INTERIM )?CONSOLIDATED)[\s\S]{0,120}(?:KONSOLIDASIAN|FINANCIAL STATEMENTS)/.test(page.text.slice(0, 900));
+  const masthead = page.normalizedText.slice(0, 1_800);
+  // A note page can quote primary-statement names in its body. Identify the
+  // bilingual note masthead first using normalized text and tolerant spacing.
+  const noteMasthead = (
+    masthead.includes("catatan atas laporan") && masthead.includes("keuangan konsolidasian")
+  ) || (
+    masthead.includes("notes to the interim consolidated") && masthead.includes("financial statements")
+  ) || masthead.includes("notes to the consolidated financial statements");
   if (noteMasthead) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.99, matchedAnchors: ["notes masthead"] };
   }
+
   const toc = ["daftar isi", "table of contents"].filter((anchor) => header.includes(anchor));
   if (toc.length) return { pageClass: "TABLE_OF_CONTENTS", statementType: "OTHER", confidence: 0.99, matchedAnchors: toc };
 
