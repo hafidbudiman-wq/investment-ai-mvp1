@@ -7,69 +7,66 @@ const PRIMARY_RULES: Array<{ pageClass: P0APageClass; statementType: P0AStatemen
   { pageClass: "PRIMARY_CASH_FLOW", statementType: "CASH_FLOW", anchors: ["laporan arus kas", "statement of cash flows"] },
 ];
 
-const NOTE_MARKERS = ["catatan atas laporan", "notes to the"] as const;
+function normalize(value: string): string {
+  return value.normalize("NFKC").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, " ").replace(/\s+/g, " ").trim();
+}
 
 function countAnchor(text: string, anchor: string): number {
   let count = 0;
   let cursor = 0;
-  while ((cursor = text.indexOf(anchor, cursor)) >= 0) {
-    count += 1;
-    cursor += anchor.length;
-  }
+  while ((cursor = text.indexOf(anchor, cursor)) >= 0) { count += 1; cursor += anchor.length; }
   return count;
 }
 
-function earliest(text: string, anchors: readonly string[]): number | null {
-  const positions = anchors.map((anchor) => text.indexOf(anchor)).filter((position) => position >= 0);
-  return positions.length ? Math.min(...positions) : null;
+function edgeRegions(page: P0AIndexedPage): string[] {
+  if (!page.tokens.length) return [page.normalizedText.slice(0, 1_800)];
+  const low = page.height * 0.34;
+  const high = page.height * 0.66;
+  const lowEdge = normalize(page.tokens.filter((token) => token.y <= low).map((token) => token.text).join(" "));
+  const highEdge = normalize(page.tokens.filter((token) => token.y >= high).map((token) => token.text).join(" "));
+  return [lowEdge, highEdge].filter(Boolean);
+}
+
+function noteMasthead(page: P0AIndexedPage): boolean {
+  return edgeRegions(page).some((edge) => {
+    const noteIdentity = (edge.includes("catatan") && edge.includes("laporan") && edge.includes("keuangan"))
+      || (edge.includes("notes") && edge.includes("financial") && edge.includes("statements"));
+    const periodIdentity = edge.includes("tanggal") || edge.includes("as of") || edge.includes("periode") || edge.includes("period ended") || edge.includes("year ended");
+    return noteIdentity && periodIdentity;
+  });
 }
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
-  const text = page.normalizedText;
-  const structuralWindow = text.slice(0, 6_000);
-  const notePosition = earliest(structuralWindow, NOTE_MARKERS);
-
-  const primaryMatches = PRIMARY_RULES.flatMap((rule) => rule.anchors.map((anchor) => ({ rule, anchor, position: structuralWindow.indexOf(anchor) })))
-    .filter((match) => match.position >= 0)
-    .sort((left, right) => left.position - right.position);
-  const firstPrimary = primaryMatches[0] ?? null;
-
-  // Use reading-order structure rather than broad page presence. Primary
-  // statements mention accompanying notes in their footer; note pages often
-  // quote primary-statement names in their body. The structural marker that
-  // appears first therefore identifies the actual page role without relying
-  // on issuer, page number, or PDF coordinate orientation.
-  if (notePosition !== null && (!firstPrimary || notePosition < firstPrimary.position)) {
+  const header = page.normalizedText.slice(0, 6_000);
+  // Coordinate orientation differs between PDFs. Inspect both physical page
+  // edges and require period/date context so a primary-statement footer that
+  // merely says "accompanying notes" cannot masquerade as a note masthead.
+  if (noteMasthead(page)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
 
-  const toc = ["daftar isi", "table of contents"].filter((anchor) => structuralWindow.includes(anchor));
+  const toc = ["daftar isi", "table of contents"].filter((anchor) => header.includes(anchor));
   if (toc.length) return { pageClass: "TABLE_OF_CONTENTS", statementType: "OTHER", confidence: 0.99, matchedAnchors: toc };
-
-  const auditor = ["laporan auditor independen", "independent auditor s report"].filter((anchor) => structuralWindow.includes(anchor));
+  const auditor = ["laporan auditor independen", "independent auditor s report"].filter((anchor) => header.includes(anchor));
   if (auditor.length) return { pageClass: "AUDITOR_REPORT", statementType: "OTHER", confidence: 0.99, matchedAnchors: auditor };
 
-  if (firstPrimary) {
-    const sameRuleAnchors = firstPrimary.rule.anchors.filter((anchor) => structuralWindow.includes(anchor));
-    return { pageClass: firstPrimary.rule.pageClass, statementType: firstPrimary.rule.statementType, confidence: 0.99, matchedAnchors: sameRuleAnchors };
+  for (const rule of PRIMARY_RULES) {
+    const matches = rule.anchors.filter((anchor) => header.includes(anchor));
+    if (matches.length) return { pageClass: rule.pageClass, statementType: rule.statementType, confidence: 0.99, matchedAnchors: matches };
   }
 
-  if (notePosition !== null) return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: ["notes masthead"] };
+  const noteAnchors = ["catatan atas laporan keuangan", "notes to the interim consolidated financial statements", "notes to the consolidated financial statements"];
+  const notes = noteAnchors.filter((anchor) => header.includes(anchor));
+  if (notes.length) return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.98, matchedAnchors: notes };
   return { pageClass: "OTHER", statementType: "OTHER", confidence: page.text ? 0.7 : 1, matchedAnchors: [] };
 }
 
-export function routePages(index: readonly P0AIndexedPage[]): P0ARoutedPage[] {
-  return index.map((page) => ({ ...page, ...classify(page) }));
-}
-
-export function primaryPages(routed: readonly P0ARoutedPage[]): number[] {
-  return routed.filter((page) => page.pageClass.startsWith("PRIMARY_")).map((page) => page.pageNumber);
-}
+export function routePages(index: readonly P0AIndexedPage[]): P0ARoutedPage[] { return index.map((page) => ({ ...page, ...classify(page) })); }
+export function primaryPages(routed: readonly P0ARoutedPage[]): number[] { return routed.filter((page) => page.pageClass.startsWith("PRIMARY_")).map((page) => page.pageNumber); }
 
 function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anchorScore: number; score: number } {
   const anchorScore = requirement.targetedAnchors.reduce((sum, anchor) => sum + countAnchor(page.normalizedText, anchor), 0);
   if (anchorScore === 0) return { anchorScore, score: 0 };
-
   if (requirement.id === "WEIGHTED_AVG_SHARES_REPORTED") {
     const scoped = /(?:continuing operations?|discontinued operations?|operasi yang dilanjutkan|operasi yang dihentikan)/.test(page.normalizedText);
     return { anchorScore, score: anchorScore - (scoped ? 1_000 : 0) };
@@ -77,10 +74,7 @@ function targetedScore(page: P0ARoutedPage, requirement: P0ARequirement): { anch
   return { anchorScore, score: anchorScore };
 }
 
-export function selectTargetedPages(
-  routed: readonly P0ARoutedPage[],
-  requirements: readonly P0ARequirement[],
-): Map<string, number[]> {
+export function selectTargetedPages(routed: readonly P0ARoutedPage[], requirements: readonly P0ARequirement[]): Map<string, number[]> {
   const notePages = routed.filter((page) => page.pageClass === "TARGETED_NOTE");
   const selected = new Map<string, number[]>();
   for (const requirement of requirements) {
