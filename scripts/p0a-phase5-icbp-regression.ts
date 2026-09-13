@@ -63,7 +63,7 @@ async function main() {
     counts,
     providerUsage: result.usage,
     effectiveProviderUsage: { providerCalls: 0, inputTokens: 0, outputTokens: 0, apiCostUsd: "0.00000000" },
-    outcomes: result.outcomes.map((outcome) => ({ requirementId: outcome.requirement.id, state: outcome.state })),
+    outcomes: result.outcomes.map((outcome) => ({ requirementId: outcome.requirementId, state: outcome.state })),
   };
   const outputDir = process.env.P0A_PHASE5_OUTPUT_DIR ?? "artifacts/phase5";
   await mkdir(outputDir, { recursive: true });
