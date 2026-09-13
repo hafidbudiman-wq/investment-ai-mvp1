@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     services:
       postgres:
         image: postgres:16-alpine
@@ -69,3 +69,38 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Create isolated Phase 5 MEDC database
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/investai-phase5-medc-drma-regression'
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c 'CREATE DATABASE p0a_phase5_medc;'
+
+      - name: Download and checksum-lock official MEDC H1 2025 source
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/investai-phase5-medc-drma-regression'
+        run: |
+          mkdir -p .phase5-source
+          curl --fail --location --retry 3 --output .phase5-source/MEDC_1H25.pdf \
+            https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  .phase5-source/MEDC_1H25.pdf" | sha256sum --check --strict
+
+      - name: Apply migrations to isolated Phase 5 MEDC database
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/investai-phase5-medc-drma-regression'
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/p0a_phase5_medc?schema=public
+        run: npx prisma migrate deploy
+
+      - name: Run MEDC Phase 5 native roundtrip acceptance
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/investai-phase5-medc-drma-regression'
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/p0a_phase5_medc?schema=public
+          P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase5-source/MEDC_1H25.pdf
+          P0A_PHASE5_OUTPUT_DIR: ${{ github.workspace }}/artifacts/phase5
+        run: node --import tsx scripts/p0a-phase5-medc-roundtrip.ts
+
+      - name: Upload MEDC actual compatibility artifact
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/investai-phase5-medc-drma-regression' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MEDC-PHASE5-P0A-ACTUAL
+          path: artifacts/phase5/MEDC-PHASE5-P0A-ACTUAL.json
+          if-no-files-found: error
