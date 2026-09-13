@@ -19,9 +19,9 @@ function countAnchor(text: string, anchor: string): number {
 }
 
 function edgeRegions(page: P0AIndexedPage): string[] {
-  if (!page.tokens.length) return [page.normalizedText.slice(0, 1_800)];
-  const low = page.height * 0.34;
-  const high = page.height * 0.66;
+  if (!page.tokens.length) return [page.normalizedText.slice(0, 1_200)];
+  const low = page.height * 0.15;
+  const high = page.height * 0.85;
   const lowEdge = normalize(page.tokens.filter((token) => token.y <= low).map((token) => token.text).join(" "));
   const highEdge = normalize(page.tokens.filter((token) => token.y >= high).map((token) => token.text).join(" "));
   return [lowEdge, highEdge].filter(Boolean);
@@ -38,9 +38,9 @@ function noteMasthead(page: P0AIndexedPage): boolean {
 
 function classify(page: P0AIndexedPage): Omit<P0ARoutedPage, keyof P0AIndexedPage> {
   const header = page.normalizedText.slice(0, 6_000);
-  // Coordinate orientation differs between PDFs. Inspect both physical page
-  // edges and require period/date context so a primary-statement footer that
-  // merely says "accompanying notes" cannot masquerade as a note masthead.
+  // Coordinate orientation differs between PDFs. Inspect only the outer 15%
+  // at both physical edges and require date/period context. This isolates a
+  // genuine note masthead from primary-statement footers and body tables.
   if (noteMasthead(page)) {
     return { pageClass: "TARGETED_NOTE", statementType: "NOTE", confidence: 0.995, matchedAnchors: ["notes masthead"] };
   }
