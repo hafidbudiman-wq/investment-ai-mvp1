@@ -1,0 +1,48 @@
+name: Phase 5 DRMA Native Diagnostic
+
+on:
+  pull_request:
+    branches:
+      - agent/investai-phase4-compatibility-qa-web
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drma:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/investai-phase5-medc-drma-regression'
+    runs-on: ubuntu-24.04
+    env:
+      P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase5-source/DRMA_Q4_2025.pdf
+      P0A_PHASE5_OUTPUT_DIR: ${{ github.workspace }}/artifacts/phase5
+    steps:
+      - name: Checkout Phase 5 head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Download and checksum-lock DRMA FY 2025 source
+        run: |
+          mkdir -p .phase5-source
+          curl --http1.1 --fail --location --retry 3 --output .phase5-source/DRMA_Q4_2025.pdf \
+            'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
+          echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  .phase5-source/DRMA_Q4_2025.pdf" | sha256sum --check --strict
+
+      - name: Run DRMA current-engine native diagnostic
+        run: npx tsx scripts/p0a-phase5-drma-native-diagnostic.ts
+
+      - name: Upload DRMA actual native diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: DRMA-PHASE5-P0A-ACTUAL
+          path: artifacts/phase5/DRMA-PHASE5-P0A-ACTUAL.json
+          if-no-files-found: error
