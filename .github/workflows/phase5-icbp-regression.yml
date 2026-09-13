@@ -1,0 +1,51 @@
+name: Phase 5 ICBP Regression
+
+on:
+  pull_request:
+    branches:
+      - agent/investai-phase4-compatibility-qa-web
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  icbp:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'agent/investai-phase5-medc-drma-regression'
+    runs-on: ubuntu-24.04
+    env:
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase5-source/ICBP_billingual_30Jun25.pdf
+      P0A_PHASE5_OUTPUT_DIR: ${{ github.workspace }}/artifacts/phase5
+    steps:
+      - name: Checkout Phase 5 head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Download exact official ICBP H1 2025 source
+        run: |
+          mkdir -p .phase5-source
+          # Indofood's server currently presents an incomplete TLS chain to the
+          # hosted runner. Transport verification is therefore bypassed here,
+          # but content identity remains fail-closed on the frozen SHA-256 below.
+          curl --insecure --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf \
+            https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  .phase5-source/ICBP_billingual_30Jun25.pdf" | sha256sum --check --strict
+
+      - name: Run frozen ICBP Phase 5 regression
+        run: npx tsx scripts/p0a-phase5-icbp-regression.ts
+
+      - name: Upload ICBP regression artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ICBP-PHASE5-REGRESSION-ACTUAL
+          path: artifacts/phase5/ICBP-PHASE5-REGRESSION-ACTUAL.json
+          if-no-files-found: error
