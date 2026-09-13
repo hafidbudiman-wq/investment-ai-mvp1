@@ -24,46 +24,35 @@ type LayoutRow = { rowIndex: number; y: number; tokens: P0APageToken[]; text: st
 type NumericRun = { raw: string; decimal: string; center: number; tokens: P0APageToken[] };
 type PeriodColumns = { currentCenter: number; comparativeCenter: number; boundary: number; currentOnLeft: boolean };
 type LogicalRow = { row: LayoutRow; label: string; normalizedLabel: string; current: NumericRun; columns: PeriodColumns };
-type SupplementalRule = {
-  requirementId: string;
-  statement: P0AStatementType;
-  aliases: readonly RegExp[];
-  excludes?: readonly RegExp[];
-};
+type SupplementalRule = { requirementId: string; statement: P0AStatementType; aliases: readonly RegExp[]; excludes?: readonly RegExp[] };
 
-/*
- * These are presentation aliases observed across ordinary IFRS/PSAK financial
- * statements. They are deliberately issuer-agnostic and do not contain ticker,
- * page-number, or known-value predicates.
- */
+/* Generic PSAK/IFRS presentation aliases only: no issuer, page, or known-value predicates. */
 const SUPPLEMENTAL_RULES: readonly SupplementalRule[] = [
   { requirementId: "REV_REPORTED", statement: "INCOME_STATEMENT", aliases: [/\bjumlah pendapatan\b/, /\btotal revenues?\b/] },
   { requirementId: "COGS_REPORTED", statement: "INCOME_STATEMENT", aliases: [/\bjumlah beban pokok pendapatan(?: dan biaya langsung lainnya)?\b/, /\btotal cost of revenues?(?: and other direct costs)?\b/] },
   { requirementId: "GROSS_PROFIT_REPORTED", statement: "INCOME_STATEMENT", aliases: [/\blaba kotor\b/] },
   { requirementId: "PRETAX_PROFIT_REPORTED", statement: "INCOME_STATEMENT", aliases: [/\blaba sebelum pajak penghasilan\b/, /\bincome before tax expense\b/] },
   {
-    requirementId: "NET_PROFIT_REPORTED",
-    statement: "INCOME_STATEMENT",
+    requirementId: "NET_PROFIT_REPORTED", statement: "INCOME_STATEMENT",
     aliases: [/\blaba periode tahun berjalan\b/, /\bprofit for the period year\b/],
-    excludes: [/\bcontinuing operations?\b/, /\bdiscontinued operations?\b/, /\boperasi yang dilanjutkan\b/, /\boperasi yang dihentikan\b/, /\bkomprehensif\b/, /\bcomprehensive\b/, /\battribut/],
+    excludes: [/\bcontinuing operations?\b/, /\bdiscontinued operations?\b/, /\boperasi yang dilanjutkan\b/, /\boperasi yang dihentikan\b/, /\bcomprehensive\b/, /\bkomprehensif\b/, /\battribut/],
   },
   {
-    requirementId: "NET_PROFIT_PARENT_REPORTED",
-    statement: "INCOME_STATEMENT",
+    requirementId: "NET_PROFIT_PARENT_REPORTED", statement: "INCOME_STATEMENT",
     aliases: [/\blaba periode tahun berjalan yang diatribusikan kepada pemilik entitas induk\b/, /\bprofit for the period year attributable to equity holders? of the parent(?: company| entity)?\b/],
-    excludes: [/\bcontinuing operations?\b/, /\bdiscontinued operations?\b/, /\boperasi yang dilanjutkan\b/, /\boperasi yang dihentikan\b/, /\bkomprehensif\b/, /\bcomprehensive\b/],
+    excludes: [/\bcontinuing operations?\b/, /\bdiscontinued operations?\b/, /\boperasi yang dilanjutkan\b/, /\boperasi yang dihentikan\b/, /\bcomprehensive\b/, /\bkomprehensif\b/],
   },
   {
-    requirementId: "EPS_BASIC_REPORTED",
-    statement: "INCOME_STATEMENT",
+    requirementId: "EPS_BASIC_REPORTED", statement: "INCOME_STATEMENT",
     aliases: [/\blaba per saham dasar yang dapat diatribusikan kepada pemilik entitas induk\b/, /\bbasic earnings per share attributable to equity holders? of the parent\b/],
     excludes: [/\bcontinuing operations?\b/, /\bdiscontinued operations?\b/, /\boperasi yang dilanjutkan\b/, /\boperasi yang dihentikan\b/],
   },
   { requirementId: "INV_REPORTED", statement: "BALANCE_SHEET", aliases: [/\bpersediaan\b/, /\binventories\b/] },
   { requirementId: "PPE_REPORTED", statement: "BALANCE_SHEET", aliases: [/\baset tetap\b/, /\bproperty plant and equipment\b/] },
+  { requirementId: "EQUITY_PARENT_REPORTED", statement: "BALANCE_SHEET", aliases: [/\btotal ekuitas yang dapat diatribusikan kepada pemilik entitas induk\b/, /\btotal equity attributable to (?:the )?equity holders? of the parent (?:company|entity)\b/] },
   { requirementId: "OCF_REPORTED", statement: "CASH_FLOW", aliases: [/\bkas neto (?:yang )?diperoleh.*aktivitas operasi\b/, /\bnet cash (?:provided by|from|used in) operating activities\b/] },
-  { requirementId: "ICF_REPORTED", statement: "CASH_FLOW", aliases: [/\bkas neto (?:yang )?digunakan.*aktivitas investasi\b/] },
-  { requirementId: "CFF_REPORTED", statement: "CASH_FLOW", aliases: [/\bkas neto (?:yang )?digunakan.*aktivitas pendanaan\b/] },
+  { requirementId: "ICF_REPORTED", statement: "CASH_FLOW", aliases: [/\bkas neto (?:yang )?digunakan.*aktivitas investasi\b/, /\bnet cash (?:used in|from) investing activities\b/] },
+  { requirementId: "CFF_REPORTED", statement: "CASH_FLOW", aliases: [/\bkas neto (?:yang )?digunakan.*aktivitas pendanaan\b/, /\bnet cash (?:used in|from) financing activities\b/] },
   { requirementId: "FX_EFFECT_CASH_REPORTED", statement: "CASH_FLOW", aliases: [/\bperbedaan nilai tukar neto\b/, /\bnet foreign exchange difference\b/] },
 ];
 
@@ -75,10 +64,7 @@ function layoutRows(page: P0AIndexedPage): LayoutRow[] {
   const grouped: Array<{ y: number; tokens: P0APageToken[] }> = [];
   for (const token of page.tokens) {
     let group = grouped.find((candidate) => Math.abs(candidate.y - token.y) <= 1.75);
-    if (!group) {
-      group = { y: token.y, tokens: [] };
-      grouped.push(group);
-    }
+    if (!group) { group = { y: token.y, tokens: [] }; grouped.push(group); }
     group.tokens.push(token);
   }
   return grouped.sort((left, right) => right.y - left.y).map((group, rowIndex) => {
@@ -93,16 +79,15 @@ function isNumericPiece(text: string): boolean {
 }
 
 function numericRuns(row: LayoutRow): NumericRun[] {
-  const candidates: P0APageToken[][] = [];
+  const groups: P0APageToken[][] = [];
   for (const token of row.tokens) {
     if (!isNumericPiece(token.text)) continue;
-    const last = candidates.at(-1);
+    const last = groups.at(-1);
     const previous = last?.at(-1);
     const gap = previous ? token.x - (previous.x + previous.width) : Number.POSITIVE_INFINITY;
-    if (last && gap <= 9) last.push(token);
-    else candidates.push([token]);
+    if (last && gap <= 9) last.push(token); else groups.push([token]);
   }
-  return candidates.flatMap((tokens) => {
+  return groups.flatMap((tokens) => {
     const raw = tokens.map((token) => token.text).join(" ").trim();
     const parsed = parseFinancialDecimal(raw);
     if (!parsed) return [];
@@ -141,11 +126,11 @@ function selectCurrentRun(row: LayoutRow, columns: PeriodColumns): NumericRun | 
 
 function labelForRow(row: LayoutRow, columns: PeriodColumns): string {
   const distance = Math.abs(columns.comparativeCenter - columns.currentCenter);
-  const tableLeft = Math.min(columns.currentCenter, columns.comparativeCenter) - distance * 0.72;
-  const tableRight = Math.max(columns.currentCenter, columns.comparativeCenter) + distance * 0.72;
+  const left = Math.min(columns.currentCenter, columns.comparativeCenter) - distance * 0.72;
+  const right = Math.max(columns.currentCenter, columns.comparativeCenter) + distance * 0.72;
   return row.tokens.filter((token) => {
     const center = token.x + token.width / 2;
-    return center < tableLeft || center > tableRight || !isNumericPiece(token.text);
+    return center < left || center > right || !isNumericPiece(token.text);
   }).map((token) => token.text).join(" ").replace(/\s+/g, " ").trim();
 }
 
@@ -206,16 +191,7 @@ function metadata(input: { requirementId: string; page: P0AIndexedPage; context:
 
 function evidenceForLogical(requirementId: string, page: P0AIndexedPage, row: LogicalRow): P0AEvidence {
   return {
-    ...createEvidence({
-      requirementId,
-      page,
-      statement: P0A_REQUIREMENT_BY_ID.get(requirementId)?.statementType ?? "OTHER",
-      table: null,
-      rowLabel: row.label,
-      columnLabel: row.columns.currentOnLeft ? "CURRENT_PERIOD_LEFT_COLUMN" : "CURRENT_PERIOD_RIGHT_COLUMN",
-      rawValue: row.current.raw,
-      snippet: sourceSnippet(page, [row.current.raw, row.label]),
-    }),
+    ...createEvidence({ requirementId, page, statement: P0A_REQUIREMENT_BY_ID.get(requirementId)?.statementType ?? "OTHER", table: null, rowLabel: row.label, columnLabel: row.columns.currentOnLeft ? "CURRENT_PERIOD_LEFT_COLUMN" : "CURRENT_PERIOD_RIGHT_COLUMN", rawValue: row.current.raw, snippet: sourceSnippet(page, [row.current.raw, row.label]) }),
     rowIndex: row.row.rowIndex,
     columnIndex: row.columns.currentOnLeft ? 0 : 1,
   };
@@ -250,29 +226,19 @@ function resolve(requirementId: string, candidates: readonly P0ANativeObservatio
   return [{ ...first, state: "CONFLICT", decimalValue: null, rawValue: candidates.map((candidate) => candidate.rawValue).join(" | "), evidence: candidates.flatMap((candidate) => candidate.evidence) }];
 }
 
+function simpleEvidence(input: { requirementId: string; page: P0AIndexedPage; row: LayoutRow; rawValue: string; columnLabel: string }): P0AEvidence {
+  return {
+    ...createEvidence({ requirementId: input.requirementId, page: input.page, statement: P0A_REQUIREMENT_BY_ID.get(input.requirementId)?.statementType ?? "OTHER", table: null, rowLabel: input.row.text, columnLabel: input.columnLabel, rawValue: input.rawValue, snippet: sourceSnippet(input.page, [input.rawValue, input.row.text]) }),
+    rowIndex: input.row.rowIndex,
+  };
+}
+
 function precedingYear(rows: readonly LayoutRow[], rowIndex: number): string | null {
   for (let index = rowIndex - 1; index >= 0; index -= 1) {
     const years = rows[index].text.match(/\b(?:19|20)\d{2}\b/g);
     if (years?.length) return years[0];
   }
   return null;
-}
-
-function simpleEvidence(input: { requirementId: string; page: P0AIndexedPage; row: LayoutRow; rawValue: string; columnLabel: string }): P0AEvidence {
-  return {
-    ...createEvidence({
-      requirementId: input.requirementId,
-      page: input.page,
-      statement: P0A_REQUIREMENT_BY_ID.get(input.requirementId)?.statementType ?? "OTHER",
-      table: null,
-      rowLabel: input.row.text,
-      columnLabel: input.columnLabel,
-      rawValue: input.rawValue,
-      snippet: sourceSnippet(input.page, [input.rawValue, input.row.text]),
-    }),
-    rowIndex: input.row.rowIndex,
-    columnIndex: null,
-  };
 }
 
 function weightedAverageShares(page: P0ARoutedPage, context: P0AIssuerContext): P0ANativeObservation | null {
@@ -282,11 +248,9 @@ function weightedAverageShares(page: P0ARoutedPage, context: P0AIssuerContext): 
   for (const [index, row] of rows.entries()) {
     if (!/\b(?:laba per saham dasar|basic earnings per share)\b/.test(row.normalized)) continue;
     if (precedingYear(rows, index) !== currentYear) continue;
-    const runs = numericRuns(row);
-    if (runs.length < 2) continue;
-    const shareRuns = runs.filter((run) => new Prisma.Decimal(run.decimal).abs().greaterThanOrEqualTo("1000000"));
-    if (!shareRuns.length) continue;
-    const selected = [...shareRuns].sort((a, b) => new Prisma.Decimal(b.decimal).abs().comparedTo(new Prisma.Decimal(a.decimal).abs()))[0];
+    const runs = numericRuns(row).filter((run) => new Prisma.Decimal(run.decimal).abs().greaterThanOrEqualTo("1000000"));
+    if (!runs.length) continue;
+    const selected = [...runs].sort((a, b) => new Prisma.Decimal(b.decimal).abs().comparedTo(new Prisma.Decimal(a.decimal).abs()))[0];
     return {
       requirementId: "WEIGHTED_AVG_SHARES_REPORTED", origin: "REPORTED", state: selected.decimal === "0" ? "ZERO" : "VALUE",
       decimalValue: selected.decimal, rawValue: selected.raw, currency: "SHARES", unitType: "SHARES", scale: "1",
@@ -299,13 +263,10 @@ function weightedAverageShares(page: P0ARoutedPage, context: P0AIssuerContext): 
 
 function treasuryShares(page: P0ARoutedPage, context: P0AIssuerContext): P0ANativeObservation | null {
   if (page.statementType !== "NOTE") return null;
-  const rows = layoutRows(page);
   const candidates: Array<{ row: LayoutRow; run: NumericRun }> = [];
-  for (const row of rows) {
+  for (const row of layoutRows(page)) {
     if (!/\b(?:saham treasuri|treasury (?:shares|stock))\b/.test(row.normalized)) continue;
-    for (const run of numericRuns(row)) {
-      if (new Prisma.Decimal(run.decimal).abs().greaterThanOrEqualTo("1000000")) candidates.push({ row, run });
-    }
+    for (const run of numericRuns(row)) if (new Prisma.Decimal(run.decimal).abs().greaterThanOrEqualTo("1000000")) candidates.push({ row, run });
   }
   if (!candidates.length) return null;
   const selected = candidates.sort((a, b) => new Prisma.Decimal(b.run.decimal).abs().comparedTo(new Prisma.Decimal(a.run.decimal).abs()))[0];
@@ -321,15 +282,44 @@ function dilutedNotApplicable(page: P0ARoutedPage, context: P0AIssuerContext): P
   if (page.statementType !== "NOTE") return null;
   const match = page.text.match(/(?:tidak\s+(?:menghitung|menyajikan)[\s\S]{0,280}?laba per saham dilusian[\s\S]{0,280}?(?:tidak terdapat|tidak mempunyai)[\s\S]{0,180}?(?:berpotensi dilutif|potensial dilutif)|did not calculate diluted earnings per share[\s\S]{0,280}?no potentially dilutive ordinary shares)/i);
   if (!match) return null;
-  const evidence = createEvidence({
-    requirementId: "EPS_DILUTED_REPORTED", page, statement: "INCOME_STATEMENT", table: null,
-    rowLabel: "Diluted earnings per share applicability", columnLabel: context.periodEnd,
-    rawValue: match[0], snippet: sourceSnippet(page, [match[0]]),
-  });
+  const evidence = createEvidence({ requirementId: "EPS_DILUTED_REPORTED", page, statement: "INCOME_STATEMENT", table: null, rowLabel: "Diluted earnings per share applicability", columnLabel: context.periodEnd, rawValue: match[0], snippet: sourceSnippet(page, [match[0]]) });
   return {
-    requirementId: "EPS_DILUTED_REPORTED", origin: "REPORTED", state: "NOT_APPLICABLE", decimalValue: null,
-    rawValue: match[0], currency: `${context.currency}_PER_SHARE`, unitType: "PER_SHARE", scale: "1", evidence: [evidence],
+    requirementId: "EPS_DILUTED_REPORTED", origin: "REPORTED", state: "NOT_APPLICABLE", decimalValue: null, rawValue: match[0],
+    currency: `${context.currency}_PER_SHARE`, unitType: "PER_SHARE", scale: "1", evidence: [evidence],
     ...metadata({ requirementId: "EPS_DILUTED_REPORTED", page, context, statement: "NOTE", rawLabel: match[0], mappingConfidence: 1 }),
+  };
+}
+
+function debtAlternative(page: P0ARoutedPage, context: P0AIssuerContext, requirementId: "SHORT_TERM_DEBT_REPORTED" | "LONG_TERM_DEBT_REPORTED"): P0ANativeObservation | null {
+  if (page.statementType !== "BALANCE_SHEET") return null;
+  const selected: LogicalRow[] = [];
+  let currentMaturityBlock = false;
+  let nonCurrentBlock = false;
+  for (const row of logicalRows(page, context)) {
+    const label = row.normalizedLabel;
+    if (/\b(?:current maturities of long term|jatuh tempo dalam satu tahun)\b/.test(label)) currentMaturityBlock = true;
+    if (/\b(?:long term liabilities net of current maturities|liabilitas jangka panjang setelah dikurangi)\b/.test(label)) nonCurrentBlock = true;
+    if (/\b(?:lease liabilities|liabilitas sewa)\b/.test(label)) continue;
+    if (/\b(?:total current liabilities|jumlah liabilitas jangka pendek)\b/.test(label)) currentMaturityBlock = false;
+    if (/\b(?:total non current liabilities|jumlah liabilitas jangka panjang)\b/.test(label)) nonCurrentBlock = false;
+    if (requirementId === "SHORT_TERM_DEBT_REPORTED") {
+      const shortStandalone = /\b(?:short term bank loans?|pinjaman bank jangka pendek)\b/.test(label);
+      const currentDebtChild = currentMaturityBlock && /\b(?:bank loans?|pinjaman bank|non bank financial|instansi keuangan non bank|bonds?|obligasi)\b/.test(label);
+      if (shortStandalone || currentDebtChild) selected.push(row);
+    } else {
+      const nonCurrentDebtChild = nonCurrentBlock && /\b(?:bank loans?|pinjaman bank|non bank financial|instansi keuangan non bank|bonds?|obligasi)\b/.test(label);
+      if (nonCurrentDebtChild) selected.push(row);
+    }
+  }
+  if (!selected.length) return null;
+  const total = selected.reduce((sum, row) => sum.plus(new Prisma.Decimal(row.current.decimal)), new Prisma.Decimal(0));
+  const requirement = P0A_REQUIREMENT_BY_ID.get(requirementId)!;
+  return {
+    requirementId, origin: "STANDARDIZED_AGGREGATE", state: total.isZero() ? "ZERO" : "VALUE", decimalValue: total.toFixed(),
+    rawValue: selected.map((row) => row.current.raw).join(" + "), currency: context.currency, unitType: requirement.unitType,
+    scale: documentScale(page, context), evidence: selected.map((row) => evidenceForLogical(requirementId, page, row)),
+    sourceFactIds: selected.map((row) => `${page.pageNumber}:${row.row.rowIndex}`),
+    ...metadata({ requirementId, page, context, statement: "BALANCE_SHEET", rawLabel: selected.map((row) => row.label).join(" | "), mappingConfidence: 0.97 }),
   };
 }
 
@@ -337,13 +327,11 @@ function unsafeBaseObservation(observation: P0ANativeObservation): boolean {
   const label = normalize(observation.rawLabel ?? observation.rawValue ?? "");
   if (observation.requirementId === "NET_CHANGE_CASH_REPORTED" && /\b(?:continuing|discontinued) operations?\b|\boperasi yang (?:dilanjutkan|dihentikan)\b/.test(label)) return true;
   if (["NET_PROFIT_REPORTED", "NET_PROFIT_PARENT_REPORTED", "EPS_BASIC_REPORTED"].includes(observation.requirementId) && observation.state === "CONFLICT") return true;
+  if (["SHORT_TERM_DEBT_REPORTED", "LONG_TERM_DEBT_REPORTED"].includes(observation.requirementId) && observation.origin === "STANDARDIZED_AGGREGATE") return true;
   return false;
 }
 
-/**
- * Phase 5 composite extractor. The frozen extractor remains the first attempt.
- * Generic supplements are used only for requirements not safely resolved by it.
- */
+/** Frozen extractor first, then issuer-agnostic cross-presentation supplements. */
 export function createCrossIssuerNativeExtractor(input: { routedPages: readonly P0ARoutedPage[]; context: P0AIssuerContext }) {
   const base = createNativeFinancialExtractor(input);
   const routedByNumber = new Map(input.routedPages.map((page) => [page.pageNumber, page]));
@@ -361,23 +349,22 @@ export function createCrossIssuerNativeExtractor(input: { routedPages: readonly 
       }
     }
 
-    if (task.requirementIds.includes("WEIGHTED_AVG_SHARES_REPORTED") && !safelyResolved.has("WEIGHTED_AVG_SHARES_REPORTED")) {
+    for (const requirementId of ["SHORT_TERM_DEBT_REPORTED", "LONG_TERM_DEBT_REPORTED"] as const) {
+      if (!task.requirementIds.includes(requirementId) || safelyResolved.has(requirementId)) continue;
       for (const page of selected) {
-        const observation = weightedAverageShares(page, input.context);
-        if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]);
+        const observation = debtAlternative(page, input.context, requirementId);
+        if (observation) candidates.set(requirementId, [...(candidates.get(requirementId) ?? []), observation]);
       }
+    }
+
+    if (task.requirementIds.includes("WEIGHTED_AVG_SHARES_REPORTED") && !safelyResolved.has("WEIGHTED_AVG_SHARES_REPORTED")) {
+      for (const page of selected) { const observation = weightedAverageShares(page, input.context); if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]); }
     }
     if (task.requirementIds.includes("TREASURY_SHARES_REPORTED") && !safelyResolved.has("TREASURY_SHARES_REPORTED")) {
-      for (const page of selected) {
-        const observation = treasuryShares(page, input.context);
-        if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]);
-      }
+      for (const page of selected) { const observation = treasuryShares(page, input.context); if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]); }
     }
     if (task.requirementIds.includes("EPS_DILUTED_REPORTED") && !safelyResolved.has("EPS_DILUTED_REPORTED")) {
-      for (const page of selected) {
-        const observation = dilutedNotApplicable(page, input.context);
-        if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]);
-      }
+      for (const page of selected) { const observation = dilutedNotApplicable(page, input.context); if (observation) candidates.set(observation.requirementId, [...(candidates.get(observation.requirementId) ?? []), observation]); }
     }
 
     const supplements = [...candidates.entries()].flatMap(([requirementId, values]) => resolve(requirementId, values));
