@@ -33,7 +33,10 @@ jobs:
       - name: Download exact official ICBP H1 2025 source
         run: |
           mkdir -p .phase5-source
-          curl --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf \
+          # Indofood's server currently presents an incomplete TLS chain to the
+          # hosted runner. Transport verification is therefore bypassed here,
+          # but content identity remains fail-closed on the frozen SHA-256 below.
+          curl --insecure --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf \
             https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf
           echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  .phase5-source/ICBP_billingual_30Jun25.pdf" | sha256sum --check --strict
 
