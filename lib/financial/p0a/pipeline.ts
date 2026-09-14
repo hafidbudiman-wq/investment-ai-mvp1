@@ -6,6 +6,7 @@ import { detectP0AGaps, resolvedReportedIds } from "@/lib/financial/p0a/gap-dete
 import { zeroAiShadowUsage } from "@/lib/financial/p0a/metering";
 import type { P0AExtractor } from "@/lib/financial/p0a/mock-extractor";
 import { createLocalPageIndex } from "@/lib/financial/p0a/page-index";
+import { ocrCompatiblePages, planOcrCompatibilityPages, type P0AOcrCompatibilityUsage, type P0AOcrRuntime } from "@/lib/financial/p0a/ocr-compatibility";
 import { routePages } from "@/lib/financial/p0a/page-router";
 import { createPhase5FinalNativeExtractor } from "@/lib/financial/p0a/phase5-final-extractor";
 import type { P0AIndexedPage, P0AIssuerContext, P0AObservation, P0APlanTask, P0AProviderUsage, P0ARequirementOutcome, P0ARoutedPage } from "@/lib/financial/p0a/types";
@@ -27,6 +28,8 @@ export type P0APipelineResult = {
   realProviderExtractionPassed: false;
   pageIndexCacheHit: boolean;
 };
+
+export type P0ACompatiblePipelineResult = P0APipelineResult & { ocrUsage: P0AOcrCompatibilityUsage };
 
 function attempted(tasks: readonly P0APlanTask[]) {
   const routes = new Map<string, P0APlanTask["route"][]>();
@@ -86,9 +89,60 @@ export async function runP0ANativePipeline(input: { bytes: Buffer; context: P0AI
     indexedPages: index,
     extractor: createPhase5FinalNativeExtractor({ routedPages, context: input.context }),
   });
+  return { ...result, usage: { ...result.usage, processingLatencyMs: Date.now() - started }, pageIndexCacheHit };
+}
+
+function runtimeFromCachedPage(page: P0AIndexedPage): P0AOcrRuntime | null {
+  const metadata = page.sourceMetadata;
+  if (!metadata) return null;
   return {
-    ...result,
-    usage: { ...result.usage, processingLatencyMs: Date.now() - started },
-    pageIndexCacheHit,
+    engine: metadata.engine,
+    engineVersion: metadata.engineVersion,
+    renderer: metadata.renderer,
+    rendererVersion: metadata.rendererVersion,
+    language: metadata.language,
+    pageSegmentationMode: metadata.pageSegmentationMode,
+    renderDpi: metadata.renderDpi,
   };
+}
+
+function zeroOcrUsage(reused: readonly P0AIndexedPage[] = []): P0AOcrCompatibilityUsage {
+  const reusedPages = reused.filter((page) => page.sourceType === "OCR");
+  return {
+    runtime: reusedPages.map(runtimeFromCachedPage).find((runtime): runtime is P0AOcrRuntime => runtime !== null) ?? null,
+    candidatePages: [], candidateReasons: [], ocrPages: [],
+    reusedOcrPages: reusedPages.map((page) => page.pageNumber).sort((a, b) => a - b),
+    rejectedPages: [], executionCount: 0,
+  };
+}
+
+/** Native-first compatibility entry point. OCR only substitutes eligible page input. */
+export async function runP0ACompatiblePipeline(input: { bytes: Buffer; context: P0AIssuerContext; indexedPages?: P0AIndexedPage[] }): Promise<P0ACompatiblePipelineResult> {
+  const index = input.indexedPages ?? await createLocalPageIndex(input.bytes);
+  if (index.some((page) => page.sourceType === "OCR")) {
+    const result = await runP0ANativePipeline({ ...input, indexedPages: index });
+    return { ...result, ocrUsage: zeroOcrUsage(index) };
+  }
+
+  const native = await runP0ANativePipeline({ ...input, indexedPages: index });
+  const unresolved = native.outcomes
+    .filter((outcome) => outcome.state === "MISSING" || outcome.state === "CONFLICT")
+    .map((outcome) => outcome.requirementId);
+  const decisions = planOcrCompatibilityPages(index, native.routedPages, unresolved);
+  if (!decisions.length) return { ...native, ocrUsage: zeroOcrUsage() };
+
+  const ocr = await ocrCompatiblePages({ bytes: input.bytes, index, decisions });
+  const ocrPages = ocr.pages.filter((page) => page.sourceType === "OCR").map((page) => page.pageNumber).sort((a, b) => a - b);
+  const usage: P0AOcrCompatibilityUsage = {
+    runtime: ocr.runtime,
+    candidatePages: decisions.map((decision) => decision.pageNumber),
+    candidateReasons: [...decisions],
+    ocrPages,
+    reusedOcrPages: [],
+    rejectedPages: ocr.rejectedPages,
+    executionCount: decisions.length,
+  };
+  if (!ocrPages.length) return { ...native, ocrUsage: usage };
+  const compatible = await runP0ANativePipeline({ ...input, indexedPages: ocr.pages });
+  return { ...compatible, ocrUsage: usage };
 }
