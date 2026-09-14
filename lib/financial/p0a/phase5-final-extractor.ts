@@ -86,7 +86,8 @@ function firstNumberAfter(input: {
       const parsed = parseFinancialDecimal(numeric[0]);
       if (!parsed) continue;
       if (input.minAbs && new Prisma.Decimal(parsed.decimal).abs().lessThan(input.minAbs)) continue;
-      return observation({ requirementId: input.requirementId, page: input.page, context: input.context, statement: input.statement, rowLabel: match[0].replace(/\s+/g, " ").trim(), rawValue: numeric[0], decimalValue: parsed.decimal, start: match.index, end: afterStart + numeric.index + numeric[0].length });
+      const rowLabel = input.page.text.slice(match.index, afterStart + numeric.index).replace(/\s+/g, " ").trim();
+      return observation({ requirementId: input.requirementId, page: input.page, context: input.context, statement: input.statement, rowLabel, rawValue: numeric[0], decimalValue: parsed.decimal, start: match.index, end: afterStart + numeric.index + numeric[0].length });
     }
   }
   return null;
