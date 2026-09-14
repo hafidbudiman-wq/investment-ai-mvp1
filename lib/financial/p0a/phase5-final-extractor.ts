@@ -59,7 +59,11 @@ function observation(input: {
   };
 }
 
-const FINANCIAL_NUMBER = /\(\s*\d[\d.,]*(?:\s+\d{3})*\s*\)|[-−–—]\s*\d[\d.,]*(?:\s+\d{3})*|\d[\d.,]*(?:\s+\d{3})*/g;
+// A financial token must stop before the next whitespace-delimited column.
+// OCR table rows often place the comparative-period value immediately after
+// the current-period value; allowing arbitrary spaced 3-digit groups would
+// merge two columns into one synthetic number.
+const FINANCIAL_NUMBER = /\(\s*\d[\d.,]*\s*\)|[-−–—]\s*\d[\d.,]*|\d[\d.,]*/g;
 
 function firstNumberAfter(input: {
   requirementId: string;
@@ -139,7 +143,6 @@ function reportedFallbacks(page: P0ARoutedPage, context: P0AIssuerContext): P0AN
   if (page.statementType === "INCOME_STATEMENT") {
     output.push(firstNumberAfter({ requirementId: "TAX_EXPENSE_REPORTED", page, context, statement: "INCOME_STATEMENT", minAbs: "1000", anchors: [/beban\s+pajak\s+penghasilan\s*-?\s*neto/i, /income\s+tax\s+expense\s*-?\s*net/i] }));
     output.push(firstNumberAfter({ requirementId: "NET_PROFIT_REPORTED", page, context, statement: "INCOME_STATEMENT", minAbs: "1000", anchors: [/laba\s+neto\s+untuk\s+tahun\s+berjalan/i, /net\s+profit\s+for\s+the\s+year/i, /profit\s+for\s+the\s+year/i] }));
-    output.push(firstNumberAfter({ requirementId: "EQUITY_PARENT_REPORTED", page, context, statement: "BALANCE_SHEET", minAbs: "1000", anchors: [] }));
     output.push(combinedEps(page, context, "EPS_BASIC_REPORTED"), combinedEps(page, context, "EPS_DILUTED_REPORTED"));
   }
   if (page.statementType === "BALANCE_SHEET") {
