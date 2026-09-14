@@ -58,7 +58,10 @@ jobs:
           mkdir -p .phase5-source artifacts/phase5
           curl --http1.1 --fail --location --retry 3 --output .phase5-source/DRMA_Q4_2025.pdf 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
           echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  .phase5-source/DRMA_Q4_2025.pdf" | sha256sum --check --strict
-          curl --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          # Indofood's host presents an incomplete TLS chain to GitHub-hosted runners.
+          # Transport verification is bypassed only for this download; the frozen
+          # content SHA-256 below remains the fail-closed source identity gate.
+          curl --insecure --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
           echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  .phase5-source/ICBP_billingual_30Jun25.pdf" | sha256sum --check --strict
           curl --http1.1 --fail --location --retry 3 --output .phase5-source/MEDC_1H25.pdf 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
           echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  .phase5-source/MEDC_1H25.pdf" | sha256sum --check --strict
