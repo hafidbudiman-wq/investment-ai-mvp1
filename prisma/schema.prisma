@@ -81,23 +81,25 @@ enum ExtractionChunkType {
 }
 
 model Company {
-  id                 String                  @id @default(cuid())
-  ticker             String                  @unique
-  name               String
-  sector             String?
-  subsector          String?
-  country            String                  @default("ID")
-  ipoYear            Int?
-  currency           String                  @default("IDR")
-  fiscalYearEnd      Int                     @default(12)
-  isActive           Boolean                 @default(true)
-  reports            FinancialReport[]
-  extractionRuns     ExtractionRun[]
-  canonicalMappings  CompanyAccountMapping[]
-  p0aReportRevisions P0AReportRevision[]
-  p0aFactAssertions  P0AFactAssertion[]
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  id                   String                  @id @default(cuid())
+  ticker               String                  @unique
+  name                 String
+  sector               String?
+  subsector            String?
+  country              String                  @default("ID")
+  ipoYear              Int?
+  currency             String                  @default("IDR")
+  fiscalYearEnd        Int                     @default(12)
+  isActive             Boolean                 @default(true)
+  reports              FinancialReport[]
+  extractionRuns       ExtractionRun[]
+  canonicalMappings    CompanyAccountMapping[]
+  p0aReportRevisions   P0AReportRevision[]
+  p0aFactAssertions    P0AFactAssertion[]
+  p0bExtractionRuns    P0BExtractionRun[]
+  derivedMetricResults DerivedMetricResult[]
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
 }
 
 model FinancialReport {
@@ -488,6 +490,7 @@ model FinancialDocument {
   p0aPasses          P0AExtractionPass[]
   p0aReportRevisions P0AReportRevision[]
   p0aEvidence        P0AFactEvidence[]
+  p0bExtractionRuns  P0BExtractionRun[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -707,25 +710,26 @@ model P0ARequirementOutcome {
 }
 
 model P0AReportRevision {
-  id             String             @id @default(cuid())
-  companyId      String
-  company        Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  documentId     String
-  document       FinancialDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  passId         String             @unique
-  pass           P0AExtractionPass  @relation(fields: [passId], references: [id], onDelete: Cascade)
-  contextHash    String
-  periodStart    DateTime
-  periodEnd      DateTime
-  periodType     String
-  currency       String
-  documentScale  Decimal            @db.Decimal(38, 6)
-  consolidated   Boolean?
-  audited        Boolean?
-  status         String             @default("SHADOW")
-  factAssertions P0AFactAssertion[]
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  id                String             @id @default(cuid())
+  companyId         String
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId        String
+  document          FinancialDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  passId            String             @unique
+  pass              P0AExtractionPass  @relation(fields: [passId], references: [id], onDelete: Cascade)
+  contextHash       String
+  periodStart       DateTime
+  periodEnd         DateTime
+  periodType        String
+  currency          String
+  documentScale     Decimal            @db.Decimal(38, 6)
+  consolidated      Boolean?
+  audited           Boolean?
+  status            String             @default("SHADOW")
+  factAssertions    P0AFactAssertion[]
+  p0bExtractionRuns P0BExtractionRun[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@index([companyId, periodEnd])
   @@index([documentId])
@@ -782,6 +786,8 @@ model P0AFactAssertion {
   status            String                     @default("SHADOW")
   evidence          P0AFactAssertionEvidence[]
   outcome           P0ARequirementOutcome?
+  p0bOutcome        P0BRequirementOutcome?
+  derivedInputs     DerivedMetricInput[]
   createdAt         DateTime                   @default(now())
   updatedAt         DateTime                   @updatedAt
 
@@ -799,4 +805,123 @@ model P0AFactAssertionEvidence {
   @@id([assertionId, evidenceId])
   @@unique([assertionId, ordinal])
   @@index([evidenceId])
+}
+
+model P0BExtractionRun {
+  id                     String                  @id @default(cuid())
+  companyId              String
+  company                Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId             String
+  document               FinancialDocument       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportRevisionId       String
+  reportRevision         P0AReportRevision       @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  manifestVersion        String
+  extractorVersion       String
+  formulaRegistryVersion String
+  completeIdentityHash   String                  @unique
+  status                 String
+  providerCalls          Int                     @default(0)
+  inputTokens            Int                     @default(0)
+  outputTokens           Int                     @default(0)
+  estimatedCostUsd       Decimal                 @default(0) @db.Decimal(18, 8)
+  outcomes               P0BRequirementOutcome[]
+  derivedResults         DerivedMetricResult[]
+  completedAt            DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  @@index([documentId, status])
+  @@index([reportRevisionId])
+}
+
+model P0BRequirementOutcome {
+  id                  String               @id @default(cuid())
+  runId               String
+  run                 P0BExtractionRun     @relation(fields: [runId], references: [id], onDelete: Cascade)
+  requirementId       String
+  family              String
+  applicability       String
+  state               String
+  reason              String
+  extractionOrigin    String?
+  reportedAssertionId String?              @unique
+  reportedAssertion   P0AFactAssertion?    @relation(fields: [reportedAssertionId], references: [id], onDelete: SetNull)
+  derivedResultId     String?              @unique
+  derivedResult       DerivedMetricResult? @relation(fields: [derivedResultId], references: [id], onDelete: SetNull)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@unique([runId, requirementId])
+  @@index([runId, state])
+}
+
+model DerivedMetricDefinition {
+  id                 String                @id @default(cuid())
+  code               String
+  formulaVersion     String
+  expression         String
+  namedInputs        Json
+  inclusionRules     Json
+  exclusionRules     Json
+  compatibilityRules Json
+  outputUnit         String
+  active             Boolean               @default(true)
+  results            DerivedMetricResult[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@unique([code, formulaVersion])
+}
+
+model DerivedMetricResult {
+  id                     String                  @id @default(cuid())
+  definitionId           String
+  definition             DerivedMetricDefinition @relation(fields: [definitionId], references: [id])
+  runId                  String
+  run                    P0BExtractionRun        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  companyId              String
+  company                Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  periodStart            DateTime
+  periodEnd              DateTime
+  periodType             String
+  consolidationScope     String
+  currency               String
+  unitType               String
+  scale                  Decimal                 @db.Decimal(38, 6)
+  decimalValue           Decimal                 @db.Decimal(38, 6)
+  calculationTimestamp   DateTime
+  calculationRunIdentity String
+  engine                 String
+  engineVersion          String
+  validationStatus       String
+  resultHash             String                  @unique
+  inputs                 DerivedMetricInput[]    @relation("ResultInputs")
+  downstreamInputs       DerivedMetricInput[]    @relation("UpstreamDerivedResult")
+  outcome                P0BRequirementOutcome?
+  createdAt              DateTime                @default(now())
+
+  @@unique([runId, definitionId])
+  @@index([companyId, periodEnd])
+}
+
+model DerivedMetricInput {
+  resultId              String
+  result                DerivedMetricResult  @relation("ResultInputs", fields: [resultId], references: [id], onDelete: Cascade)
+  ordinal               Int
+  inputRole             String
+  inputIdentity         String
+  inputAssertionId      String?
+  inputAssertion        P0AFactAssertion?    @relation(fields: [inputAssertionId], references: [id], onDelete: Restrict)
+  inputResultId         String?
+  inputResult           DerivedMetricResult? @relation("UpstreamDerivedResult", fields: [inputResultId], references: [id], onDelete: Restrict)
+  inputValue            Decimal              @db.Decimal(38, 6)
+  inputExtractionOrigin String?
+  inputEvidenceHashes   Json
+  revisionContextHash   String
+  createdAt             DateTime             @default(now())
+
+  @@id([resultId, ordinal])
+  @@index([inputAssertionId])
+  @@index([inputResultId])
+  @@index([inputIdentity])
 }

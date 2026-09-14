@@ -1,0 +1,347 @@
+{
+  "artifactVersion": "INVESTAI_PHASE6A_CROSS_ISSUER_MATRIX_V1",
+  "matrix": [
+    {
+      "requirement": "SHARES_OUTSTANDING_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "MISSING",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+      },
+      "MEDC": {
+        "state": "MISSING",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+      },
+      "DRMA": {
+        "state": "MISSING",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+      }
+    },
+    {
+      "requirement": "TOTAL_DEBT_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "TOTAL_DEBT_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "LEASE_LIABILITIES_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "LEASE_LIABILITIES_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "SGA_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "SGA_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "INPUT_MISSING",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "EBITDA_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "EBITDA_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "NOT_CALCULABLE",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "CONTRACT_FORMULA_UNDEFINED: Canonical Data Contract v1.0 FINAL does not define an unambiguous calculation formula."
+      },
+      "MEDC": {
+        "state": "NOT_CALCULABLE",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "CONTRACT_FORMULA_UNDEFINED: Canonical Data Contract v1.0 FINAL does not define an unambiguous calculation formula."
+      },
+      "DRMA": {
+        "state": "NOT_CALCULABLE",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "CONTRACT_FORMULA_UNDEFINED: Canonical Data Contract v1.0 FINAL does not define an unambiguous calculation formula."
+      }
+    },
+    {
+      "requirement": "INTEREST_EXPENSE_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "RESTRICTED_CASH_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "OCI_TOTAL_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "MISSING",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "CAPEX_PPE_CASH_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "CAPEX_INTANGIBLE_CASH_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "CAPEX_TOTAL_CASH_REPORTED",
+      "family": "REPORTED",
+      "ICBP": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "MEDC": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      },
+      "DRMA": {
+        "state": "NOT_DISCLOSED",
+        "evidenceAvailable": false,
+        "reasonIfUnavailable": "No explicit issuer-reported scalar was found; absence is not zero."
+      }
+    },
+    {
+      "requirement": "CAPEX_TOTAL_CASH_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    },
+    {
+      "requirement": "FCF_CALCULATED",
+      "family": "CALCULATED",
+      "ICBP": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "MEDC": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      },
+      "DRMA": {
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
+      }
+    }
+  ]
+}

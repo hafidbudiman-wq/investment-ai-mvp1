@@ -1,0 +1,1281 @@
+{
+  "artifactVersion": "INVESTAI_PHASE6A_P0B_CORE_V1",
+  "source": {
+    "fileName": "ICBP_billingual_30Jun25.pdf",
+    "sha256": "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089"
+  },
+  "passIdentity": {
+    "runIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+    "manifestVersion": "investai-canonical-v1.0-final:p0-b-phase6a",
+    "extractorVersion": "p0b-phase6a-deterministic-v1",
+    "formulaRegistryVersion": "p0b-phase6a-formulas-v1",
+    "p0aVersions": {
+      "contract": "investai-canonical-v1.0-final:p0-a",
+      "parser": "p0a-page-index-v2-native-ocr-compatible",
+      "router": "p0a-page-router-v11-integer-eps-compatible",
+      "applicability": "p0a-applicability-v1",
+      "planner": "p0a-fact-planner-v2-route-metadata",
+      "gapDetector": "p0a-gap-detector-v1",
+      "validation": "p0a-validation-v1",
+      "mapping": "p0a-native-financial-mapping-v5-ocr-presentation-variants",
+      "scopedPrompt": "p0a-scoped-openai-prompt-v1"
+    },
+    "p0aOutcomeFingerprint": "efc9fa53bb0c7ecad341d476e4372654a7ec9818d17ee5753f68ebdfd0fd04e1"
+  },
+  "periodScope": {
+    "ticker": "ICBP",
+    "issuerType": "LISTED_COMMON_EQUITY",
+    "accountingModel": "NON_FINANCIAL",
+    "consolidated": true,
+    "audited": false,
+    "periodStart": "2025-01-01",
+    "periodEnd": "2025-06-30",
+    "periodType": "H1",
+    "currency": "IDR",
+    "documentScale": "1000000"
+  },
+  "routing": {
+    "p0aSelectedPages": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      86,
+      88
+    ],
+    "phase6aEvidencePages": [
+      5,
+      7,
+      10
+    ]
+  },
+  "ocr": {
+    "pages": [],
+    "reusedOnSecondEvaluation": [],
+    "wholeDocumentOcr": false
+  },
+  "requirements": [
+    {
+      "requirementId": "SHARES_OUTSTANDING_REPORTED",
+      "canonicalCode": "SHARES_OUTSTANDING_REPORTED",
+      "family": "REPORTED",
+      "applicability": "EXPECTED",
+      "state": "MISSING",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "SHARES",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "Applicable expected fact was not resolved after deterministic primary/note search.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "TOTAL_DEBT_REPORTED",
+      "canonicalCode": "TOTAL_DEBT_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "TOTAL_DEBT_CALCULATED",
+      "canonicalCode": "TOTAL_DEBT_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "DEBT_SHORT_BANK_DIRECT",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts",
+          "columnLabel": "2025-06-30",
+          "rawValue": "287.819",
+          "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan ",
+          "snippetHash": "86ca2f8d6b2100b117819f58026273f45ec1d842c581b49dcd63a435a8adb856",
+          "evidenceHash": "4097148edf2b13197c63434f8420cdc83a5f0ab2da68cd2d97544dc67c4ed976",
+          "locatorHash": "cabee0049707894ec16252f1d430a822866a21adeb9243a806c2603aebc2d38f"
+        },
+        {
+          "requirementId": "DEBT_CURRENT_MATURITY_BANK",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank",
+          "columnLabel": "2025-06-30",
+          "rawValue": "333.397",
+          "snippet": "bilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setel",
+          "snippetHash": "d0ba2f503409a0e1b37b9cb8382cf1f6b7aacf8ff230af3570d279075f279c68",
+          "evidenceHash": "015356216dbcc8e5719fb09b76af89afe63b96c368d1a82de7c6289341baa71a",
+          "locatorHash": "1f041a88555517e288e3a2381ced459dcc3a727b61d4d57a287756a66ad0a6f8"
+        },
+        {
+          "requirementId": "DEBT_NONCURRENT_BANK",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank",
+          "columnLabel": "2025-06-30",
+          "rawValue": "494.121",
+          "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.0",
+          "snippetHash": "3aea6a4f6744b0eb528c5b5fe9baa31728e8e54d9b1c8fc16acd978439f984de",
+          "evidenceHash": "d453a031e495e5bbd30ca3275124e97f46a566eb60ecb427cc94aa6dc29bfa5f",
+          "locatorHash": "c416444ad56170f9b1688255723a7f798d08cdd0a2fd12fcb74e79f13a283190"
+        },
+        {
+          "requirementId": "DEBT_NONCURRENT_RUPIAH_BONDS",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi",
+          "columnLabel": "2025-06-30",
+          "rawValue": "44.416.407",
+          "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net ",
+          "snippetHash": "141455b208b81e4df98a82333bb6e6494410ec5cfdd940a53eaac0bed10e7d58",
+          "evidenceHash": "c6ce11a14a143b75132da3511d7d0296d820a8714c9aaf7b7953e14605fb0811",
+          "locatorHash": "d097db47f6096380145002d491ae1a5e6cd06d91984c5cbec07a924b1841f551"
+        },
+        {
+          "requirementId": "DEBT_NONCURRENT_OTHER_LONG",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya",
+          "columnLabel": "2025-06-30",
+          "rawValue": "8.753",
+          "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilit",
+          "snippetHash": "b9740b1742c592fb1e8dcffd80b53b607462cd1de0fec9bd87d6d0846a0c2955",
+          "evidenceHash": "211b98dfd613932cd684b4172784cb2e6f76c6215420ee3a3881b5fe78b86988",
+          "locatorHash": "6852e504e8842aa98fbc8a8a8d515c881796bb02ae600d6fd70390aae24623c6"
+        },
+        {
+          "requirementId": "LEASE_CURRENT_COMPONENT",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa",
+          "columnLabel": "2025-06-30",
+          "rawValue": "123.054",
+          "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam wak",
+          "snippetHash": "4e7903135b91c42991ad039c210e6ea248af56c61b0c3d66e31cc34dd3181e83",
+          "evidenceHash": "c3106021bb5889e51e616415ba20094b5b87479083dbb7c0c9d0f2984f261f08",
+          "locatorHash": "6a17e481baa0e80385088fab6e4cb7e3ce23d43de34efd0f4e1bc2e333723335"
+        },
+        {
+          "requirementId": "LEASE_NONCURRENT_COMPONENT",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa",
+          "columnLabel": "2025-06-30",
+          "rawValue": "155.308",
+          "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilities for employee benefits Total Liabilitas Jangka",
+          "snippetHash": "d17ee7c17febd2808e0a2093a7e86502dfbd16d5ecf2272e07d49d7f229824d6",
+          "evidenceHash": "6724799aaff51cef964fa2404cf37a98ca4a14a98a7425a88a86f9d07df39225",
+          "locatorHash": "b31b17c5dcb9fff62dfab60c32a8bc485b3e2b909eacbb873230310c5b212d0d"
+        }
+      ],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [
+        {
+          "inputId": "fact:d6adf5152f6eabfcbab48af320fba5832d854df87bfff1c25fe1c757cd0093ef",
+          "inputRole": "SHORT_TERM_BANK_DEBT",
+          "requirementId": "DEBT_SHORT_BANK_DIRECT",
+          "value": "287819",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "DEBT_SHORT_BANK_DIRECT",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts",
+              "columnLabel": "2025-06-30",
+              "rawValue": "287.819",
+              "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan ",
+              "snippetHash": "86ca2f8d6b2100b117819f58026273f45ec1d842c581b49dcd63a435a8adb856",
+              "evidenceHash": "4097148edf2b13197c63434f8420cdc83a5f0ab2da68cd2d97544dc67c4ed976",
+              "locatorHash": "cabee0049707894ec16252f1d430a822866a21adeb9243a806c2603aebc2d38f"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:13ba4fd368527bc65886071e8aefc05953ec018a407ae08be87b051a7e27d231",
+          "inputRole": "CURRENT_MATURITY_BANK_DEBT",
+          "requirementId": "DEBT_CURRENT_MATURITY_BANK",
+          "value": "333397",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "DEBT_CURRENT_MATURITY_BANK",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank",
+              "columnLabel": "2025-06-30",
+              "rawValue": "333.397",
+              "snippet": "bilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setel",
+              "snippetHash": "d0ba2f503409a0e1b37b9cb8382cf1f6b7aacf8ff230af3570d279075f279c68",
+              "evidenceHash": "015356216dbcc8e5719fb09b76af89afe63b96c368d1a82de7c6289341baa71a",
+              "locatorHash": "1f041a88555517e288e3a2381ced459dcc3a727b61d4d57a287756a66ad0a6f8"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:862f37a59511f15d23e51eee24551ea813419a20340a40c7244ca16c4c4eac83",
+          "inputRole": "LONG_TERM_BANK_DEBT",
+          "requirementId": "DEBT_NONCURRENT_BANK",
+          "value": "494121",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "DEBT_NONCURRENT_BANK",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank",
+              "columnLabel": "2025-06-30",
+              "rawValue": "494.121",
+              "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.0",
+              "snippetHash": "3aea6a4f6744b0eb528c5b5fe9baa31728e8e54d9b1c8fc16acd978439f984de",
+              "evidenceHash": "d453a031e495e5bbd30ca3275124e97f46a566eb60ecb427cc94aa6dc29bfa5f",
+              "locatorHash": "c416444ad56170f9b1688255723a7f798d08cdd0a2fd12fcb74e79f13a283190"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:b8c6ab2a53d6c35427ee3e9e3d9e0ae90822592d51381d11645924b44851b183",
+          "inputRole": "LONG_TERM_RUPIAH_BONDS",
+          "requirementId": "DEBT_NONCURRENT_RUPIAH_BONDS",
+          "value": "44416407",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "DEBT_NONCURRENT_RUPIAH_BONDS",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi",
+              "columnLabel": "2025-06-30",
+              "rawValue": "44.416.407",
+              "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net ",
+              "snippetHash": "141455b208b81e4df98a82333bb6e6494410ec5cfdd940a53eaac0bed10e7d58",
+              "evidenceHash": "c6ce11a14a143b75132da3511d7d0296d820a8714c9aaf7b7953e14605fb0811",
+              "locatorHash": "d097db47f6096380145002d491ae1a5e6cd06d91984c5cbec07a924b1841f551"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:b3d993a9e0ee5199eb952e91b016621035ceac2cb26a0eddf91a79ba7c454860",
+          "inputRole": "LONG_TERM_OTHER_INTEREST_BEARING_DEBT",
+          "requirementId": "DEBT_NONCURRENT_OTHER_LONG",
+          "value": "8753",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "DEBT_NONCURRENT_OTHER_LONG",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya",
+              "columnLabel": "2025-06-30",
+              "rawValue": "8.753",
+              "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilit",
+              "snippetHash": "b9740b1742c592fb1e8dcffd80b53b607462cd1de0fec9bd87d6d0846a0c2955",
+              "evidenceHash": "211b98dfd613932cd684b4172784cb2e6f76c6215420ee3a3881b5fe78b86988",
+              "locatorHash": "6852e504e8842aa98fbc8a8a8d515c881796bb02ae600d6fd70390aae24623c6"
+            }
+          ]
+        },
+        {
+          "inputId": "result:3011e12ec730f7b130c5bfa133ae4c14998ca3fce0d92a8bad0afbc4140c9b90",
+          "inputRole": "LEASE_LIABILITIES_TOTAL",
+          "requirementId": "LEASE_LIABILITIES_CALCULATED",
+          "value": "278362",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": null,
+          "evidence": [
+            {
+              "requirementId": "LEASE_CURRENT_COMPONENT",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa",
+              "columnLabel": "2025-06-30",
+              "rawValue": "123.054",
+              "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam wak",
+              "snippetHash": "4e7903135b91c42991ad039c210e6ea248af56c61b0c3d66e31cc34dd3181e83",
+              "evidenceHash": "c3106021bb5889e51e616415ba20094b5b87479083dbb7c0c9d0f2984f261f08",
+              "locatorHash": "6a17e481baa0e80385088fab6e4cb7e3ce23d43de34efd0f4e1bc2e333723335"
+            },
+            {
+              "requirementId": "LEASE_NONCURRENT_COMPONENT",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa",
+              "columnLabel": "2025-06-30",
+              "rawValue": "155.308",
+              "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilities for employee benefits Total Liabilitas Jangka",
+              "snippetHash": "d17ee7c17febd2808e0a2093a7e86502dfbd16d5ecf2272e07d49d7f229824d6",
+              "evidenceHash": "6724799aaff51cef964fa2404cf37a98ca4a14a98a7425a88a86f9d07df39225",
+              "locatorHash": "b31b17c5dcb9fff62dfab60c32a8bc485b3e2b909eacbb873230310c5b212d0d"
+            }
+          ]
+        }
+      ],
+      "state": "VALUE",
+      "value": "45818859",
+      "rawValue": null,
+      "formula": {
+        "formulaId": "P0B-TOTAL-DEBT-INCL-LEASES",
+        "formulaVersion": "1.0.0",
+        "expression": "SUM(ACCEPTED_SHORT_TERM_DEBT_EX_LEASE_COMPONENTS) + SUM(ACCEPTED_LONG_TERM_DEBT_EX_LEASE_COMPONENTS) + LEASE_LIABILITIES_TOTAL",
+        "calculationRunIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+        "resultHash": "37a45836fe341dd87f5537cf0e68abc2e51f133639921197940f10c358a89ac1"
+      },
+      "reason": "Deterministic Decimal calculation from exact accepted input identities.",
+      "factIdentity": "result:37a45836fe341dd87f5537cf0e68abc2e51f133639921197940f10c358a89ac1"
+    },
+    {
+      "requirementId": "LEASE_LIABILITIES_REPORTED",
+      "canonicalCode": "LEASE_LIABILITIES_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "LEASE_LIABILITIES_CALCULATED",
+      "canonicalCode": "LEASE_LIABILITIES_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "LEASE_CURRENT_COMPONENT",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa",
+          "columnLabel": "2025-06-30",
+          "rawValue": "123.054",
+          "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam wak",
+          "snippetHash": "4e7903135b91c42991ad039c210e6ea248af56c61b0c3d66e31cc34dd3181e83",
+          "evidenceHash": "c3106021bb5889e51e616415ba20094b5b87479083dbb7c0c9d0f2984f261f08",
+          "locatorHash": "6a17e481baa0e80385088fab6e4cb7e3ce23d43de34efd0f4e1bc2e333723335"
+        },
+        {
+          "requirementId": "LEASE_NONCURRENT_COMPONENT",
+          "pageNumber": 5,
+          "printedPageLabel": null,
+          "statement": "BALANCE_SHEET",
+          "table": null,
+          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa",
+          "columnLabel": "2025-06-30",
+          "rawValue": "155.308",
+          "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilities for employee benefits Total Liabilitas Jangka",
+          "snippetHash": "d17ee7c17febd2808e0a2093a7e86502dfbd16d5ecf2272e07d49d7f229824d6",
+          "evidenceHash": "6724799aaff51cef964fa2404cf37a98ca4a14a98a7425a88a86f9d07df39225",
+          "locatorHash": "b31b17c5dcb9fff62dfab60c32a8bc485b3e2b909eacbb873230310c5b212d0d"
+        }
+      ],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [
+        {
+          "inputId": "fact:452328e399ff18451a9794d4b38cd503e0d454a5cee2ea48a6ad0fb9130a47ca",
+          "inputRole": "LEASE_CURRENT",
+          "requirementId": "LEASE_CURRENT_COMPONENT",
+          "value": "123054",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "LEASE_CURRENT_COMPONENT",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh tempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa",
+              "columnLabel": "2025-06-30",
+              "rawValue": "123.054",
+              "snippet": "r 31, 2024 LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Utang bank jangka pendek , c erukan dan utang trust receipts 13,33,34 ,35 287.819 185.303 Short-term bank loans , o verdrafts and trust receipts payable Utang 33,34 Accounts payable Usaha 14 Trade Pihak ketiga 3.978.473 3.710.084 Third parties Pihak berelasi 32 375.059 391.345 Related parties Bukan usaha Non-trade Pihak ketiga 813.86 7 750.083 Third parties Pihak berelasi 32 313.882 315.752 Related parties Utang dividen 22,34 2.915.477 - Dividend Payable Beban akrual 15,33,34 3.590.960 3.244.70 7 Accrued expenses Liabilitas imbalan kerja karyawan 15,34 495.492 4 9 7.267 Liabilities for employee benefits Utang pajak 16 1.217.298 1.401.567 Taxes payable Utang jangka panjang yang jatuh\ntempo dalam waktu satu tahun 33,34, 35, 36 Current maturities of long-term debts Utang bank 17 333.397 351.952 Bank loans Liabilitas sewa 12 123.054 76.713 Lease liabilities Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam wak",
+              "snippetHash": "4e7903135b91c42991ad039c210e6ea248af56c61b0c3d66e31cc34dd3181e83",
+              "evidenceHash": "c3106021bb5889e51e616415ba20094b5b87479083dbb7c0c9d0f2984f261f08",
+              "locatorHash": "6a17e481baa0e80385088fab6e4cb7e3ce23d43de34efd0f4e1bc2e333723335"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:eaddf2b196aca127d9bf66df3284ed2fcc9138f4759fd42d1ba01f4f058ed822",
+          "inputRole": "LEASE_NONCURRENT",
+          "requirementId": "LEASE_NONCURRENT_COMPONENT",
+          "value": "155308",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "LEASE_NONCURRENT_COMPONENT",
+              "pageNumber": 5,
+              "printedPageLabel": null,
+              "statement": "BALANCE_SHEET",
+              "table": null,
+              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah dikurangi bagian yang jatuh tempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa",
+              "columnLabel": "2025-06-30",
+              "rawValue": "155.308",
+              "snippet": " Total Liabilitas Jangka Pendek 14.444.778 10.924.773 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Utang jangka panjang - setelah\ndikurangi bagian yang jatuh\ntempo dalam waktu satu tahun 17,33,34, 35, 36 Long-term debts - net of current maturities Utang bank 494.121 662.989 Bank loans Utang obligasi 44.416.407 44.211.216 Bonds payable Utang jangka panjang lainnya 8.753 8.753 Other long-term debt Liabilitas sewa 12,34 155.308 127.726 Lease liabilities Liabilitas pajak tangguhan - neto 1 6 350.038 331.571 Deferred tax liabilities - net Liabilitas imbalan kerja karyawan 18 2.626.495 2.729.992 Liabilities for employee benefits Total Liabilitas Jangka",
+              "snippetHash": "d17ee7c17febd2808e0a2093a7e86502dfbd16d5ecf2272e07d49d7f229824d6",
+              "evidenceHash": "6724799aaff51cef964fa2404cf37a98ca4a14a98a7425a88a86f9d07df39225",
+              "locatorHash": "b31b17c5dcb9fff62dfab60c32a8bc485b3e2b909eacbb873230310c5b212d0d"
+            }
+          ]
+        }
+      ],
+      "state": "VALUE",
+      "value": "278362",
+      "rawValue": null,
+      "formula": {
+        "formulaId": "P0B-LEASE-TOTAL",
+        "formulaVersion": "1.0.0",
+        "expression": "LEASE_CURRENT + LEASE_NONCURRENT",
+        "calculationRunIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+        "resultHash": "3011e12ec730f7b130c5bfa133ae4c14998ca3fce0d92a8bad0afbc4140c9b90"
+      },
+      "reason": "Deterministic Decimal calculation from exact accepted input identities.",
+      "factIdentity": "result:3011e12ec730f7b130c5bfa133ae4c14998ca3fce0d92a8bad0afbc4140c9b90"
+    },
+    {
+      "requirementId": "SGA_REPORTED",
+      "canonicalCode": "SGA_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "SGA_CALCULATED",
+      "canonicalCode": "SGA_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "SELLING_DISTRIBUTION_COMPONENT",
+          "pageNumber": 7,
+          "printedPageLabel": null,
+          "statement": "INCOME_STATEMENT",
+          "table": null,
+          "rowLabel": "Beban penjualan dan distribusi",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(3.877.245 )",
+          "snippet": "388 22.978.539 COST OF GOODS SOLD LABA BRUTO 13.122.540 13.982.818 GROSS PROFIT Beban penjualan dan distribusi 10,26,32 (3.877.245 ) (3.847.586 ) Selling and distribution expenses Beban umum dan administrasi 10,26,32 (1.315.378 ) (1.468.074 ) General and administrative expenses Pendapatan operasi lain 27,32 685.536 4 0 4.363 Other operating income ",
+          "snippetHash": "193e125708e0d7a7b246ef54e55e382df55ae9ecb3d834002e22b8e77d3dc56c",
+          "evidenceHash": "43dd67a12de0a6708572742e5e37aeaf251bc8f5ed4271dd603760792734891b",
+          "locatorHash": "9ea663038b309db003ea2a5d53488824e7f06d33b69e739c2e98cc1dd5aed8c9"
+        },
+        {
+          "requirementId": "GENERAL_ADMIN_COMPONENT",
+          "pageNumber": 7,
+          "printedPageLabel": null,
+          "statement": "INCOME_STATEMENT",
+          "table": null,
+          "rowLabel": "Beban umum dan administrasi",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(1.315.378 )",
+          "snippet": "distribusi 10,26,32 (3.877.245 ) (3.847.586 ) Selling and distribution expenses Beban umum dan administrasi 10,26,32 (1.315.378 ) (1.468.074 ) General and administrative expenses Pendapatan operasi lain 27,32 685.536 4 0 4.363 Other operating income Beban operasi lain 28,32 (139.575 ) (178.392 ) Other operating expenses LABA USAHA 31 8.475.878 8",
+          "snippetHash": "2f2c640f2ab13fd353046c750913ea98a148c8c9aeb018bfd4a9a935367b186e",
+          "evidenceHash": "529b21faa74d45d6f9504c7c90ba5115770410f32883a2605e432d6f6dc1925a",
+          "locatorHash": "8ba82b56dfc6b9cdd212b346ca7a602f6da504f680b782db65870beadb3535b9"
+        }
+      ],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [
+        {
+          "inputId": "fact:c2d4c025957e8fd61a755b7e5ec56fbf9747d30573dbe8f5f86465d73fe30cc9",
+          "inputRole": "SELLING_DISTRIBUTION_EXPENSE",
+          "requirementId": "SELLING_DISTRIBUTION_COMPONENT",
+          "value": "-3877245",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "SELLING_DISTRIBUTION_COMPONENT",
+              "pageNumber": 7,
+              "printedPageLabel": null,
+              "statement": "INCOME_STATEMENT",
+              "table": null,
+              "rowLabel": "Beban penjualan dan distribusi",
+              "columnLabel": "2025-06-30",
+              "rawValue": "(3.877.245 )",
+              "snippet": "388 22.978.539 COST OF GOODS SOLD LABA BRUTO 13.122.540 13.982.818 GROSS PROFIT Beban penjualan dan distribusi 10,26,32 (3.877.245 ) (3.847.586 ) Selling and distribution expenses Beban umum dan administrasi 10,26,32 (1.315.378 ) (1.468.074 ) General and administrative expenses Pendapatan operasi lain 27,32 685.536 4 0 4.363 Other operating income ",
+              "snippetHash": "193e125708e0d7a7b246ef54e55e382df55ae9ecb3d834002e22b8e77d3dc56c",
+              "evidenceHash": "43dd67a12de0a6708572742e5e37aeaf251bc8f5ed4271dd603760792734891b",
+              "locatorHash": "9ea663038b309db003ea2a5d53488824e7f06d33b69e739c2e98cc1dd5aed8c9"
+            }
+          ]
+        },
+        {
+          "inputId": "fact:69f7039e772340ddcc2de3dc2b3e6e4ad894f7ea1122fde6518d89b8496a15d5",
+          "inputRole": "GENERAL_ADMINISTRATIVE_EXPENSE",
+          "requirementId": "GENERAL_ADMIN_COMPONENT",
+          "value": "-1315378",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "GENERAL_ADMIN_COMPONENT",
+              "pageNumber": 7,
+              "printedPageLabel": null,
+              "statement": "INCOME_STATEMENT",
+              "table": null,
+              "rowLabel": "Beban umum dan administrasi",
+              "columnLabel": "2025-06-30",
+              "rawValue": "(1.315.378 )",
+              "snippet": "distribusi 10,26,32 (3.877.245 ) (3.847.586 ) Selling and distribution expenses Beban umum dan administrasi 10,26,32 (1.315.378 ) (1.468.074 ) General and administrative expenses Pendapatan operasi lain 27,32 685.536 4 0 4.363 Other operating income Beban operasi lain 28,32 (139.575 ) (178.392 ) Other operating expenses LABA USAHA 31 8.475.878 8",
+              "snippetHash": "2f2c640f2ab13fd353046c750913ea98a148c8c9aeb018bfd4a9a935367b186e",
+              "evidenceHash": "529b21faa74d45d6f9504c7c90ba5115770410f32883a2605e432d6f6dc1925a",
+              "locatorHash": "8ba82b56dfc6b9cdd212b346ca7a602f6da504f680b782db65870beadb3535b9"
+            }
+          ]
+        }
+      ],
+      "state": "VALUE",
+      "value": "-5192623",
+      "rawValue": null,
+      "formula": {
+        "formulaId": "P0B-SGA",
+        "formulaVersion": "1.0.0",
+        "expression": "SELLING_DISTRIBUTION_EXPENSE + GENERAL_ADMINISTRATIVE_EXPENSE",
+        "calculationRunIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+        "resultHash": "63b505c3e5190dac6ec46464a364e41a81ae079524ce3a2a3db596bacc7afb03"
+      },
+      "reason": "Deterministic Decimal calculation from exact accepted input identities.",
+      "factIdentity": "result:63b505c3e5190dac6ec46464a364e41a81ae079524ce3a2a3db596bacc7afb03"
+    },
+    {
+      "requirementId": "EBITDA_REPORTED",
+      "canonicalCode": "EBITDA_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "EBITDA_CALCULATED",
+      "canonicalCode": "EBITDA_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [],
+      "state": "NOT_CALCULABLE",
+      "value": null,
+      "rawValue": null,
+      "formula": null,
+      "reason": "CONTRACT_FORMULA_UNDEFINED: Canonical Data Contract v1.0 FINAL does not define an unambiguous calculation formula.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "INTEREST_EXPENSE_REPORTED",
+      "canonicalCode": "INTEREST_EXPENSE_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "RESTRICTED_CASH_REPORTED",
+      "canonicalCode": "RESTRICTED_CASH_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "OCI_TOTAL_REPORTED",
+      "canonicalCode": "OCI_TOTAL_REPORTED",
+      "family": "REPORTED",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "value": "-273353",
+      "rawValue": "(273.353 )",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "OCI_TOTAL_REPORTED",
+          "pageNumber": 7,
+          "printedPageLabel": null,
+          "statement": "INCOME_STATEMENT",
+          "table": null,
+          "rowLabel": "R ugi komprehensif lain periode berjalan",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(273.353 )",
+          "snippet": "angan 56.722 84.852 Exchange differences on translation of financial statements R ugi komprehensif lain periode berjalan (273.353 ) 77.895 Other comprehensive losses for the period TOTAL LABA KOMPREHENSIF PERIODE BERJALAN 5.932.240 4.453.886 TOTAL COMPREHENSIVE INCOME FOR THE PERIOD",
+          "snippetHash": "735c952dccf5c945044032821c06c14ca7b5cea8b18954dbc24d388048df053b",
+          "evidenceHash": "ff5995d1da7c8b147962893584ba97c9ad385ae4ac2ab79461c27fc4ac60ceef",
+          "locatorHash": "850a2e6c03b1561394395b754b23149bedd50f21ef2131bdf03c86c1e142afaf"
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "Explicit issuer-reported scalar with source evidence.",
+      "factIdentity": "fact:ba55752a0755da6ede787f9b024e1732b640925d83cdd5a4644b58821151f4ed"
+    },
+    {
+      "requirementId": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+      "canonicalCode": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+      "family": "REPORTED",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "value": "5932240",
+      "rawValue": "5.932.240",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+          "pageNumber": 7,
+          "printedPageLabel": null,
+          "statement": "INCOME_STATEMENT",
+          "table": null,
+          "rowLabel": "TOTAL LABA KOMPREHENSIF PERIODE BERJALAN",
+          "columnLabel": "2025-06-30",
+          "rawValue": "5.932.240",
+          "snippet": "in periode berjalan (273.353 ) 77.895 Other comprehensive losses for the period TOTAL LABA KOMPREHENSIF PERIODE BERJALAN 5.932.240 4.453.886 TOTAL COMPREHENSIVE INCOME FOR THE PERIOD",
+          "snippetHash": "033a309e242497afde33f50d5734302f3b5fde89dfd9522be00b277a639b624f",
+          "evidenceHash": "2ff491850b4c3d99e958406a98570974a8519ac7e896033961fce2a9ec6a0267",
+          "locatorHash": "89d64c511f90778943edea7687b9d4e1c13717da896ba1f87f7058d8ecb37c0a"
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "Explicit issuer-reported scalar with source evidence.",
+      "factIdentity": "fact:43bbf71dd37d697add4d9ef93b8d656c2513e79684dbc2911f46b43b394ace95"
+    },
+    {
+      "requirementId": "CAPEX_PPE_CASH_REPORTED",
+      "canonicalCode": "CAPEX_PPE_CASH_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "VALUE",
+      "value": "-2447972",
+      "rawValue": "(2.447.972 )",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "CAPEX_PPE_CASH_REPORTED",
+          "pageNumber": 10,
+          "printedPageLabel": null,
+          "statement": "CASH_FLOW",
+          "table": null,
+          "rowLabel": "pembelian aset tetap",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(2.447.972 )",
+          "snippet": "47 8.700 Proceeds from sale of fixed assets Penambahan aset tetap dan uang muka pembelian aset tetap (2.447.972 ) ( 2.005.799 ) Additions to fixed assets and advances for purchase of fixed assets Penambahan investasi di Ventura Bersama 1 - (23.500 ) Addition investment in a Joint Venture Kas Neto yang Digunakan untuk\nAktivitas Investasi (",
+          "snippetHash": "d8e7fc2e662bbb1428f689dc32f71eaa8ee35103cd90cb042065869af37e17e8",
+          "evidenceHash": "d4aa84d70987a4b597acc9fb0ec78dc2c352fc820f6d22d936be03480d8ecdeb",
+          "locatorHash": "0f65b33bf302506db1636ebd27cb8b5436d80599948fd32ed41bc7dc0b4bbf5f"
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "Explicit issuer-reported scalar with source evidence.",
+      "factIdentity": "fact:351401fceb94cc7780fe0d17ad90a5e3d74145d9c01d950c8f20ad01a0e1f043"
+    },
+    {
+      "requirementId": "CAPEX_INTANGIBLE_CASH_REPORTED",
+      "canonicalCode": "CAPEX_INTANGIBLE_CASH_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "CAPEX_TOTAL_CASH_REPORTED",
+      "canonicalCode": "CAPEX_TOTAL_CASH_REPORTED",
+      "family": "REPORTED",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "value": null,
+      "rawValue": null,
+      "currency": null,
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": null,
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "No explicit issuer-reported scalar was found; absence is not zero.",
+      "factIdentity": null
+    },
+    {
+      "requirementId": "CAPEX_TOTAL_CASH_CALCULATED",
+      "canonicalCode": "CAPEX_TOTAL_CASH_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "CAPEX_PPE_CASH_REPORTED",
+          "pageNumber": 10,
+          "printedPageLabel": null,
+          "statement": "CASH_FLOW",
+          "table": null,
+          "rowLabel": "pembelian aset tetap",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(2.447.972 )",
+          "snippet": "47 8.700 Proceeds from sale of fixed assets Penambahan aset tetap dan uang muka pembelian aset tetap (2.447.972 ) ( 2.005.799 ) Additions to fixed assets and advances for purchase of fixed assets Penambahan investasi di Ventura Bersama 1 - (23.500 ) Addition investment in a Joint Venture Kas Neto yang Digunakan untuk\nAktivitas Investasi (",
+          "snippetHash": "d8e7fc2e662bbb1428f689dc32f71eaa8ee35103cd90cb042065869af37e17e8",
+          "evidenceHash": "d4aa84d70987a4b597acc9fb0ec78dc2c352fc820f6d22d936be03480d8ecdeb",
+          "locatorHash": "0f65b33bf302506db1636ebd27cb8b5436d80599948fd32ed41bc7dc0b4bbf5f"
+        }
+      ],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [
+        {
+          "inputId": "fact:351401fceb94cc7780fe0d17ad90a5e3d74145d9c01d950c8f20ad01a0e1f043",
+          "inputRole": "CAPEX_PPE_CASH",
+          "requirementId": "CAPEX_PPE_CASH_REPORTED",
+          "value": "-2447972",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "CAPEX_PPE_CASH_REPORTED",
+              "pageNumber": 10,
+              "printedPageLabel": null,
+              "statement": "CASH_FLOW",
+              "table": null,
+              "rowLabel": "pembelian aset tetap",
+              "columnLabel": "2025-06-30",
+              "rawValue": "(2.447.972 )",
+              "snippet": "47 8.700 Proceeds from sale of fixed assets Penambahan aset tetap dan uang muka pembelian aset tetap (2.447.972 ) ( 2.005.799 ) Additions to fixed assets and advances for purchase of fixed assets Penambahan investasi di Ventura Bersama 1 - (23.500 ) Addition investment in a Joint Venture Kas Neto yang Digunakan untuk\nAktivitas Investasi (",
+              "snippetHash": "d8e7fc2e662bbb1428f689dc32f71eaa8ee35103cd90cb042065869af37e17e8",
+              "evidenceHash": "d4aa84d70987a4b597acc9fb0ec78dc2c352fc820f6d22d936be03480d8ecdeb",
+              "locatorHash": "0f65b33bf302506db1636ebd27cb8b5436d80599948fd32ed41bc7dc0b4bbf5f"
+            }
+          ]
+        }
+      ],
+      "state": "VALUE",
+      "value": "-2447972",
+      "rawValue": null,
+      "formula": {
+        "formulaId": "P0B-CAPEX-TOTAL-CASH",
+        "formulaVersion": "1.0.0",
+        "expression": "SUM(ELIGIBLE_DISCLOSED_CASH_CAPEX_COMPONENTS)",
+        "calculationRunIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+        "resultHash": "9fbbcce5a81623971d4e93f77d7f7e6142318b55073024a295ccf3f218e949a7"
+      },
+      "reason": "Deterministic Decimal calculation from exact accepted input identities.",
+      "factIdentity": "result:9fbbcce5a81623971d4e93f77d7f7e6142318b55073024a295ccf3f218e949a7"
+    },
+    {
+      "requirementId": "FCF_CALCULATED",
+      "canonicalCode": "FCF_CALCULATED",
+      "family": "CALCULATED",
+      "applicability": "OPTIONAL",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1000000",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
+          "requirementId": "OCF_COMPONENT",
+          "pageNumber": 10,
+          "printedPageLabel": null,
+          "statement": "CASH_FLOW",
+          "table": null,
+          "rowLabel": "Kas Neto yang Diperoleh dari Aktivitas Operasi",
+          "columnLabel": "2025-06-30",
+          "rawValue": "4.844.057",
+          "snippet": "(pembayaran) lainn ya - neto 57.923 ( 102.927 ) Other receipts (payments) - net Kas Neto yang Diperoleh dari Aktivitas\nOperasi 4.844.057 5.518.610 Net Cash Provided by Operating Activities ARUS KAS DARI AKTIVITAS INVESTASI CASH FLOWS FROM INVESTING ACTIVITIES Pengurangan ( Penambahan ) investasi jangka pendek 21.710 (876.380 ) Deduction ( Additions ) to short - te",
+          "snippetHash": "f506b40eb0cb54c79e5e4cca4c7f6d37fe07f0e028a8d3dda589e7478b78789a",
+          "evidenceHash": "57bd06783a98abda3ca91e55d6f910dda00edaddbc0fee5659d204a6908a426f",
+          "locatorHash": "576c8717a90cc223c2bd9078d0ddb57acb149193a7121726ee23234cc7ddbe2c"
+        },
+        {
+          "requirementId": "CAPEX_PPE_CASH_REPORTED",
+          "pageNumber": 10,
+          "printedPageLabel": null,
+          "statement": "CASH_FLOW",
+          "table": null,
+          "rowLabel": "pembelian aset tetap",
+          "columnLabel": "2025-06-30",
+          "rawValue": "(2.447.972 )",
+          "snippet": "47 8.700 Proceeds from sale of fixed assets Penambahan aset tetap dan uang muka pembelian aset tetap (2.447.972 ) ( 2.005.799 ) Additions to fixed assets and advances for purchase of fixed assets Penambahan investasi di Ventura Bersama 1 - (23.500 ) Addition investment in a Joint Venture Kas Neto yang Digunakan untuk\nAktivitas Investasi (",
+          "snippetHash": "d8e7fc2e662bbb1428f689dc32f71eaa8ee35103cd90cb042065869af37e17e8",
+          "evidenceHash": "d4aa84d70987a4b597acc9fb0ec78dc2c352fc820f6d22d936be03480d8ecdeb",
+          "locatorHash": "0f65b33bf302506db1636ebd27cb8b5436d80599948fd32ed41bc7dc0b4bbf5f"
+        }
+      ],
+      "extractionOrigin": null,
+      "confidence": {
+        "read": null,
+        "mapping": null
+      },
+      "inputs": [
+        {
+          "inputId": "fact:a04d01e57fcc40dc1e7871c0165b3934e95d7b09f4d09e8f9ab8256dd1d44653",
+          "inputRole": "OCF_REPORTED",
+          "requirementId": "OCF_COMPONENT",
+          "value": "4844057",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": "NATIVE",
+          "evidence": [
+            {
+              "requirementId": "OCF_COMPONENT",
+              "pageNumber": 10,
+              "printedPageLabel": null,
+              "statement": "CASH_FLOW",
+              "table": null,
+              "rowLabel": "Kas Neto yang Diperoleh dari Aktivitas Operasi",
+              "columnLabel": "2025-06-30",
+              "rawValue": "4.844.057",
+              "snippet": "(pembayaran) lainn ya - neto 57.923 ( 102.927 ) Other receipts (payments) - net Kas Neto yang Diperoleh dari Aktivitas\nOperasi 4.844.057 5.518.610 Net Cash Provided by Operating Activities ARUS KAS DARI AKTIVITAS INVESTASI CASH FLOWS FROM INVESTING ACTIVITIES Pengurangan ( Penambahan ) investasi jangka pendek 21.710 (876.380 ) Deduction ( Additions ) to short - te",
+              "snippetHash": "f506b40eb0cb54c79e5e4cca4c7f6d37fe07f0e028a8d3dda589e7478b78789a",
+              "evidenceHash": "57bd06783a98abda3ca91e55d6f910dda00edaddbc0fee5659d204a6908a426f",
+              "locatorHash": "576c8717a90cc223c2bd9078d0ddb57acb149193a7121726ee23234cc7ddbe2c"
+            }
+          ]
+        },
+        {
+          "inputId": "result:9fbbcce5a81623971d4e93f77d7f7e6142318b55073024a295ccf3f218e949a7",
+          "inputRole": "SIGNED_CAPEX_TOTAL_CASH",
+          "requirementId": "CAPEX_TOTAL_CASH_CALCULATED",
+          "value": "-2447972",
+          "currency": "IDR",
+          "scale": "1000000",
+          "periodStart": "2025-01-01",
+          "periodEnd": "2025-06-30",
+          "scope": "CONSOLIDATED",
+          "extractionOrigin": null,
+          "evidence": [
+            {
+              "requirementId": "CAPEX_PPE_CASH_REPORTED",
+              "pageNumber": 10,
+              "printedPageLabel": null,
+              "statement": "CASH_FLOW",
+              "table": null,
+              "rowLabel": "pembelian aset tetap",
+              "columnLabel": "2025-06-30",
+              "rawValue": "(2.447.972 )",
+              "snippet": "47 8.700 Proceeds from sale of fixed assets Penambahan aset tetap dan uang muka pembelian aset tetap (2.447.972 ) ( 2.005.799 ) Additions to fixed assets and advances for purchase of fixed assets Penambahan investasi di Ventura Bersama 1 - (23.500 ) Addition investment in a Joint Venture Kas Neto yang Digunakan untuk\nAktivitas Investasi (",
+              "snippetHash": "d8e7fc2e662bbb1428f689dc32f71eaa8ee35103cd90cb042065869af37e17e8",
+              "evidenceHash": "d4aa84d70987a4b597acc9fb0ec78dc2c352fc820f6d22d936be03480d8ecdeb",
+              "locatorHash": "0f65b33bf302506db1636ebd27cb8b5436d80599948fd32ed41bc7dc0b4bbf5f"
+            }
+          ]
+        }
+      ],
+      "state": "VALUE",
+      "value": "2396085",
+      "rawValue": null,
+      "formula": {
+        "formulaId": "P0B-FCF",
+        "formulaVersion": "1.0.0",
+        "expression": "OCF_REPORTED + SIGNED_CAPEX_TOTAL_CASH",
+        "calculationRunIdentity": "db87ba33ba433126be1fcbf33ca338ff696244f5ac6cfd4a69fa0d17b56f9589",
+        "resultHash": "0c90756afcc8a55ca93d989a8c7ed82258960c10e4b1fe4f08f35b95b0b3b5c7"
+      },
+      "reason": "Deterministic Decimal calculation from exact accepted input identities.",
+      "factIdentity": "result:0c90756afcc8a55ca93d989a8c7ed82258960c10e4b1fe4f08f35b95b0b3b5c7"
+    }
+  ],
+  "controls": [
+    {
+      "controlId": "COMPREHENSIVE_INCOME_BRIDGE",
+      "applicable": true,
+      "passed": true,
+      "reason": "NET_PROFIT_REPORTED + OCI_TOTAL_REPORTED compared with TOTAL_COMPREHENSIVE_INCOME_REPORTED only at matching scope."
+    },
+    {
+      "controlId": "LEASE_LIABILITIES_CALCULATED_REPRODUCIBILITY",
+      "applicable": true,
+      "passed": true,
+      "reason": "Stored result must equal Decimal sum of the exact stored inputs."
+    },
+    {
+      "controlId": "TOTAL_DEBT_CALCULATED_REPRODUCIBILITY",
+      "applicable": true,
+      "passed": true,
+      "reason": "Stored result must equal Decimal sum of the exact stored inputs."
+    },
+    {
+      "controlId": "SGA_CALCULATED_REPRODUCIBILITY",
+      "applicable": true,
+      "passed": true,
+      "reason": "Stored result must equal Decimal sum of the exact stored inputs."
+    },
+    {
+      "controlId": "CAPEX_TOTAL_CASH_CALCULATED_REPRODUCIBILITY",
+      "applicable": true,
+      "passed": true,
+      "reason": "Stored result must equal Decimal sum of the exact stored inputs."
+    },
+    {
+      "controlId": "FCF_CALCULATED_REPRODUCIBILITY",
+      "applicable": true,
+      "passed": true,
+      "reason": "Stored result must equal Decimal sum of the exact stored inputs."
+    }
+  ],
+  "providerUsage": {
+    "providerCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "costUsd": "0.00000000"
+  },
+  "idempotency": {
+    "runs": 2,
+    "completeIdentityStable": true,
+    "outcomesStable": true,
+    "duplicateLogicalResults": 0
+  },
+  "productionSafety": {
+    "legacyMutation": false,
+    "canonicalFinancialEntryMutation": false,
+    "railwayMutation": false,
+    "deployment": false
+  }
+}
