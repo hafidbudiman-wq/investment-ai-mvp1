@@ -84,7 +84,11 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
-      - name: Run OCR-specific and full tests
+      - name: Run OCR-specific and standard full tests
+        env:
+          P0A_DRMA_PDF_PATH: ""
+          P0A_ICBP_PDF_PATH: ""
+          P0A_MEDC_PDF_PATH: ""
         run: npm test
 
       - name: Prove ICBP and MEDC remain native-only
