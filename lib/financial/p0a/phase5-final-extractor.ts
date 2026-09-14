@@ -147,7 +147,20 @@ function reportedFallbacks(page: P0ARoutedPage, context: P0AIssuerContext): P0AN
     output.push(combinedEps(page, context, "EPS_BASIC_REPORTED"), combinedEps(page, context, "EPS_DILUTED_REPORTED"));
   }
   if (page.statementType === "BALANCE_SHEET") {
-    output.push(firstNumberAfter({ requirementId: "EQUITY_PARENT_REPORTED", page, context, statement: "BALANCE_SHEET", minAbs: "1000", maxChars: 260, anchors: [/total\s+ekuitas\s+yang\s+(?:dapat\s+)?diatribusikan\s+kepada\s+pemilik\s+entitas\s+induk/i, /total\s+equity\s+attributable\s+to\s+(?:the\s+)?owners?\s+of\s+the\s+parent(?:\s+company)?/i] }));
+    output.push(firstNumberAfter({
+      requirementId: "EQUITY_PARENT_REPORTED", page, context, statement: "BALANCE_SHEET", minAbs: "1000", maxChars: 320,
+      anchors: [
+        /total\s+ekuitas\s+yang\s+(?:dapat\s+)?diatribusikan(?:[\s\S]{0,120}?)?kepada\s+pemilik\s+entitas\s+induk/i,
+        /total\s+equity\s+attributable\s+to\s+(?:the\s+)?owners?\s+of\s+the\s+parent(?:\s+company)?/i,
+      ],
+    }));
+    output.push(firstNumberAfter({
+      requirementId: "PPE_REPORTED", page, context, statement: "BALANCE_SHEET", minAbs: "1000", maxChars: 180,
+      anchors: [
+        /(?:^|\n)\s*aset\s+tetap\b/im,
+        /(?:^|\n)\s*property\s*,?\s*plant\s+and\s+equipment\b/im,
+      ],
+    }));
     output.push(issuedShares(page, context));
   }
   if (page.statementType === "CASH_FLOW") {
@@ -185,7 +198,9 @@ export function createPhase5FinalNativeExtractor(input: { routedPages: readonly 
       const pretax = statedScopePretax(page, input.context);
       if (pretax) upsert(pretax, true);
       for (const fallback of reportedFallbacks(page, input.context)) {
-        const force = fallback.requirementId === "TAX_EXPENSE_REPORTED";
+        const existing = output.find((candidate) => candidate.requirementId === fallback.requirementId);
+        const exactPrimaryResolvesConflict = (fallback.requirementId === "PPE_REPORTED" || fallback.requirementId === "EQUITY_PARENT_REPORTED") && existing?.state === "CONFLICT";
+        const force = fallback.requirementId === "TAX_EXPENSE_REPORTED" || exactPrimaryResolvesConflict;
         upsert(fallback, force);
       }
     }
