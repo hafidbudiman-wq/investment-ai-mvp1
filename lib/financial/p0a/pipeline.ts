@@ -84,36 +84,42 @@ export async function runP0ANativePipeline(input: { bytes: Buffer; context: P0AI
   const pageIndexCacheHit = input.indexedPages !== undefined;
   const index = input.indexedPages ?? await createLocalPageIndex(input.bytes);
   const routedPages = routePages(index);
-  const result = await runP0AShadowPipeline({
-    ...input,
-    indexedPages: index,
-    extractor: createPhase5FinalNativeExtractor({ routedPages, context: input.context }),
-  });
+  const result = await runP0AShadowPipeline({ ...input, indexedPages: index, extractor: createPhase5FinalNativeExtractor({ routedPages, context: input.context }) });
   return { ...result, usage: { ...result.usage, processingLatencyMs: Date.now() - started }, pageIndexCacheHit };
 }
 
 function runtimeFromCachedPage(page: P0AIndexedPage): P0AOcrRuntime | null {
   const metadata = page.sourceMetadata;
   if (!metadata) return null;
-  return {
-    engine: metadata.engine,
-    engineVersion: metadata.engineVersion,
-    renderer: metadata.renderer,
-    rendererVersion: metadata.rendererVersion,
-    language: metadata.language,
-    pageSegmentationMode: metadata.pageSegmentationMode,
-    renderDpi: metadata.renderDpi,
-  };
+  return { engine: metadata.engine, engineVersion: metadata.engineVersion, renderer: metadata.renderer, rendererVersion: metadata.rendererVersion, language: metadata.language, pageSegmentationMode: metadata.pageSegmentationMode, renderDpi: metadata.renderDpi };
 }
 
 function zeroOcrUsage(reused: readonly P0AIndexedPage[] = []): P0AOcrCompatibilityUsage {
   const reusedPages = reused.filter((page) => page.sourceType === "OCR");
   return {
     runtime: reusedPages.map(runtimeFromCachedPage).find((runtime): runtime is P0AOcrRuntime => runtime !== null) ?? null,
-    candidatePages: [], candidateReasons: [], ocrPages: [],
-    reusedOcrPages: reusedPages.map((page) => page.pageNumber).sort((a, b) => a - b),
-    rejectedPages: [], executionCount: 0,
+    candidatePages: [], candidateReasons: [], ocrPages: [], reusedOcrPages: reusedPages.map((page) => page.pageNumber).sort((a, b) => a - b), rejectedPages: [], executionCount: 0,
   };
+}
+
+/**
+ * Returns the earliest dense primary-statement cluster. Later note/appendix
+ * pages can resemble primary statements; they must not suppress OCR of an
+ * earlier scanned statement corridor.
+ */
+function primaryStatementCorridor(routedPages: readonly P0ARoutedPage[]): P0ARoutedPage[] {
+  const primary = routedPages
+    .filter((page) => page.pageClass.startsWith("PRIMARY_") && page.sourceType !== "OCR")
+    .sort((a, b) => a.pageNumber - b.pageNumber);
+  if (primary.length < 2) return primary;
+  const clusters: P0ARoutedPage[][] = [];
+  for (const page of primary) {
+    const current = clusters.at(-1);
+    if (!current || page.pageNumber - current.at(-1)!.pageNumber > 2) clusters.push([page]);
+    else current.push(page);
+  }
+  const plausible = clusters.filter((cluster) => cluster.length >= 2 || new Set(cluster.map((page) => page.statementType)).size >= 2);
+  return (plausible[0] ?? clusters[0] ?? primary);
 }
 
 /** Native-first compatibility entry point. OCR only substitutes eligible page input. */
@@ -125,10 +131,8 @@ export async function runP0ACompatiblePipeline(input: { bytes: Buffer; context: 
   }
 
   const native = await runP0ANativePipeline({ ...input, indexedPages: index });
-  const unresolved = native.outcomes
-    .filter((outcome) => outcome.state === "MISSING" || outcome.state === "CONFLICT")
-    .map((outcome) => outcome.requirementId);
-  const decisions = planOcrCompatibilityPages(index, native.routedPages, unresolved);
+  const unresolved = native.outcomes.filter((outcome) => outcome.state === "MISSING" || outcome.state === "CONFLICT").map((outcome) => outcome.requirementId);
+  const decisions = planOcrCompatibilityPages(index, primaryStatementCorridor(native.routedPages), unresolved);
   if (!decisions.length) return { ...native, ocrUsage: zeroOcrUsage() };
 
   const ocr = await ocrCompatiblePages({ bytes: input.bytes, index, decisions });
