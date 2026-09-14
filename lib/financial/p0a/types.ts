@@ -29,6 +29,25 @@ export type P0AValueState =
 export type P0AFactOrigin = "REPORTED" | "STANDARDIZED_AGGREGATE";
 export type P0AUnitType = "DOCUMENT_CURRENCY" | "PER_SHARE" | "SHARES";
 export type P0APeriodNature = "INSTANT" | "DURATION";
+export type P0APageContentClass = "NATIVE_TEXT" | "IMAGE_ONLY" | "HYBRID" | "INSUFFICIENT_TEXT";
+export type P0APageSourceType = "NATIVE" | "OCR";
+
+export type P0AOcrSourceMetadata = {
+  engine: "tesseract";
+  engineVersion: string;
+  language: string;
+  pageSegmentationMode: number;
+  renderer: "pdftoppm";
+  rendererVersion: string;
+  renderDpi: number;
+  imageWidth: number;
+  imageHeight: number;
+  pageImageHash: string;
+  ocrTextHash: string;
+  wordCount: number;
+  meanConfidence: number;
+  numericMeanConfidence: number | null;
+};
 
 export type P0APageToken = {
   text: string;
@@ -37,6 +56,7 @@ export type P0APageToken = {
   width: number;
   height: number;
   lineBreak: boolean;
+  confidence?: number;
 };
 
 export type P0AIndexedPage = {
@@ -49,7 +69,10 @@ export type P0AIndexedPage = {
   layoutHash: string;
   printedPageLabel: string | null;
   tokens: P0APageToken[];
-  extractionStatus: "NATIVE_TEXT" | "EMPTY";
+  extractionStatus: "NATIVE_TEXT" | "EMPTY" | "OCR_TEXT";
+  contentClass?: P0APageContentClass;
+  sourceType?: P0APageSourceType;
+  sourceMetadata?: P0AOcrSourceMetadata | null;
 };
 
 export type P0ARoutedPage = P0AIndexedPage & {
