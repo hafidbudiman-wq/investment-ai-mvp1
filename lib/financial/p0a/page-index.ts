@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
-import type { P0AIndexedPage, P0APageToken } from "@/lib/financial/p0a/types";
+import { getDocument, OPS } from "pdfjs-dist/legacy/build/pdf.mjs";
+import type { P0AIndexedPage, P0APageContentClass, P0APageToken } from "@/lib/financial/p0a/types";
 
 export const P0A_NATIVE_SAFETY_LIMITS = Object.freeze({
   maxBytes: 50 * 1024 * 1024,
@@ -8,6 +8,8 @@ export const P0A_NATIVE_SAFETY_LIMITS = Object.freeze({
   maxPageCharacters: 150_000,
   maxTotalCharacters: 8_000_000,
 });
+
+const INSUFFICIENT_NATIVE_CHARACTERS = 80;
 
 function sha256(value: string | Buffer): string {
   return createHash("sha256").update(value).digest("hex");
@@ -35,6 +37,22 @@ function printedPageLabel(text: string): string | null {
   const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
   const tail = lines.slice(-8).reverse().find((line) => /^\d{1,4}$/.test(line));
   return tail ?? null;
+}
+
+function imagePaintOperations(): Set<number> {
+  const ops = OPS as unknown as Record<string, number>;
+  return new Set(["paintImageXObject", "paintImageMaskXObject", "paintSolidColorImageMask", "paintJpegXObject"]
+    .map((name) => ops[name])
+    .filter((value): value is number => typeof value === "number"));
+}
+
+const IMAGE_PAINT_OPERATIONS = imagePaintOperations();
+
+function contentClass(text: string, imagePaintCount: number): P0APageContentClass {
+  if (text.length >= INSUFFICIENT_NATIVE_CHARACTERS) return "NATIVE_TEXT";
+  if (!text && imagePaintCount > 0) return "IMAGE_ONLY";
+  if (imagePaintCount > 0) return "INSUFFICIENT_TEXT";
+  return "INSUFFICIENT_TEXT";
 }
 
 export async function createLocalPageIndex(bytes: Buffer): Promise<P0AIndexedPage[]> {
@@ -82,6 +100,12 @@ export async function createLocalPageIndex(bytes: Buffer): Promise<P0AIndexedPag
       if (totalCharacters > P0A_NATIVE_SAFETY_LIMITS.maxTotalCharacters) {
         throw new Error("PDF exceeds P0-A aggregate native text safety limit.");
       }
+
+      let imagePaintCount = 0;
+      if (text.length < INSUFFICIENT_NATIVE_CHARACTERS) {
+        const operators = await page.getOperatorList();
+        imagePaintCount = operators.fnArray.filter((operation) => IMAGE_PAINT_OPERATIONS.has(operation)).length;
+      }
       const layoutProjection = tokens.map(({ text: tokenText, x, y, width, height }) => [tokenText, x, y, width, height]);
       pages.push({
         pageNumber,
@@ -94,6 +118,9 @@ export async function createLocalPageIndex(bytes: Buffer): Promise<P0AIndexedPag
         printedPageLabel: printedPageLabel(text),
         tokens,
         extractionStatus: text ? "NATIVE_TEXT" : "EMPTY",
+        contentClass: contentClass(text, imagePaintCount),
+        sourceType: "NATIVE",
+        sourceMetadata: null,
       });
       page.cleanup();
     }
@@ -104,5 +131,14 @@ export async function createLocalPageIndex(bytes: Buffer): Promise<P0AIndexedPag
 }
 
 export function documentPageCacheKey(documentSha256: string, page: P0AIndexedPage, parserVersion: string): string {
-  return sha256([documentSha256, page.pageNumber, parserVersion, page.textHash, page.layoutHash].join(":"));
+  return sha256([
+    documentSha256,
+    page.pageNumber,
+    parserVersion,
+    page.textHash,
+    page.layoutHash,
+    page.sourceType ?? "NATIVE",
+    page.sourceMetadata?.pageImageHash ?? "",
+    page.sourceMetadata?.engineVersion ?? "",
+  ].join(":"));
 }
