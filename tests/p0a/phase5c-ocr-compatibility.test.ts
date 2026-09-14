@@ -3,11 +3,12 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import { planOcrCompatibilityPages } from "../../lib/financial/p0a/ocr-compatibility";
+import { routePages } from "../../lib/financial/p0a/page-router";
 import type { P0AIndexedPage, P0APageClass, P0ARoutedPage, P0AStatementType } from "../../lib/financial/p0a/types";
 
 function indexed(pageNumber: number, contentClass: P0AIndexedPage["contentClass"], text = ""): P0AIndexedPage {
   return {
-    pageNumber, width: 595, height: 842, text, normalizedText: text.toLowerCase(),
+    pageNumber, width: 595, height: 842, text, normalizedText: text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(),
     textHash: `${pageNumber}`.padStart(64, "a"), layoutHash: `${pageNumber}`.padStart(64, "b"),
     printedPageLabel: null, tokens: [], extractionStatus: text ? "NATIVE_TEXT" : "EMPTY",
     contentClass, sourceType: "NATIVE", sourceMetadata: null,
@@ -43,7 +44,24 @@ test("OCR planner does not OCR an image page when the unresolved statement type 
   assert.deepEqual(planOcrCompatibilityPages([image, balance], [routed(balance, "PRIMARY_BALANCE_SHEET", "BALANCE_SHEET")], ["TOTAL_ASSETS_REPORTED"]), []);
 });
 
-test("production OCR compatibility code contains no issuer/page/gold-value special case", () => {
-  const source = readFileSync(join(process.cwd(), "lib/financial/p0a/ocr-compatibility.ts"), "utf8");
-  assert.doesNotMatch(source, /DRMA|Dharma Polimetal|4[.,]705[.,]882[.,]300|pageNumber\s*===\s*(?:4|5|6|7)|pageNumber\s*==\s*(?:4|5|6|7)/i);
+test("generic integer EPS table with weighted shares routes as a targeted note", () => {
+  const text = [
+    "NOTES TO CONSOLIDATED FINANCIAL STATEMENTS FOR THE YEAR ENDED",
+    "Weighted average number of ordinary shares outstanding 4.500.000.000 4.500.000.000",
+    "Basic/diluted earnings per share 125 110",
+  ].join("\n");
+  const page = indexed(75, "NATIVE_TEXT", text);
+  const [result] = routePages([page]);
+  assert.equal(result.pageClass, "TARGETED_NOTE");
+  assert.equal(result.statementType, "NOTE");
+});
+
+test("production Phase 5C extraction code contains no issuer/page/gold-value special case", () => {
+  const sources = [
+    "lib/financial/p0a/ocr-compatibility.ts",
+    "lib/financial/p0a/phase5-final-extractor.ts",
+    "lib/financial/p0a/page-router.ts",
+    "lib/financial/p0a/pipeline.ts",
+  ].map((file) => readFileSync(join(process.cwd(), file), "utf8")).join("\n");
+  assert.doesNotMatch(sources, /DRMA|Dharma Polimetal|4[.,]705[.,]882[.,]300|652[.,]584[.,]272[.,]073|pageNumber\s*===\s*(?:4|5|6|7)|pageNumber\s*==\s*(?:4|5|6|7)/i);
 });
