@@ -10,48 +10,129 @@ permissions:
   contents: read
 
 jobs:
-  phase5c-ocr:
+  phase5c-final-gate:
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: phase5c
+          POSTGRES_PASSWORD: phase5c
+          POSTGRES_DB: p0a_phase5c_quality
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U phase5c -d p0a_phase5c_quality"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     env:
-      DATABASE_URL: postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5c_validate
+      DATABASE_URL: postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5c_quality
+      PGPASSWORD: phase5c
       P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase5-source/DRMA_Q4_2025.pdf
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase5-source/ICBP_billingual_30Jun25.pdf
+      P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase5-source/MEDC_1H25.pdf
       P0A_PHASE5_OUTPUT_DIR: ${{ github.workspace }}/artifacts/phase5
     steps:
       - name: Checkout Phase 5C head
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Install deterministic OCR runtime
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind postgresql-client
           tesseract --version
           pdftoppm -v
           tesseract --list-langs
+
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
-      - name: Download and checksum-lock DRMA FY 2025 source
+
+      - name: Download and checksum-lock three issuer sources
         run: |
-          mkdir -p .phase5-source
+          mkdir -p .phase5-source artifacts/phase5
           curl --http1.1 --fail --location --retry 3 --output .phase5-source/DRMA_Q4_2025.pdf 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
           echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  .phase5-source/DRMA_Q4_2025.pdf" | sha256sum --check --strict
-      - name: Validate Prisma
-        run: npx prisma validate
+          curl --http1.1 --fail --location --retry 3 --output .phase5-source/ICBP_billingual_30Jun25.pdf 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  .phase5-source/ICBP_billingual_30Jun25.pdf" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output .phase5-source/MEDC_1H25.pdf 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  .phase5-source/MEDC_1H25.pdf" | sha256sum --check --strict
+
+      - name: Validate and generate Prisma
+        run: |
+          npx prisma validate
+          npx prisma generate
+
+      - name: Apply disposable quality database migrations
+        run: |
+          npx prisma migrate deploy
+          npx prisma migrate status
+
+      - name: Seed disposable quality database twice
+        run: |
+          npx tsx prisma/seed.ts
+          npx tsx prisma/seed.ts
+
       - name: Type-check
         run: npm run typecheck
+
       - name: Run OCR-specific and full tests
         run: npm test
+
+      - name: Prove ICBP and MEDC remain native-only
+        run: npx tsx scripts/p0a-phase5c-native-regression.ts
+
+      - name: Run frozen ICBP regression
+        run: npx tsx scripts/p0a-phase5-icbp-regression.ts
+
+      - name: Create isolated MEDC acceptance database
+        run: |
+          psql -h 127.0.0.1 -U phase5c -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE p0a_phase5_medc;'
+          DATABASE_URL='postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5_medc' npx prisma migrate deploy
+
+      - name: Run frozen MEDC roundtrip regression
+        env:
+          DATABASE_URL: postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5_medc
+        run: node --import tsx scripts/p0a-phase5-medc-roundtrip.ts
+
       - name: Run DRMA Phase 5C OCR diagnostic
         run: npx tsx scripts/p0a-phase5c-drma-diagnostic.ts
+
+      - name: Create isolated DRMA acceptance database
+        run: |
+          psql -h 127.0.0.1 -U phase5c -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE p0a_phase5_drma;'
+          DATABASE_URL='postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5_drma' npx prisma migrate deploy
+
+      - name: Run DRMA OCR persistence roundtrip twice
+        env:
+          DATABASE_URL: postgresql://phase5c:phase5c@127.0.0.1:5432/p0a_phase5_drma
+        run: npx tsx scripts/p0a-phase5c-drma-roundtrip.ts
+
       - name: Lint
         run: npm run lint
+
       - name: Production build
         run: npm run build
-      - name: Upload DRMA Phase 5C OCR diagnostic
+
+      - name: Verify final artifacts
+        run: |
+          test -s artifacts/phase5/ICBP-PHASE5-REGRESSION-ACTUAL.json
+          test -s artifacts/phase5/MEDC-PHASE5-P0A-ACTUAL.json
+          test -s artifacts/phase5/DRMA-PHASE5-P0A-ACTUAL.json
+          sha256sum artifacts/phase5/ICBP-PHASE5-REGRESSION-ACTUAL.json artifacts/phase5/MEDC-PHASE5-P0A-ACTUAL.json artifacts/phase5/DRMA-PHASE5-P0A-ACTUAL.json
+
+      - name: Upload Phase 5C final artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: DRMA-PHASE5C-OCR-DIAGNOSTIC
-          path: artifacts/phase5/DRMA-PHASE5C-OCR-DIAGNOSTIC.json
+          name: PHASE5C-THREE-ISSUER-FINAL
+          path: |
+            artifacts/phase5/ICBP-PHASE5-REGRESSION-ACTUAL.json
+            artifacts/phase5/MEDC-PHASE5-P0A-ACTUAL.json
+            artifacts/phase5/DRMA-PHASE5-P0A-ACTUAL.json
+            artifacts/phase5/DRMA-PHASE5C-OCR-DIAGNOSTIC.json
           if-no-files-found: error
