@@ -37,7 +37,7 @@ test("Phase 6A production source contains no issuer, page, or gold-value hardcod
 
 const cases = [
   { ticker: "ICBP", env: "P0A_ICBP_PDF_PATH", context: { ticker: "ICBP", issuerType: "LISTED_COMMON_EQUITY", accountingModel: "NON_FINANCIAL", consolidated: true, audited: false, periodStart: "2025-01-01", periodEnd: "2025-06-30", periodType: "H1", currency: "IDR", documentScale: "1000000" }, expected: { fcf: "2396085", debt: "45818859", capex: "-2447972", oci: "-273353", interest: null, ocr: [] } },
-  { ticker: "MEDC", env: "P0A_MEDC_PDF_PATH", context: { ticker: "MEDC", issuerType: "LISTED_COMMON_EQUITY", accountingModel: "NON_FINANCIAL", consolidated: true, audited: false, periodStart: "2025-01-01", periodEnd: "2025-06-30", periodType: "H1", currency: "USD", documentScale: "1" }, expected: { fcf: "213075976", debt: "3735874708", capex: "-185274393", oci: null, interest: null, ocr: [] } },
+  { ticker: "MEDC", env: "P0A_MEDC_PDF_PATH", context: { ticker: "MEDC", issuerType: "LISTED_COMMON_EQUITY", accountingModel: "NON_FINANCIAL", consolidated: true, audited: false, periodStart: "2025-01-01", periodEnd: "2025-06-30", periodType: "H1", currency: "USD", documentScale: "1" }, expected: { fcf: "213075976", debt: "3735874708", capex: "-185274393", oci: "-25292786", interest: null, ocr: [] } },
   { ticker: "DRMA", env: "P0A_DRMA_PDF_PATH", context: { ticker: "DRMA", issuerType: "LISTED_COMMON_EQUITY", accountingModel: "NON_FINANCIAL", consolidated: true, audited: true, periodStart: "2025-01-01", periodEnd: "2025-12-31", periodType: "FY", currency: "IDR", documentScale: "1" }, expected: { fcf: "610058582694", debt: "278683993522", capex: "-313970875677", oci: "-1592457184", interest: "32135649832", ocr: [4, 5, 6, 7] } },
 ] as const;
 
@@ -49,9 +49,17 @@ for (const item of cases) test(`${item.ticker} Phase 6A source regression`, { sk
   assert.equal(value("TOTAL_DEBT_CALCULATED"), item.expected.debt);
   assert.equal(value("CAPEX_TOTAL_CASH_CALCULATED"), item.expected.capex);
   assert.equal(value("OCI_TOTAL_REPORTED"), item.expected.oci);
-  assert.equal(result.outcomes.find((outcome) => outcome.canonicalCode === "OCI_TOTAL_REPORTED")?.state, item.expected.oci === null ? "MISSING" : "VALUE");
+  const oci = result.outcomes.find((outcome) => outcome.canonicalCode === "OCI_TOTAL_REPORTED");
+  assert.equal(oci?.state, item.expected.oci === null ? "MISSING" : "VALUE");
+  if (item.ticker === "MEDC") {
+    assert.equal(oci?.evidence[0]?.statement, "CHANGES_IN_EQUITY");
+    assert.equal(oci?.evidence[0]?.columnLabel, "Jumlah Ekuitas / Total Equity");
+    assert.equal(oci?.rawValue, "(25.292.786)");
+  }
   assert.equal(value("INTEREST_EXPENSE_REPORTED"), item.expected.interest);
-  assert.equal(result.outcomes.find((outcome) => outcome.canonicalCode === "SHARES_OUTSTANDING_REPORTED")?.state, "MISSING");
+  const shares = result.outcomes.find((outcome) => outcome.canonicalCode === "SHARES_OUTSTANDING_REPORTED");
+  assert.equal(shares?.state, "NOT_DISCLOSED");
+  assert.match(shares?.reason ?? "", /^TRUE_NOT_DISCLOSED:/);
   assert.equal(result.outcomes.find((outcome) => outcome.canonicalCode === "EBITDA_CALCULATED")?.state, "NOT_CALCULABLE");
   for (const outcome of result.outcomes.filter((candidate) => candidate.family === "CALCULATED" && ["VALUE", "ZERO"].includes(candidate.state))) {
     assert.ok(outcome.formula?.formulaVersion);

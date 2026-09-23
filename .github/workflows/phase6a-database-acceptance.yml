@@ -1,0 +1,203 @@
+name: Phase 6A Disposable PostgreSQL Acceptance
+
+on:
+  push:
+    branches:
+      - agent/investai-phase6a-p0b-core
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase6a-database-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16.4-alpine3.20
+        env:
+          POSTGRES_USER: phase6a
+          POSTGRES_PASSWORD: phase6a
+          POSTGRES_DB: investai_phase6a_acceptance
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U phase6a -d investai_phase6a_acceptance"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DATABASE_URL: postgresql://phase6a:phase6a@127.0.0.1:5432/investai_phase6a_acceptance?schema=public
+      PGPASSWORD: phase6a
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase6a-source/ICBP_billingual_30Jun25.pdf
+      P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase6a-source/MEDC_1H25.pdf
+      P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase6a-source/DRMA_Q4_2025.pdf
+      PHASE6A_OUTPUT_DIR: ${{ github.workspace }}/.phase6a-qa/full-artifacts
+
+    steps:
+      - name: Checkout exact Phase 6A commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact checkout identity
+        run: test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install deterministic OCR and PostgreSQL clients
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind postgresql-client
+          tesseract --version
+          pdftoppm -v
+          psql --version
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Wait for disposable PostgreSQL readiness
+        run: |
+          for attempt in $(seq 1 30); do
+            pg_isready -h 127.0.0.1 -U phase6a -d investai_phase6a_acceptance && exit 0
+            sleep 1
+          done
+          exit 1
+
+      - name: Prisma validate
+        run: npx prisma validate
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Prisma migrate deploy
+        run: npx prisma migrate deploy
+
+      - name: Prisma migrate status
+        run: npx prisma migrate status
+
+      - name: Capture initial database counts and fingerprints
+        run: |
+          mkdir -p .phase6a-qa
+          node --import tsx scripts/phase6a-db-acceptance.ts snapshot .phase6a-qa/00-after-migrate.json
+
+      - name: Seed first run
+        run: npm run db:seed
+
+      - name: Capture first-seed counts
+        run: node --import tsx scripts/phase6a-db-acceptance.ts snapshot .phase6a-qa/01-after-seed-first.json
+
+      - name: Seed second run
+        run: npm run db:seed
+
+      - name: Capture second-seed counts
+        run: node --import tsx scripts/phase6a-db-acceptance.ts snapshot .phase6a-qa/02-after-seed-second.json
+
+      - name: Download and checksum-lock the three frozen issuer sources
+        run: |
+          mkdir -p .phase6a-source
+          curl --insecure --http1.1 --fail --location --retry 3 --output "$P0A_ICBP_PDF_PATH" 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  $P0A_ICBP_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_MEDC_PDF_PATH" 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  $P0A_MEDC_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_DRMA_PDF_PATH" 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
+          echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  $P0A_DRMA_PDF_PATH" | sha256sum --check --strict
+
+      - name: Prepare frozen P0-A baselines and fingerprints
+        run: node --import tsx scripts/phase6a-db-acceptance.ts prepare .phase6a-qa/03-p0a-baseline.json
+
+      - name: Persist Phase 6A ICBP first run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist ICBP first .phase6a-qa/04-icbp-first.json
+
+      - name: Persist Phase 6A MEDC first run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist MEDC first .phase6a-qa/05-medc-first.json
+
+      - name: Persist Phase 6A DRMA first run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist DRMA first .phase6a-qa/06-drma-first.json
+
+      - name: Capture first-persistence counts
+        run: node --import tsx scripts/phase6a-db-acceptance.ts snapshot .phase6a-qa/07-after-first-persistence.json
+
+      - name: Persist Phase 6A ICBP second identical run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist ICBP second .phase6a-qa/08-icbp-second.json
+
+      - name: Persist Phase 6A MEDC second identical run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist MEDC second .phase6a-qa/09-medc-second.json
+
+      - name: Persist Phase 6A DRMA second identical run
+        run: node --import tsx scripts/phase6a-db-acceptance.ts persist DRMA second .phase6a-qa/10-drma-second.json
+
+      - name: Capture second-persistence counts
+        run: node --import tsx scripts/phase6a-db-acceptance.ts snapshot .phase6a-qa/11-after-second-persistence.json
+
+      - name: Prove DB idempotency, linkage, reproducibility, and legacy safety
+        run: |
+          node --import tsx scripts/phase6a-db-acceptance.ts verify \
+            .phase6a-qa/03-p0a-baseline.json \
+            .phase6a-qa/01-after-seed-first.json \
+            .phase6a-qa/02-after-seed-second.json \
+            .phase6a-qa/07-after-first-persistence.json \
+            .phase6a-qa/11-after-second-persistence.json \
+            .phase6a-qa/PHASE6A-DATABASE-ACCEPTANCE.json
+
+      - name: Generate full evidence-bearing Phase 6A artifacts
+        run: node --import tsx scripts/p0b-phase6a-three-issuer.ts
+
+      - name: Verify full evidence artifact SHA-256
+        working-directory: .phase6a-qa/full-artifacts
+        run: sha256sum --check --strict SHA256SUMS.txt
+
+      - name: Verify repository sanitized artifact SHA-256
+        working-directory: artifacts/phase6a
+        run: sha256sum --check --strict SHA256SUMS.txt
+
+      - name: Prove Phase 3A source assertion is pre-existing and unrelated
+        run: |
+          git diff --exit-code 9e34089afda409237ff0edeeec918cfbf1399d67 -- \
+            lib/financial/p0a \
+            scripts/p0a-phase3-icbp-native-acceptance.ts \
+            tests/p0a/phase3-native-scoped.test.ts
+
+      - name: Run standard full regression suite
+        env:
+          P0A_ICBP_PDF_PATH: ""
+          P0A_MEDC_PDF_PATH: ""
+          P0A_DRMA_PDF_PATH: ""
+        run: npm test
+
+      - name: Run source-backed P0-A and OCR regression
+        run: |
+          npx tsx scripts/p0a-phase5c-native-regression.ts
+          npx tsx scripts/p0a-phase5-icbp-regression.ts
+          npx tsx scripts/p0a-phase5c-drma-diagnostic.ts
+
+      - name: Run source-backed Phase 6A fact tests
+        run: node --import tsx --test tests/p0b/phase6a-core.test.ts
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload full evidence and database acceptance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHASE6A-FINAL-DATABASE-ACCEPTANCE-${{ github.sha }}
+          path: |
+            .phase6a-qa/*.json
+            .phase6a-qa/full-artifacts/*.json
+            .phase6a-qa/full-artifacts/SHA256SUMS.txt
+            artifacts/phase5/*.json
+          if-no-files-found: warn
+          retention-days: 30

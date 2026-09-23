@@ -1,7 +1,7 @@
 import type { Phase6ARequirement } from "@/lib/financial/p0b/types";
 
 export const PHASE6A_MANIFEST_VERSION = "investai-canonical-v1.0-final:p0-b-phase6a";
-export const PHASE6A_EXTRACTOR_VERSION = "p0b-phase6a-deterministic-v1";
+export const PHASE6A_EXTRACTOR_VERSION = "p0b-phase6a-deterministic-v1.1.0";
 export const PHASE6A_FORMULA_REGISTRY_VERSION = "p0b-phase6a-formulas-v1";
 
 const reported = (canonicalCode: string, definition: string, applicability: "EXPECTED" | "OPTIONAL", unitType: Phase6ARequirement["unitType"], periodNature: Phase6ARequirement["periodNature"]): Phase6ARequirement => ({ requirementId: canonicalCode, canonicalCode, family: "REPORTED", definition, applicability, unitType, periodNature });

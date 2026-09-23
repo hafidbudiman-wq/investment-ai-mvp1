@@ -11,7 +11,9 @@ export async function persistPhase6A(client: PrismaClient, input: { documentId: 
     const run = await tx.p0BExtractionRun.upsert({
       where: { completeIdentityHash: input.result.runIdentity },
       create: { companyId: input.companyId, documentId: input.documentId, reportRevisionId: input.reportRevisionId, manifestVersion: input.result.manifestVersion, extractorVersion: input.result.extractorVersion, formulaRegistryVersion: input.result.formulaRegistryVersion, completeIdentityHash: input.result.runIdentity, status: "SUCCEEDED", completedAt: new Date() },
-      update: { status: "SUCCEEDED" },
+      // A complete identity is immutable. A retry may discover the row, but it
+      // must not touch updatedAt or rewrite any previously accepted result.
+      update: {},
     });
     const pages = await tx.p0ADocumentPage.findMany({ where: { documentId: input.documentId, parserVersion: input.result.p0a.versions.parser } });
     const pageIds = new Map(pages.map((page) => [page.pageNumber, page.id]));

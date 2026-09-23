@@ -56,6 +56,9 @@ const COMPONENT_SPECS: readonly ReportedSpec[] = [
   { code: "DEBT_NONCURRENT_OTHER_LONG", statements: ["BALANCE_SHEET"], minAbs: "1000", requirePrimary: true, aliases: [/LIABILITAS\s+JANGKA\s+PANJANG[\s\S]{0,1000}?Utang\s+jangka\s+panjang\s+lainnya/i] },
 ];
 
+const SHARES_SUBSTITUTE = /weighted\s+average\s+(?:number\s+of\s+)?(?:ordinary\s+)?shares?|rata[- ]rata\s+tertimbang(?:\s+jumlah)?\s+saham|treasury\s+(?:shares?|stock)|saham\s+treasuri|issued\s+(?:and\s+fully\s+paid\s+)?shares?|saham\s+(?:yang\s+)?(?:telah\s+)?diterbitkan|shares?\s+buyback|pembelian\s+kembali\s+saham/i;
+const OCI_COMPONENT = /translation\s+adjustment|selisih\s+kurs\s+karena\s+penjabaran|cash\s+flow\s+hedg|instrumen\s+lindung\s+nilai\s+arus\s+kas|share\s+of\s+other\s+comprehensive|bagian\s+rugi\s+komprehensif\s+lain/i;
+
 function scope(page: P0ARoutedPage, context: P0AIssuerContext): "CONSOLIDATED" | "STANDALONE" | "UNKNOWN" {
   if (/\b(?:separate statement|separate financial statements?|separate financial information|laporan[^\n]{0,80}tersendiri|informasi keuangan entitas induk|entitas induk saja|parent entity financial information|parent company only)\b/i.test(page.text)) return "STANDALONE";
   if (/\b(?:consolidated|konsolidasian)\b/i.test(page.text)) return "CONSOLIDATED";
@@ -105,6 +108,62 @@ function extractSpec(pages: readonly P0ARoutedPage[], context: P0AIssuerContext,
   return candidates.sort((a, b) => b.score - a.score)[0]?.input ?? null;
 }
 
+/**
+ * A statement of changes in equity can report an OCI row and its consolidated
+ * total even when the profit-or-loss statement only lists OCI components. The
+ * last numeric cell before the next comprehensive-income row is the explicit
+ * Total Equity column, not an InvestAI sum. This is a requirement/statement
+ * rule: no issuer, page number, or expected value participates in selection.
+ */
+function extractChangesInEquityOciTotal(pages: readonly P0ARoutedPage[], context: P0AIssuerContext): Phase6AInput | null {
+  const candidates: Array<{ input: Phase6AInput; score: number }> = [];
+  for (const page of pages) {
+    if (page.statementType !== "CHANGES_IN_EQUITY" || !page.pageClass.startsWith("PRIMARY_") || (context.consolidated === true && scope(page, context) === "STANDALONE")) continue;
+    const rowPattern = /(?:penghasilan\s+komprehensif\s+lain|other\s+comprehensive\s+income)/ig;
+    for (const match of page.text.matchAll(rowPattern)) {
+      if (match.index === undefined) continue;
+      const afterStart = match.index + match[0].length;
+      const remainder = page.text.slice(afterStart);
+      const nextRow = remainder.search(/(?:jumlah\s+laba\s+komprehensif|total\s+comprehensive\s+income)/i);
+      if (nextRow < 0) continue;
+      const row = remainder.slice(0, nextRow);
+      NUMBER.lastIndex = 0;
+      const parsed: Array<{ raw: string; decimal: string }> = [];
+      for (const number of row.matchAll(NUMBER)) {
+        const value = parseFinancialDecimal(number[0]);
+        if (value && new Prisma.Decimal(value.decimal).abs().greaterThanOrEqualTo("10000")) parsed.push({ raw: number[0], decimal: value.decimal });
+      }
+      const total = parsed.at(-1);
+      if (!total) continue;
+      const rowStart = Math.max(0, match.index - 80);
+      const snippet = page.text.slice(rowStart, Math.min(page.text.length, afterStart + nextRow));
+      const evidence = createEvidence({ requirementId: "OCI_TOTAL_REPORTED", page, statement: page.statementType, rowLabel: match[0].replace(/\s+/g, " ").trim(), columnLabel: "Jumlah Ekuitas / Total Equity", rawValue: total.raw, snippet });
+      const value = total.decimal;
+      const inputId = `fact:${sha([context.ticker, "OCI_TOTAL_REPORTED", context.periodEnd, scope(page, context), value, evidence.evidenceHash].join("|"))}`;
+      const balanceYears = [...page.text.matchAll(/(?:saldo\s+tanggal|balance,?)[\s\S]{0,60}?(\d{4})/ig)].map((candidate) => candidate[1]);
+      const closesOnContextYear = balanceYears.at(-1) === context.periodEnd.slice(0, 4);
+      candidates.push({
+        input: { inputId, inputRole: "OCI_TOTAL_REPORTED", requirementId: "OCI_TOTAL_REPORTED", value, currency: context.currency, scale: context.documentScale, periodStart: context.periodStart, periodEnd: context.periodEnd, scope: scope(page, context), extractionOrigin: page.sourceType ?? "NATIVE", evidence: [evidence] },
+        score: (closesOnContextYear ? 1_000 : 0) + page.pageNumber / 10_000,
+      });
+    }
+  }
+  return candidates.sort((a, b) => b.score - a.score)[0]?.input ?? null;
+}
+
+function exhaustiveAbsenceReason(requirement: Phase6ARequirement, pages: readonly P0ARoutedPage[], context: P0AIssuerContext): string | null {
+  const compatiblePages = pages.filter((page) => !(context.consolidated === true && scope(page, context) === "STANDALONE"));
+  if (requirement.canonicalCode === "SHARES_OUTSTANDING_REPORTED") {
+    const substitutePages = compatiblePages.filter((page) => SHARES_SUBSTITUTE.test(page.text)).map((page) => page.pageNumber);
+    if (substitutePages.length) return `TRUE_NOT_DISCLOSED: exhaustive deterministic full-document review found only prohibited issued, treasury, weighted-average, or buyback substitutes on candidate pages ${[...new Set(substitutePages)].join(", ")}; no exact issuer-reported period-end outstanding-shares scalar exists.`;
+  }
+  if (requirement.canonicalCode === "OCI_TOTAL_REPORTED") {
+    const componentPages = compatiblePages.filter((page) => OCI_COMPONENT.test(page.text)).map((page) => page.pageNumber);
+    if (componentPages.length) return `TRUE_NOT_DISCLOSED: exhaustive deterministic review found OCI components but no explicit reported OCI total on candidate pages ${[...new Set(componentPages)].join(", ")}; components were not summed or relabeled as REPORTED.`;
+  }
+  return null;
+}
+
 function p0aInput(p0a: P0ACompatiblePipelineResult, requirementId: string, role = requirementId): Phase6AInput | null {
   const observation = p0a.outcomes.find((item) => item.requirementId === requirementId)?.reportedObservation;
   if (!observation || !observation.decimalValue || !["VALUE", "ZERO"].includes(observation.state)) return null;
@@ -137,7 +196,8 @@ function compatible(inputs: readonly Phase6AInput[]): boolean {
 
 function reportedOutcome(requirement: Phase6ARequirement, input: Phase6AInput | null, context: P0AIssuerContext, pages: readonly P0ARoutedPage[]): Phase6AOutcome {
   const requiredMissing = requirement.applicability === "EXPECTED";
-  if (!input) return { requirementId: requirement.requirementId, canonicalCode: requirement.canonicalCode, family: "REPORTED", applicability: requirement.applicability, state: requiredMissing ? "MISSING" : "NOT_DISCLOSED", value: null, rawValue: null, currency: null, unitType: requirement.unitType, scale: null, period: { start: context.periodStart, end: context.periodEnd, type: context.periodType }, scope: context.consolidated === true ? "CONSOLIDATED" : context.consolidated === false ? "STANDALONE" : "UNKNOWN", evidence: [], extractionOrigin: null, confidence: { read: null, mapping: null }, formula: null, inputs: [], reason: requiredMissing ? "Applicable expected fact was not resolved after deterministic primary/note search." : "No explicit issuer-reported scalar was found; absence is not zero.", factIdentity: null };
+  const absenceReason = input ? null : exhaustiveAbsenceReason(requirement, pages, context);
+  if (!input) return { requirementId: requirement.requirementId, canonicalCode: requirement.canonicalCode, family: "REPORTED", applicability: requirement.applicability, state: absenceReason || !requiredMissing ? "NOT_DISCLOSED" : "MISSING", value: null, rawValue: null, currency: null, unitType: requirement.unitType, scale: null, period: { start: context.periodStart, end: context.periodEnd, type: context.periodType }, scope: context.consolidated === true ? "CONSOLIDATED" : context.consolidated === false ? "STANDALONE" : "UNKNOWN", evidence: [], extractionOrigin: null, confidence: { read: null, mapping: null }, formula: null, inputs: [], reason: absenceReason ?? (requiredMissing ? "Applicable expected fact was not resolved after deterministic primary/note search." : "No explicit issuer-reported scalar was found; absence is not zero."), factIdentity: null };
   const sourcePage = pages.find((page) => page.pageNumber === input.evidence[0]?.pageNumber);
   return { requirementId: requirement.requirementId, canonicalCode: requirement.canonicalCode, family: "REPORTED", applicability: requirement.applicability, state: new Prisma.Decimal(input.value).isZero() ? "ZERO" : "VALUE", value: input.value, rawValue: input.evidence[0]?.rawValue ?? input.value, currency: input.currency, unitType: requirement.unitType, scale: input.scale, period: { start: context.periodStart, end: context.periodEnd, type: context.periodType }, scope: input.scope, evidence: input.evidence, extractionOrigin: sourcePage?.sourceType ?? "NATIVE", confidence: { read: sourcePage?.sourceType === "OCR" ? sourcePage.sourceMetadata?.numericMeanConfidence ?? null : 1, mapping: 0.995 }, formula: null, inputs: [], reason: "Explicit issuer-reported scalar with source evidence.", factIdentity: input.inputId };
 }
@@ -174,6 +234,10 @@ export async function runPhase6A(input: { bytes: Buffer; context: P0AIssuerConte
   for (const spec of [...REPORTED_SPECS, ...COMPONENT_SPECS]) {
     const found = extractSpec(p0a.routedPages, input.context, spec);
     if (found) extracted.set(spec.code, normalizedInput(found, input.context));
+  }
+  if (!extracted.has("OCI_TOTAL_REPORTED")) {
+    const equityOci = extractChangesInEquityOciTotal(p0a.routedPages, input.context);
+    if (equityOci) extracted.set("OCI_TOTAL_REPORTED", normalizedInput(equityOci, input.context));
   }
 
   const byCode = new Map<string, Phase6AOutcome>();

@@ -5,9 +5,9 @@
     "sha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e"
   },
   "passIdentity": {
-    "runIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+    "runIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
     "manifestVersion": "investai-canonical-v1.0-final:p0-b-phase6a",
-    "extractorVersion": "p0b-phase6a-deterministic-v1",
+    "extractorVersion": "p0b-phase6a-deterministic-v1.1.0",
     "formulaRegistryVersion": "p0b-phase6a-formulas-v1",
     "p0aVersions": {
       "contract": "investai-canonical-v1.0-final:p0-a",
@@ -54,6 +54,7 @@
       6,
       8,
       9,
+      12,
       13,
       94
     ]
@@ -69,9 +70,8 @@
       "canonicalCode": "SHARES_OUTSTANDING_REPORTED",
       "family": "REPORTED",
       "applicability": "EXPECTED",
-      "state": "MISSING",
+      "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "SHARES",
       "scale": null,
@@ -89,7 +89,7 @@
       },
       "formula": null,
       "inputs": [],
-      "reason": "Applicable expected fact was not resolved after deterministic primary/note search.",
+      "reason": "TRUE_NOT_DISCLOSED: exhaustive deterministic full-document review found only prohibited issued, treasury, weighted-average, or buyback substitutes on candidate pages 7, 11, 12, 14, 16, 45, 70, 71, 104, 189, 192, 193, 194, 218, 219, 220; no exact issuer-reported period-end outstanding-shares scalar exists.",
       "factIdentity": null
     },
     {
@@ -99,7 +99,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -136,143 +135,73 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "DEBT_SHORT_BANK_DIRECT",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek",
-          "columnLabel": "2025-06-30",
-          "rawValue": "15.000.000",
-          "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak be",
-          "snippetHash": "912d7dd1aa9d42a77255f170ab96bf950f904896df2dd0c74910bab7bd0bc28b",
           "evidenceHash": "5bd448d0f262ca42e2edcb5deabb419b1e619cf0dde1199ed46d8dd24dfa6c6f",
+          "snippetHash": "912d7dd1aa9d42a77255f170ab96bf950f904896df2dd0c74910bab7bd0bc28b",
           "locatorHash": "03445786c8c637a15eb4a3e86f495895d8b176f16e5c785290f0950af6f6110c"
         },
         {
-          "requirementId": "DEBT_CURRENT_MATURITY_BANK",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank",
-          "columnLabel": "2025-06-30",
-          "rawValue": "118.147.525",
-          "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.",
-          "snippetHash": "e5c2ab75359770134291478ef9702980bbc3784bd6cca89189c025cc5ecac069",
           "evidenceHash": "13a73d782440dbc994af334077e7f762554e984b27e57312f79a852786ab35b9",
+          "snippetHash": "e5c2ab75359770134291478ef9702980bbc3784bd6cca89189c025cc5ecac069",
           "locatorHash": "8779aef2239c1c333df14571e0c048763cd52b5c82065042c5bdb7d592c1ee8b"
         },
         {
-          "requirementId": "DEBT_CURRENT_MATURITY_NONBANK",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank",
-          "columnLabel": "2025-06-30",
-          "rawValue": "2.010.800",
-          "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Cont",
-          "snippetHash": "40e8144b218f95b808284c6e74af62ea4fde044f0b199a4fce1aeea06c8828fa",
           "evidenceHash": "ac21a9418a23676bf5ce91a82e65fd7d0d5740a9abf6f05f9bc222fc1664bc0f",
+          "snippetHash": "40e8144b218f95b808284c6e74af62ea4fde044f0b199a4fce1aeea06c8828fa",
           "locatorHash": "a40a40c0bfa9822bf1a3b61947882fb8c716870ab6cbdac2a6fd94e8a8c2bd39"
         },
         {
-          "requirementId": "DEBT_CURRENT_MATURITY_RUPIAH_BONDS",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah",
-          "columnLabel": "2025-06-30",
-          "rawValue": "181.932.175",
-          "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Curr",
-          "snippetHash": "fdfb918179a37fedece42143105f29e7083f8b3a3a6980e68bae3b1541d63a03",
           "evidenceHash": "9d5d653dcd76449fe0601f77687c9aaff219163b062d18f4325d86cde6826cf0",
+          "snippetHash": "fdfb918179a37fedece42143105f29e7083f8b3a3a6980e68bae3b1541d63a03",
           "locatorHash": "cbd52fa49456e527f674e7430585915c8c47b87614a6c190d1949173d53025d4"
         },
         {
-          "requirementId": "DEBT_NONCURRENT_BANK",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank",
-          "columnLabel": "2025-06-30",
-          "rawValue": "1.106.210.750",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar ",
-          "snippetHash": "f079536ab7e208913974c77b701379ffead62bdf6fd365c2cabee7f48083187f",
           "evidenceHash": "babefd925ee2aac853cb2f41f7aad52d1bc6ef138e24a81a869755e390efa071",
+          "snippetHash": "f079536ab7e208913974c77b701379ffead62bdf6fd365c2cabee7f48083187f",
           "locatorHash": "72f5763e5b3a1510bda680164d43e55825ff3d62fe577a05fce8c846e114d62e"
         },
         {
-          "requirementId": "DEBT_NONCURRENT_NONBANK",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank",
-          "columnLabel": "2025-06-30",
-          "rawValue": "102.980.668",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.",
-          "snippetHash": "9b665396459eaa420fd71b8c78aee771d35ca14ab97655b10bab3fe8f4b1de63",
           "evidenceHash": "6a6ccdaf9ca82b584dbc29c95f1d6102c378190bb99ff561e501bbc61181f766",
+          "snippetHash": "9b665396459eaa420fd71b8c78aee771d35ca14ab97655b10bab3fe8f4b1de63",
           "locatorHash": "7b3b523ac31da97158b84ea03ced0347f0329ffab4b98df4c9e8510c2de69ee6"
         },
         {
-          "requirementId": "DEBT_NONCURRENT_RUPIAH_BONDS",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah",
-          "columnLabel": "2025-06-30",
-          "rawValue": "613.959.451",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Ut",
-          "snippetHash": "9693f5669ead5542aff397e494811e938133726bf917e22302526ad673360cb4",
           "evidenceHash": "d6c3941f9f5cd5bb48c104be67e0696f43e5d70e9846580e582c40646ac79946",
+          "snippetHash": "9693f5669ead5542aff397e494811e938133726bf917e22302526ad673360cb4",
           "locatorHash": "9e84b59786deaac3d40277f42888a51e0c54c1ad1b9a045688cfadc70660a8c7"
         },
         {
-          "requirementId": "DEBT_NONCURRENT_USD_BONDS",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS",
-          "columnLabel": "2025-06-30",
-          "rawValue": "1.317.278.277",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabil",
-          "snippetHash": "13ddacbac05a05832bb0abbb375d85f4ae53abd3801ffdffc348fe6717ab78f0",
           "evidenceHash": "eacf65b1f6b0c358ed2f8ee58e246fa7542a741b160dc32328c3d29000f8dc10",
+          "snippetHash": "13ddacbac05a05832bb0abbb375d85f4ae53abd3801ffdffc348fe6717ab78f0",
           "locatorHash": "eae4cf85b8812c20ee8037786462f4fdb896877a6e4465b7895a7fb774f44567"
         },
         {
-          "requirementId": "LEASE_CURRENT_COMPONENT",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other provisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung berhubungan dengan aset dimiliki untuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with assets held for sale Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa",
-          "columnLabel": "2025-06-30",
-          "rawValue": "105.889.581",
-          "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other\nprovisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung\nberhubungan dengan aset dimiliki\nuntuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIAB",
-          "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
           "evidenceHash": "bc3e85d2f216e21631205a149a531220de9f7ed4c31f1f2e22e36b998df3d7d8",
+          "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
           "locatorHash": "cdbf20297b85833e67581c22d9dd611568f5c5874fc66f8ef9ef3ceba5feada3"
         },
         {
-          "requirementId": "LEASE_NONCURRENT_COMPONENT",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa",
-          "columnLabel": "2025-06-30",
-          "rawValue": "172.465.481",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabilitas pajak tangguhan 2,38 647.670.678 686.476.118 Deferred tax li",
-          "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
           "evidenceHash": "93472f9a145c4328a967836d8db5bbde348e021da11a7437bef27f1d4a5672dc",
+          "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
           "locatorHash": "621e8b55335d40d18ce5b685510b47ad7f8a4fe882f519f3265356ff9135e0fb"
         }
       ],
@@ -295,17 +224,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_SHORT_BANK_DIRECT",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek",
-              "columnLabel": "2025-06-30",
-              "rawValue": "15.000.000",
-              "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak be",
-              "snippetHash": "912d7dd1aa9d42a77255f170ab96bf950f904896df2dd0c74910bab7bd0bc28b",
               "evidenceHash": "5bd448d0f262ca42e2edcb5deabb419b1e619cf0dde1199ed46d8dd24dfa6c6f",
+              "snippetHash": "912d7dd1aa9d42a77255f170ab96bf950f904896df2dd0c74910bab7bd0bc28b",
               "locatorHash": "03445786c8c637a15eb4a3e86f495895d8b176f16e5c785290f0950af6f6110c"
             }
           ]
@@ -323,17 +245,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_CURRENT_MATURITY_BANK",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank",
-              "columnLabel": "2025-06-30",
-              "rawValue": "118.147.525",
-              "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.",
-              "snippetHash": "e5c2ab75359770134291478ef9702980bbc3784bd6cca89189c025cc5ecac069",
               "evidenceHash": "13a73d782440dbc994af334077e7f762554e984b27e57312f79a852786ab35b9",
+              "snippetHash": "e5c2ab75359770134291478ef9702980bbc3784bd6cca89189c025cc5ecac069",
               "locatorHash": "8779aef2239c1c333df14571e0c048763cd52b5c82065042c5bdb7d592c1ee8b"
             }
           ]
@@ -351,17 +266,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_CURRENT_MATURITY_NONBANK",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank",
-              "columnLabel": "2025-06-30",
-              "rawValue": "2.010.800",
-              "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Cont",
-              "snippetHash": "40e8144b218f95b808284c6e74af62ea4fde044f0b199a4fce1aeea06c8828fa",
               "evidenceHash": "ac21a9418a23676bf5ce91a82e65fd7d0d5740a9abf6f05f9bc222fc1664bc0f",
+              "snippetHash": "40e8144b218f95b808284c6e74af62ea4fde044f0b199a4fce1aeea06c8828fa",
               "locatorHash": "a40a40c0bfa9822bf1a3b61947882fb8c716870ab6cbdac2a6fd94e8a8c2bd39"
             }
           ]
@@ -379,17 +287,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_CURRENT_MATURITY_RUPIAH_BONDS",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah",
-              "columnLabel": "2025-06-30",
-              "rawValue": "181.932.175",
-              "snippet": "12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Curr",
-              "snippetHash": "fdfb918179a37fedece42143105f29e7083f8b3a3a6980e68bae3b1541d63a03",
               "evidenceHash": "9d5d653dcd76449fe0601f77687c9aaff219163b062d18f4325d86cde6826cf0",
+              "snippetHash": "fdfb918179a37fedece42143105f29e7083f8b3a3a6980e68bae3b1541d63a03",
               "locatorHash": "cbd52fa49456e527f674e7430585915c8c47b87614a6c190d1949173d53025d4"
             }
           ]
@@ -407,17 +308,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_NONCURRENT_BANK",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank",
-              "columnLabel": "2025-06-30",
-              "rawValue": "1.106.210.750",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar ",
-              "snippetHash": "f079536ab7e208913974c77b701379ffead62bdf6fd365c2cabee7f48083187f",
               "evidenceHash": "babefd925ee2aac853cb2f41f7aad52d1bc6ef138e24a81a869755e390efa071",
+              "snippetHash": "f079536ab7e208913974c77b701379ffead62bdf6fd365c2cabee7f48083187f",
               "locatorHash": "72f5763e5b3a1510bda680164d43e55825ff3d62fe577a05fce8c846e114d62e"
             }
           ]
@@ -435,17 +329,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_NONCURRENT_NONBANK",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank",
-              "columnLabel": "2025-06-30",
-              "rawValue": "102.980.668",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.",
-              "snippetHash": "9b665396459eaa420fd71b8c78aee771d35ca14ab97655b10bab3fe8f4b1de63",
               "evidenceHash": "6a6ccdaf9ca82b584dbc29c95f1d6102c378190bb99ff561e501bbc61181f766",
+              "snippetHash": "9b665396459eaa420fd71b8c78aee771d35ca14ab97655b10bab3fe8f4b1de63",
               "locatorHash": "7b3b523ac31da97158b84ea03ced0347f0329ffab4b98df4c9e8510c2de69ee6"
             }
           ]
@@ -463,17 +350,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_NONCURRENT_RUPIAH_BONDS",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah",
-              "columnLabel": "2025-06-30",
-              "rawValue": "613.959.451",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Ut",
-              "snippetHash": "9693f5669ead5542aff397e494811e938133726bf917e22302526ad673360cb4",
               "evidenceHash": "d6c3941f9f5cd5bb48c104be67e0696f43e5d70e9846580e582c40646ac79946",
+              "snippetHash": "9693f5669ead5542aff397e494811e938133726bf917e22302526ad673360cb4",
               "locatorHash": "9e84b59786deaac3d40277f42888a51e0c54c1ad1b9a045688cfadc70660a8c7"
             }
           ]
@@ -491,17 +371,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "DEBT_NONCURRENT_USD_BONDS",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS",
-              "columnLabel": "2025-06-30",
-              "rawValue": "1.317.278.277",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabil",
-              "snippetHash": "13ddacbac05a05832bb0abbb375d85f4ae53abd3801ffdffc348fe6717ab78f0",
               "evidenceHash": "eacf65b1f6b0c358ed2f8ee58e246fa7542a741b160dc32328c3d29000f8dc10",
+              "snippetHash": "13ddacbac05a05832bb0abbb375d85f4ae53abd3801ffdffc348fe6717ab78f0",
               "locatorHash": "eae4cf85b8812c20ee8037786462f4fdb896877a6e4465b7895a7fb774f44567"
             }
           ]
@@ -519,31 +392,17 @@
           "extractionOrigin": null,
           "evidence": [
             {
-              "requirementId": "LEASE_CURRENT_COMPONENT",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other provisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung berhubungan dengan aset dimiliki untuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with assets held for sale Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa",
-              "columnLabel": "2025-06-30",
-              "rawValue": "105.889.581",
-              "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other\nprovisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung\nberhubungan dengan aset dimiliki\nuntuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIAB",
-              "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
               "evidenceHash": "bc3e85d2f216e21631205a149a531220de9f7ed4c31f1f2e22e36b998df3d7d8",
+              "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
               "locatorHash": "cdbf20297b85833e67581c22d9dd611568f5c5874fc66f8ef9ef3ceba5feada3"
             },
             {
-              "requirementId": "LEASE_NONCURRENT_COMPONENT",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa",
-              "columnLabel": "2025-06-30",
-              "rawValue": "172.465.481",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabilitas pajak tangguhan 2,38 647.670.678 686.476.118 Deferred tax li",
-              "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
               "evidenceHash": "93472f9a145c4328a967836d8db5bbde348e021da11a7437bef27f1d4a5672dc",
+              "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
               "locatorHash": "621e8b55335d40d18ce5b685510b47ad7f8a4fe882f519f3265356ff9135e0fb"
             }
           ]
@@ -551,12 +410,11 @@
       ],
       "state": "VALUE",
       "value": "3735874708",
-      "rawValue": null,
       "formula": {
         "formulaId": "P0B-TOTAL-DEBT-INCL-LEASES",
         "formulaVersion": "1.0.0",
         "expression": "SUM(ACCEPTED_SHORT_TERM_DEBT_EX_LEASE_COMPONENTS) + SUM(ACCEPTED_LONG_TERM_DEBT_EX_LEASE_COMPONENTS) + LEASE_LIABILITIES_TOTAL",
-        "calculationRunIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+        "calculationRunIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
         "resultHash": "4474f0a61fed065708268bca75e164b6f1fab69117ed49b8c469606397a97de6"
       },
       "reason": "Deterministic Decimal calculation from exact accepted input identities.",
@@ -569,7 +427,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -606,31 +463,17 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "LEASE_CURRENT_COMPONENT",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other provisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung berhubungan dengan aset dimiliki untuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with assets held for sale Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa",
-          "columnLabel": "2025-06-30",
-          "rawValue": "105.889.581",
-          "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other\nprovisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung\nberhubungan dengan aset dimiliki\nuntuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIAB",
-          "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
           "evidenceHash": "bc3e85d2f216e21631205a149a531220de9f7ed4c31f1f2e22e36b998df3d7d8",
+          "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
           "locatorHash": "cdbf20297b85833e67581c22d9dd611568f5c5874fc66f8ef9ef3ceba5feada3"
         },
         {
-          "requirementId": "LEASE_NONCURRENT_COMPONENT",
           "pageNumber": 6,
           "printedPageLabel": null,
-          "statement": "BALANCE_SHEET",
-          "table": null,
-          "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa",
-          "columnLabel": "2025-06-30",
-          "rawValue": "172.465.481",
-          "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabilitas pajak tangguhan 2,38 647.670.678 686.476.118 Deferred tax li",
-          "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
           "evidenceHash": "93472f9a145c4328a967836d8db5bbde348e021da11a7437bef27f1d4a5672dc",
+          "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
           "locatorHash": "621e8b55335d40d18ce5b685510b47ad7f8a4fe882f519f3265356ff9135e0fb"
         }
       ],
@@ -653,17 +496,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "LEASE_CURRENT_COMPONENT",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other provisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung berhubungan dengan aset dimiliki untuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with assets held for sale Pinjaman jangka panjang yang jatuh tempo dalam satu tahun 2 Current maturities of long-term debts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 2.010.800 14.871 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa",
-              "columnLabel": "2025-06-30",
-              "rawValue": "105.889.581",
-              "snippet": "LIABILITAS DAN EKUITAS LIABILITIES AND EQUITY LIABILITAS LIABILITIES LIABILITAS JANGKA PENDEK CURRENT LIABILITIES Pinjaman bank jangka pendek 2,28 15.000.000 54.691.856 Short-term bank loans Utang usaha 2,21 Trade payables - Pihak berelasi 40.134.020 37.769.518 Related parties - - Pihak ketiga 279.277.995 305.828.073 Third parties - Utang lain-lain 2,23 Other payables - Pihak berelasi 13.211.316 15.168.241 Related parties - - Pihak ketiga 189.429.497 132.091.345 Third parties - Utang pajak 2,25 60.336.965 76.869.454 Taxes payable Biaya akrual dan provisi lain-lain 2,26 303.504.935 276.060.037 Accrued expenses and other\nprovisions Liabilitas derivatif 2,27 9.189.471 12.653.816 Derivative liabilities Liabilitas yang secara langsung\nberhubungan dengan aset dimiliki\nuntuk dijual 2,39 12.439.909 13.817.699 Liabilities directly associated with\nassets held for sale Pinjaman jangka panjang yang jatuh\ntempo dalam satu tahun 2 Current maturities of long-term\ndebts - Pinjaman bank 28 118.147.525 162.501.916 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 2.010.800 14.871 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 181.932.175 211.478.310 Rupiah bonds - Liabilitas sewa 24 105.889.581 130.372.051 Lease liabilities Liabilitas kontrak 22 135.493.426 76.068.456 Contract liabilities Jumlah Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIAB",
-              "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
               "evidenceHash": "bc3e85d2f216e21631205a149a531220de9f7ed4c31f1f2e22e36b998df3d7d8",
+              "snippetHash": "a78de0cf7871be53d181c3d6c286837cb53fd3d751d91c10f9820fde3fdecc05",
               "locatorHash": "cdbf20297b85833e67581c22d9dd611568f5c5874fc66f8ef9ef3ceba5feada3"
             }
           ]
@@ -681,17 +517,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "LEASE_NONCURRENT_COMPONENT",
               "pageNumber": 6,
               "printedPageLabel": null,
-              "statement": "BALANCE_SHEET",
-              "table": null,
-              "rowLabel": "LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah dikurangi bagian yang jatuh tempo dalam satu tahun 2 Long-term liabilities - net of current maturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan non-bank 29 102.980.668 69.990.180 Loans from non-bank - financial - institutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa",
-              "columnLabel": "2025-06-30",
-              "rawValue": "172.465.481",
-              "snippet": " Liabilitas Jangka Pendek 1.465.997.615 1.505.385.643 Total Current Liabilities LIABILITAS JANGKA PANJANG NON-CURRENT LIABILITIES Liabilitas jangka panjang setelah\ndikurangi bagian yang jatuh tempo\ndalam satu tahun 2 Long-term liabilities - net of current\nmaturities - Pinjaman bank 28 1.106.210.750 1.028.429.769 Bank loans - - Pinjaman dari instansi keuangan\nnon-bank 29 102.980.668 69.990.180 Loans from non-bank - financial -\ninstitutions . - Obligasi Rupiah 29 613.959.451 330.777.880 Rupiah bonds - - Obligasi Dolar AS 29 1.317.278.277 1.442.197.561 US Dollar bonds - Liabilitas sewa 24 172.465.481 147.515.311 Lease liabilities Liabilitas kontrak 22 41.794.356 83.090.632 Contract liabilities Utang lain-lain 2,23 87.238.980 91.048.352 Other payables Liabilitas pajak tangguhan 2,38 647.670.678 686.476.118 Deferred tax li",
-              "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
               "evidenceHash": "93472f9a145c4328a967836d8db5bbde348e021da11a7437bef27f1d4a5672dc",
+              "snippetHash": "37fc5511214b0e3099fd9158488f56a3849b638a7b835e37738d6a1388539213",
               "locatorHash": "621e8b55335d40d18ce5b685510b47ad7f8a4fe882f519f3265356ff9135e0fb"
             }
           ]
@@ -699,12 +528,11 @@
       ],
       "state": "VALUE",
       "value": "278355062",
-      "rawValue": null,
       "formula": {
         "formulaId": "P0B-LEASE-TOTAL",
         "formulaVersion": "1.0.0",
         "expression": "LEASE_CURRENT + LEASE_NONCURRENT",
-        "calculationRunIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+        "calculationRunIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
         "resultHash": "df6906d741e39a74d414844530218f36fe6ebe215ce9ca72293d560e7107651e"
       },
       "reason": "Deterministic Decimal calculation from exact accepted input identities.",
@@ -717,7 +545,6 @@
       "applicability": "OPTIONAL",
       "state": "VALUE",
       "value": "-97976286",
-      "rawValue": "(97.976.286)",
       "currency": "USD",
       "unitType": "DOCUMENT_CURRENCY",
       "scale": "1",
@@ -729,17 +556,10 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "SGA_REPORTED",
           "pageNumber": 8,
           "printedPageLabel": null,
-          "statement": "INCOME_STATEMENT",
-          "table": null,
-          "rowLabel": "Beban penjualan, umum dan administrasi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(97.976.286)",
-          "snippet": "REVENUES\nAND OTHER DIRECT COSTS LABA KOTOR 435.789.928 451.346.641 GROSS PROFIT Beban penjualan, umum dan\nadministrasi 2,36 (97.976.286) (96.223.137) Selling, general and administrative\nexpenses Beban pendanaan 24,28,29 (169.426.281) (142.768.173) Finance costs Kerugian penyesuaian nilai wajar\naset keuangan 2,14 (20.590.500) (1.738.000) Loss on fair value ",
-          "snippetHash": "cef15202fc5d43851b4ba47b8f8716450dc0c088330ae7d262932bb294bcf8e0",
           "evidenceHash": "c066e9baf6ac10047aa0950b95147fc00153966f57a4aaeb06715352de63f56e",
+          "snippetHash": "cef15202fc5d43851b4ba47b8f8716450dc0c088330ae7d262932bb294bcf8e0",
           "locatorHash": "19cedb9e2c04e99945c3faf8ed5fd63f543b3ea5b9719ab45e6accc4821045c0"
         }
       ],
@@ -769,17 +589,10 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "GENERAL_ADMIN_COMPONENT",
           "pageNumber": 8,
           "printedPageLabel": null,
-          "statement": "INCOME_STATEMENT",
-          "table": null,
-          "rowLabel": "general and administrative expenses",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(169.426.281)",
-          "snippet": " Beban penjualan, umum dan\nadministrasi 2,36 (97.976.286) (96.223.137) Selling, general and administrative\nexpenses Beban pendanaan 24,28,29 (169.426.281) (142.768.173) Finance costs Kerugian penyesuaian nilai wajar\naset keuangan 2,14 (20.590.500) (1.738.000) Loss on fair value adjustment of\nfinancial assets Pendapatan bunga 37 22.886.319 33.835.150 Int",
-          "snippetHash": "40beb79afe83c0604e176c4c1958dc0421dd6be8ea362772b02900b83b17c936",
           "evidenceHash": "32816d1b3a4c52b0ad699077588171c86f6373034b154fa5c01bc3383b9ce7be",
+          "snippetHash": "40beb79afe83c0604e176c4c1958dc0421dd6be8ea362772b02900b83b17c936",
           "locatorHash": "fce1dc4d799a2baa295297e41cfb1bb721f0c33117c12bbdf37720104d7412f5"
         }
       ],
@@ -802,17 +615,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "GENERAL_ADMIN_COMPONENT",
               "pageNumber": 8,
               "printedPageLabel": null,
-              "statement": "INCOME_STATEMENT",
-              "table": null,
-              "rowLabel": "general and administrative expenses",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(169.426.281)",
-              "snippet": " Beban penjualan, umum dan\nadministrasi 2,36 (97.976.286) (96.223.137) Selling, general and administrative\nexpenses Beban pendanaan 24,28,29 (169.426.281) (142.768.173) Finance costs Kerugian penyesuaian nilai wajar\naset keuangan 2,14 (20.590.500) (1.738.000) Loss on fair value adjustment of\nfinancial assets Pendapatan bunga 37 22.886.319 33.835.150 Int",
-              "snippetHash": "40beb79afe83c0604e176c4c1958dc0421dd6be8ea362772b02900b83b17c936",
               "evidenceHash": "32816d1b3a4c52b0ad699077588171c86f6373034b154fa5c01bc3383b9ce7be",
+              "snippetHash": "40beb79afe83c0604e176c4c1958dc0421dd6be8ea362772b02900b83b17c936",
               "locatorHash": "fce1dc4d799a2baa295297e41cfb1bb721f0c33117c12bbdf37720104d7412f5"
             }
           ]
@@ -820,12 +626,11 @@
       ],
       "state": "INPUT_MISSING",
       "value": null,
-      "rawValue": null,
       "formula": {
         "formulaId": "P0B-SGA",
         "formulaVersion": "1.0.0",
         "expression": "SELLING_DISTRIBUTION_EXPENSE + GENERAL_ADMINISTRATIVE_EXPENSE",
-        "calculationRunIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+        "calculationRunIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
         "resultHash": ""
       },
       "reason": "One or more contract-required input roles are missing; no partial calculation was emitted.",
@@ -838,7 +643,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -882,7 +686,6 @@
       "inputs": [],
       "state": "NOT_CALCULABLE",
       "value": null,
-      "rawValue": null,
       "formula": null,
       "reason": "CONTRACT_FORMULA_UNDEFINED: Canonical Data Contract v1.0 FINAL does not define an unambiguous calculation formula.",
       "factIdentity": null
@@ -894,7 +697,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -922,7 +724,6 @@
       "applicability": "OPTIONAL",
       "state": "VALUE",
       "value": "43098363",
-      "rawValue": "43.098.363",
       "currency": "USD",
       "unitType": "DOCUMENT_CURRENCY",
       "scale": "1",
@@ -934,17 +735,10 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "RESTRICTED_CASH_REPORTED",
           "pageNumber": 94,
           "printedPageLabel": null,
-          "statement": "NOTE",
-          "table": null,
-          "rowLabel": "Restricted cash",
-          "columnLabel": "2025-06-30",
-          "rawValue": "43.098.363",
-          "snippet": " Amerika Serikat United States Dollar Rekening bank yang dibatasi\npenggunaannya Restricted cash in banks Bank of New York Mellon 43.098.363 38.272.581 Bank of New York Mellon DBS Bank Ltd 9.636.979 10.729.872 DBS Bank Ltd Standard Chartered Bank - Cabang\nSingapura 3.464.091 9.108.765 Standard Chartered Bank - Singapore\nBranch PT Bank",
-          "snippetHash": "2cf3268c32a7646253d04a2e7e102cef2d053420cc1179caba01a7473a85dafe",
           "evidenceHash": "6632675679eee1ac1ec8c37eb4f84954a447b5d09090e2d0c7baa39695da614b",
+          "snippetHash": "2cf3268c32a7646253d04a2e7e102cef2d053420cc1179caba01a7473a85dafe",
           "locatorHash": "e36e0afd1c0060c8d888f0e69b160b32ee3a819e00b9b8799cac260c96d4ce33"
         }
       ],
@@ -963,37 +757,8 @@
       "canonicalCode": "OCI_TOTAL_REPORTED",
       "family": "REPORTED",
       "applicability": "EXPECTED",
-      "state": "MISSING",
-      "value": null,
-      "rawValue": null,
-      "currency": null,
-      "unitType": "DOCUMENT_CURRENCY",
-      "scale": null,
-      "period": {
-        "start": "2025-01-01",
-        "end": "2025-06-30",
-        "type": "H1"
-      },
-      "scope": "CONSOLIDATED",
-      "evidence": [],
-      "extractionOrigin": null,
-      "confidence": {
-        "read": null,
-        "mapping": null
-      },
-      "formula": null,
-      "inputs": [],
-      "reason": "Applicable expected fact was not resolved after deterministic primary/note search.",
-      "factIdentity": null
-    },
-    {
-      "requirementId": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
-      "canonicalCode": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
-      "family": "REPORTED",
-      "applicability": "EXPECTED",
       "state": "VALUE",
-      "value": "17127773",
-      "rawValue": "17.127.773",
+      "value": "-25292786",
       "currency": "USD",
       "unitType": "DOCUMENT_CURRENCY",
       "scale": "1",
@@ -1005,17 +770,45 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+          "pageNumber": 12,
+          "printedPageLabel": null,
+          "evidenceHash": "3136b48da1523fb9363422529e00fdf6d26d6f18794cf8fdc7b8412ad55f4b56",
+          "snippetHash": "2f2bf8190263aff459063a75318d04590b4dbc0b2587ba2ac4bc9f508a3a6758",
+          "locatorHash": "3201d580443030328123d1e9d0b0a00f931a1d90848683d9c83567b90aa3f7a9"
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "formula": null,
+      "inputs": [],
+      "reason": "Explicit issuer-reported scalar with source evidence.",
+      "factIdentity": "fact:2caf87cb79c3cfb32d315d24ced83ef01c35048983738d3a21a0cc9bacd26d1c"
+    },
+    {
+      "requirementId": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+      "canonicalCode": "TOTAL_COMPREHENSIVE_INCOME_REPORTED",
+      "family": "REPORTED",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "value": "17127773",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "scope": "CONSOLIDATED",
+      "evidence": [
+        {
           "pageNumber": 9,
           "printedPageLabel": null,
-          "statement": "INCOME_STATEMENT",
-          "table": null,
-          "rowLabel": "JUMLAH LABA KOMPREHENSIF PERIODE/ TAHUN BERJALAN",
-          "columnLabel": "2025-06-30",
-          "rawValue": "17.127.773",
-          "snippet": "come tax related to the account\nthat will not be reclassified to\nprofit or loss JUMLAH LABA\nKOMPREHENSIF PERIODE/\nTAHUN BERJALAN 17.127.773 198.228.286 TOTAL COMPREHENSIVE\nINCOME FOR THE PERIOD/\nYEAR 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim consolidated financial statements\nincluded herein are in the Indonesian language. PT MEDCO ENERGI INTERN",
-          "snippetHash": "145133c78fc628ed86bdd32fbb804d8071e4b7d03e2cba2c12dbabdbc3018a1d",
           "evidenceHash": "5237195d0a252f8da9e28f7e4007e8c9d1199be46f53cb9db3b1d1e492ee7f10",
+          "snippetHash": "145133c78fc628ed86bdd32fbb804d8071e4b7d03e2cba2c12dbabdbc3018a1d",
           "locatorHash": "da503bd44547b57ece0130ce5739fcffcdcf5f5631f2d45ab4ff79028e509cc6"
         }
       ],
@@ -1036,7 +829,6 @@
       "applicability": "OPTIONAL",
       "state": "VALUE",
       "value": "-6677451",
-      "rawValue": "(6.677.451)",
       "currency": "USD",
       "unitType": "DOCUMENT_CURRENCY",
       "scale": "1",
@@ -1048,17 +840,10 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "CAPEX_PPE_CASH_REPORTED",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Perolehan aset tetap",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(6.677.451)",
-          "snippet": "han investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plant and\nequipment Penambahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession",
-          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "evidenceHash": "7cfbcfedade2d2213b8d6d54929f71cad4d30bf39bce6ad13e908c6c310e0823",
+          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "locatorHash": "f459193d8c4bb2189e7519e17621683ba5c58d05a428bc1b90588cb370ad8c05"
         }
       ],
@@ -1079,7 +864,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -1107,7 +891,6 @@
       "applicability": "OPTIONAL",
       "state": "NOT_DISCLOSED",
       "value": null,
-      "rawValue": null,
       "currency": null,
       "unitType": "DOCUMENT_CURRENCY",
       "scale": null,
@@ -1144,59 +927,31 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "CAPEX_PPE_CASH_REPORTED",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Perolehan aset tetap",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(6.677.451)",
-          "snippet": "han investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plant and\nequipment Penambahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession",
-          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "evidenceHash": "7cfbcfedade2d2213b8d6d54929f71cad4d30bf39bce6ad13e908c6c310e0823",
+          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "locatorHash": "f459193d8c4bb2189e7519e17621683ba5c58d05a428bc1b90588cb370ad8c05"
         },
         {
-          "requirementId": "CAPEX_EXPLORATION_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan aset eksplorasi dan evaluasi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(9.662.851)",
-          "snippet": "pihak berelasi 44.162 198.047 Receipt of other receivables from\nrelated parties Penambahan aset eksplorasi dan\nevaluasi 17 (9.662.851) (1.557.518) Addition to exploration and\nevaluation assets Penambahan investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plan",
-          "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
           "evidenceHash": "d549e45d5bb8d47bb96a4c6a93ae48fba6c69b356754c099f75bf4375e756ac3",
+          "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
           "locatorHash": "f24e65dbf36e732b75a5537b133327c09a7b98843fc9b8ced8d7ba0ce687fb6b"
         },
         {
-          "requirementId": "CAPEX_CONCESSION_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan pada aset konsesi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(5.151.556)",
-          "snippet": "ahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession financial\nassets Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas p",
-          "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
           "evidenceHash": "fe55da3aecf2e50164491c46a63ae18b8dbc92e5fc1fd0685d9362e31cc93e6a",
+          "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
           "locatorHash": "1cd967303efb501131428d13cc6a2d41ec2b82a0d9b25a56810f551da3fab3ad"
         },
         {
-          "requirementId": "CAPEX_OIL_GAS_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan aset minyak dan gas bumi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(163.782.535)",
-          "snippet": "s Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim",
-          "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
           "evidenceHash": "fa3ccb44bfb5bf7a64c11105417995e95bacff6ad1b0fb802b764901c9648cf8",
+          "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
           "locatorHash": "b926b79f2216cbedea7840a20bcb029dbf6aa0c5f4cdd2235338c6423f36e35b"
         }
       ],
@@ -1219,17 +974,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "CAPEX_PPE_CASH_REPORTED",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Perolehan aset tetap",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(6.677.451)",
-              "snippet": "han investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plant and\nequipment Penambahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession",
-              "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
               "evidenceHash": "7cfbcfedade2d2213b8d6d54929f71cad4d30bf39bce6ad13e908c6c310e0823",
+              "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
               "locatorHash": "f459193d8c4bb2189e7519e17621683ba5c58d05a428bc1b90588cb370ad8c05"
             }
           ]
@@ -1247,17 +995,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "CAPEX_EXPLORATION_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan aset eksplorasi dan evaluasi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(9.662.851)",
-              "snippet": "pihak berelasi 44.162 198.047 Receipt of other receivables from\nrelated parties Penambahan aset eksplorasi dan\nevaluasi 17 (9.662.851) (1.557.518) Addition to exploration and\nevaluation assets Penambahan investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plan",
-              "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
               "evidenceHash": "d549e45d5bb8d47bb96a4c6a93ae48fba6c69b356754c099f75bf4375e756ac3",
+              "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
               "locatorHash": "f24e65dbf36e732b75a5537b133327c09a7b98843fc9b8ced8d7ba0ce687fb6b"
             }
           ]
@@ -1275,17 +1016,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "CAPEX_CONCESSION_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan pada aset konsesi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(5.151.556)",
-              "snippet": "ahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession financial\nassets Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas p",
-              "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
               "evidenceHash": "fe55da3aecf2e50164491c46a63ae18b8dbc92e5fc1fd0685d9362e31cc93e6a",
+              "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
               "locatorHash": "1cd967303efb501131428d13cc6a2d41ec2b82a0d9b25a56810f551da3fab3ad"
             }
           ]
@@ -1303,17 +1037,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "CAPEX_OIL_GAS_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan aset minyak dan gas bumi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(163.782.535)",
-              "snippet": "s Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim",
-              "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
               "evidenceHash": "fa3ccb44bfb5bf7a64c11105417995e95bacff6ad1b0fb802b764901c9648cf8",
+              "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
               "locatorHash": "b926b79f2216cbedea7840a20bcb029dbf6aa0c5f4cdd2235338c6423f36e35b"
             }
           ]
@@ -1321,12 +1048,11 @@
       ],
       "state": "VALUE",
       "value": "-185274393",
-      "rawValue": null,
       "formula": {
         "formulaId": "P0B-CAPEX-TOTAL-CASH",
         "formulaVersion": "1.0.0",
         "expression": "SUM(ELIGIBLE_DISCLOSED_CASH_CAPEX_COMPONENTS)",
-        "calculationRunIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+        "calculationRunIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
         "resultHash": "4dbf16c175d1ae9e38105ff470ce0c8cd19ce1a67889fedac0d55d35e5342988"
       },
       "reason": "Deterministic Decimal calculation from exact accepted input identities.",
@@ -1348,73 +1074,38 @@
       "scope": "CONSOLIDATED",
       "evidence": [
         {
-          "requirementId": "OCF_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Kas neto diperoleh dari aktivitas operasi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "398.350.369",
-          "snippet": "ations Pembayaran pajak penghasilan (164.544.435) (180.425.289) Income tax paid Kas neto diperoleh dari aktivitas\noperasi 398.350.369 593.516.639 Net cash used in operating\nactivities ARUS KAS DARI AKTIVITAS\nINVESTASI CASH FLOWS FROM INVESTING\nACTIVITIES Penerimaan dari pelepasan Entitas\nAnak atau asosiasi 39,48 – 116.577.272 Proceeds from disposal of\nsubsidi",
-          "snippetHash": "bc986bc2579bcb04a5fa689b53b178d55a496ae7dc0230e06db415689363c066",
           "evidenceHash": "e12d2e81a4e3a1321b8359ca3ba3c351e884e9b2cec83228f900ecf58b7f8d91",
+          "snippetHash": "bc986bc2579bcb04a5fa689b53b178d55a496ae7dc0230e06db415689363c066",
           "locatorHash": "d40e922df136fc23521e6525d56b493442cfaf04d1cfbfb5986f272efc02d71d"
         },
         {
-          "requirementId": "CAPEX_PPE_CASH_REPORTED",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Perolehan aset tetap",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(6.677.451)",
-          "snippet": "han investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plant and\nequipment Penambahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession",
-          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "evidenceHash": "7cfbcfedade2d2213b8d6d54929f71cad4d30bf39bce6ad13e908c6c310e0823",
+          "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
           "locatorHash": "f459193d8c4bb2189e7519e17621683ba5c58d05a428bc1b90588cb370ad8c05"
         },
         {
-          "requirementId": "CAPEX_EXPLORATION_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan aset eksplorasi dan evaluasi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(9.662.851)",
-          "snippet": "pihak berelasi 44.162 198.047 Receipt of other receivables from\nrelated parties Penambahan aset eksplorasi dan\nevaluasi 17 (9.662.851) (1.557.518) Addition to exploration and\nevaluation assets Penambahan investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plan",
-          "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
           "evidenceHash": "d549e45d5bb8d47bb96a4c6a93ae48fba6c69b356754c099f75bf4375e756ac3",
+          "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
           "locatorHash": "f24e65dbf36e732b75a5537b133327c09a7b98843fc9b8ced8d7ba0ce687fb6b"
         },
         {
-          "requirementId": "CAPEX_CONCESSION_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan pada aset konsesi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(5.151.556)",
-          "snippet": "ahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession financial\nassets Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas p",
-          "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
           "evidenceHash": "fe55da3aecf2e50164491c46a63ae18b8dbc92e5fc1fd0685d9362e31cc93e6a",
+          "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
           "locatorHash": "1cd967303efb501131428d13cc6a2d41ec2b82a0d9b25a56810f551da3fab3ad"
         },
         {
-          "requirementId": "CAPEX_OIL_GAS_COMPONENT",
           "pageNumber": 13,
           "printedPageLabel": null,
-          "statement": "CASH_FLOW",
-          "table": null,
-          "rowLabel": "Penambahan aset minyak dan gas bumi",
-          "columnLabel": "2025-06-30",
-          "rawValue": "(163.782.535)",
-          "snippet": "s Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim",
-          "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
           "evidenceHash": "fa3ccb44bfb5bf7a64c11105417995e95bacff6ad1b0fb802b764901c9648cf8",
+          "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
           "locatorHash": "b926b79f2216cbedea7840a20bcb029dbf6aa0c5f4cdd2235338c6423f36e35b"
         }
       ],
@@ -1437,17 +1128,10 @@
           "extractionOrigin": "NATIVE",
           "evidence": [
             {
-              "requirementId": "OCF_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Kas neto diperoleh dari aktivitas operasi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "398.350.369",
-              "snippet": "ations Pembayaran pajak penghasilan (164.544.435) (180.425.289) Income tax paid Kas neto diperoleh dari aktivitas\noperasi 398.350.369 593.516.639 Net cash used in operating\nactivities ARUS KAS DARI AKTIVITAS\nINVESTASI CASH FLOWS FROM INVESTING\nACTIVITIES Penerimaan dari pelepasan Entitas\nAnak atau asosiasi 39,48 – 116.577.272 Proceeds from disposal of\nsubsidi",
-              "snippetHash": "bc986bc2579bcb04a5fa689b53b178d55a496ae7dc0230e06db415689363c066",
               "evidenceHash": "e12d2e81a4e3a1321b8359ca3ba3c351e884e9b2cec83228f900ecf58b7f8d91",
+              "snippetHash": "bc986bc2579bcb04a5fa689b53b178d55a496ae7dc0230e06db415689363c066",
               "locatorHash": "d40e922df136fc23521e6525d56b493442cfaf04d1cfbfb5986f272efc02d71d"
             }
           ]
@@ -1465,59 +1149,31 @@
           "extractionOrigin": null,
           "evidence": [
             {
-              "requirementId": "CAPEX_PPE_CASH_REPORTED",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Perolehan aset tetap",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(6.677.451)",
-              "snippet": "han investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plant and\nequipment Penambahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession",
-              "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
               "evidenceHash": "7cfbcfedade2d2213b8d6d54929f71cad4d30bf39bce6ad13e908c6c310e0823",
+              "snippetHash": "a69a545190f5e58d29b6aca3c4abd3046755fb0af64e83bed0cd180ad1682332",
               "locatorHash": "f459193d8c4bb2189e7519e17621683ba5c58d05a428bc1b90588cb370ad8c05"
             },
             {
-              "requirementId": "CAPEX_EXPLORATION_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan aset eksplorasi dan evaluasi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(9.662.851)",
-              "snippet": "pihak berelasi 44.162 198.047 Receipt of other receivables from\nrelated parties Penambahan aset eksplorasi dan\nevaluasi 17 (9.662.851) (1.557.518) Addition to exploration and\nevaluation assets Penambahan investasi jangka\npanjang 14 – (16.000.000) Addition of long-term investment Perolehan aset tetap 15 (6.677.451) (20.167.959) Acquisitions of property, plan",
-              "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
               "evidenceHash": "d549e45d5bb8d47bb96a4c6a93ae48fba6c69b356754c099f75bf4375e756ac3",
+              "snippetHash": "50f376bff020c2959ae08fcd5978447aac4d2f775ac1b5133dccbe709af2f033",
               "locatorHash": "f24e65dbf36e732b75a5537b133327c09a7b98843fc9b8ced8d7ba0ce687fb6b"
             },
             {
-              "requirementId": "CAPEX_CONCESSION_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan pada aset konsesi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(5.151.556)",
-              "snippet": "ahan investasi jangka\npendek – (21.000.000) Additions to short-term investments Penambahan pada aset konsesi 9 (5.151.556) (26.812.926) Additions to concession financial\nassets Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas p",
-              "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
               "evidenceHash": "fe55da3aecf2e50164491c46a63ae18b8dbc92e5fc1fd0685d9362e31cc93e6a",
+              "snippetHash": "13f840a35cca5347ca4c72fd57d8d7e7650f4145322357fdc615b0b73e2e23f7",
               "locatorHash": "1cd967303efb501131428d13cc6a2d41ec2b82a0d9b25a56810f551da3fab3ad"
             },
             {
-              "requirementId": "CAPEX_OIL_GAS_COMPONENT",
               "pageNumber": 13,
               "printedPageLabel": null,
-              "statement": "CASH_FLOW",
-              "table": null,
-              "rowLabel": "Penambahan aset minyak dan gas bumi",
-              "columnLabel": "2025-06-30",
-              "rawValue": "(163.782.535)",
-              "snippet": "s Penambahan aset lain-lain (35.024.913) (33.036.469) Additions to other assets Penambahan aset minyak dan gas\nbumi 18 (163.782.535) (124.057.589) Additions to oil and gas properties Kas neto digunakan untuk\naktivitas investasi (46.783.511) (74.056.133) Net cash used in investing\nactivities 30 Juni/ June 30, Catatan/ Notes 2025 2024 The original interim",
-              "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
               "evidenceHash": "fa3ccb44bfb5bf7a64c11105417995e95bacff6ad1b0fb802b764901c9648cf8",
+              "snippetHash": "bb0cc637e90be23d1767dda4a152a48437341f62f760534df6ff18687698ad09",
               "locatorHash": "b926b79f2216cbedea7840a20bcb029dbf6aa0c5f4cdd2235338c6423f36e35b"
             }
           ]
@@ -1525,12 +1181,11 @@
       ],
       "state": "VALUE",
       "value": "213075976",
-      "rawValue": null,
       "formula": {
         "formulaId": "P0B-FCF",
         "formulaVersion": "1.0.0",
         "expression": "OCF_REPORTED + SIGNED_CAPEX_TOTAL_CASH",
-        "calculationRunIdentity": "5c1a4b8b7888b3a4fa8ceb156215b80c13fa61c6f47e4f5550bec01f419eaf41",
+        "calculationRunIdentity": "6c443a87c6a86476c30bb9231b152cb575c5793131e6053dbaae0f415f612083",
         "resultHash": "2e253ba89365d212d491b91e67e66d2c205d1e1a405f9130f0ea63687b3bb4c6"
       },
       "reason": "Deterministic Decimal calculation from exact accepted input identities.",
@@ -1540,8 +1195,8 @@
   "controls": [
     {
       "controlId": "COMPREHENSIVE_INCOME_BRIDGE",
-      "applicable": false,
-      "passed": null,
+      "applicable": true,
+      "passed": true,
       "reason": "NET_PROFIT_REPORTED + OCI_TOTAL_REPORTED compared with TOTAL_COMPREHENSIVE_INCOME_REPORTED only at matching scope."
     },
     {
@@ -1592,5 +1247,6 @@
     "canonicalFinancialEntryMutation": false,
     "railwayMutation": false,
     "deployment": false
-  }
+  },
+  "repositoryArtifactPolicy": "SANITIZED_METADATA_HASHES_ONLY"
 }

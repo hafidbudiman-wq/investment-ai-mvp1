@@ -5,19 +5,19 @@
       "requirement": "SHARES_OUTSTANDING_REPORTED",
       "family": "REPORTED",
       "ICBP": {
-        "state": "MISSING",
+        "state": "NOT_DISCLOSED",
         "evidenceAvailable": false,
-        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+        "reasonIfUnavailable": "TRUE_NOT_DISCLOSED: exhaustive deterministic full-document review found only prohibited issued, treasury, weighted-average, or buyback substitutes on candidate pages 11, 12, 13, 47, 72, 86, 87, 88; no exact issuer-reported period-end outstanding-shares scalar exists."
       },
       "MEDC": {
-        "state": "MISSING",
+        "state": "NOT_DISCLOSED",
         "evidenceAvailable": false,
-        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+        "reasonIfUnavailable": "TRUE_NOT_DISCLOSED: exhaustive deterministic full-document review found only prohibited issued, treasury, weighted-average, or buyback substitutes on candidate pages 7, 11, 12, 14, 16, 45, 70, 71, 104, 189, 192, 193, 194, 218, 219, 220; no exact issuer-reported period-end outstanding-shares scalar exists."
       },
       "DRMA": {
-        "state": "MISSING",
+        "state": "NOT_DISCLOSED",
         "evidenceAvailable": false,
-        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+        "reasonIfUnavailable": "TRUE_NOT_DISCLOSED: exhaustive deterministic full-document review found only prohibited issued, treasury, weighted-average, or buyback substitutes on candidate pages 13, 37, 75; no exact issuer-reported period-end outstanding-shares scalar exists."
       }
     },
     {
@@ -219,9 +219,9 @@
         "reasonIfUnavailable": null
       },
       "MEDC": {
-        "state": "MISSING",
-        "evidenceAvailable": false,
-        "reasonIfUnavailable": "Applicable expected fact was not resolved after deterministic primary/note search."
+        "state": "VALUE",
+        "evidenceAvailable": true,
+        "reasonIfUnavailable": null
       },
       "DRMA": {
         "state": "VALUE",
@@ -343,5 +343,6 @@
         "reasonIfUnavailable": null
       }
     }
-  ]
+  ],
+  "repositoryArtifactPolicy": "SANITIZED_METADATA_HASHES_ONLY"
 }
