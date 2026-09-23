@@ -57,7 +57,20 @@ export async function persistPhase6A(client: PrismaClient, input: { documentId: 
     }
 
     const resultIds = new Map<string, string>();
-    for (const outcome of input.result.outcomes.filter((item) => item.family === "CALCULATED" && ["VALUE", "ZERO"].includes(item.state))) {
+    const pendingCalculated = input.result.outcomes.filter((item) => item.family === "CALCULATED" && ["VALUE", "ZERO"].includes(item.state));
+    const orderedCalculated: typeof pendingCalculated = [];
+    const availableResults = new Set<string>();
+    while (pendingCalculated.length) {
+      const index = pendingCalculated.findIndex((outcome) => outcome.inputs.every((metricInput) =>
+        !metricInput.inputId.startsWith("result:") || availableResults.has(metricInput.inputId)
+      ));
+      if (index < 0) throw new Error(`Cyclic or missing calculated input identity: ${pendingCalculated.map((outcome) => outcome.factIdentity).join(", ")}`);
+      const [next] = pendingCalculated.splice(index, 1);
+      orderedCalculated.push(next);
+      if (next.factIdentity) availableResults.add(next.factIdentity);
+    }
+
+    for (const outcome of orderedCalculated) {
       const formula = PHASE6A_FORMULA_BY_CODE.get(outcome.canonicalCode);
       if (!formula || !outcome.formula || outcome.value === null || !outcome.currency || !outcome.scale || !outcome.factIdentity) throw new Error(`Incomplete calculated identity for ${outcome.requirementId}`);
       const definition = await tx.derivedMetricDefinition.upsert({ where: { code_formulaVersion: { code: formula.code, formulaVersion: formula.formulaVersion } }, create: { code: formula.code, formulaVersion: formula.formulaVersion, expression: formula.expression, namedInputs: json(formula.inputRoles), inclusionRules: json(formula.inclusionRules), exclusionRules: json(formula.exclusionRules), compatibilityRules: json(["same company", "same period", "same scope", "same currency", "same scale"]), outputUnit: outcome.unitType }, update: {} });

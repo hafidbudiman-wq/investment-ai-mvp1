@@ -23,6 +23,9 @@ test("Phase 6A persistence uses immutable identities and never writes legacy fac
   assert.match(persistence, /inputIdentity:\s*metricInput\.inputId/);
   assert.match(persistence, /inputEvidenceHashes:/);
   assert.match(persistence, /Unpersisted exact input identity/);
+  assert.match(persistence, /orderedCalculated/);
+  assert.match(persistence, /availableResults\.has\(metricInput\.inputId\)/);
+  assert.match(persistence, /Cyclic or missing calculated input identity/);
   assert.match(persistence, /where:\s*\{\s*completeIdentityHash:[\s\S]*?update:\s*\{\s*\}/);
   assert.doesNotMatch(persistence, /completeIdentityHash:[\s\S]*?update:\s*\{\s*status:\s*"SUCCEEDED"/);
   assert.doesNotMatch(persistence, /(?:financialEntry|canonicalAccount)\.(?:create|update|upsert|delete)/i);
