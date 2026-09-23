@@ -200,4 +200,5 @@ jobs:
             .phase6a-qa/full-artifacts/SHA256SUMS.txt
             artifacts/phase5/*.json
           if-no-files-found: warn
+          include-hidden-files: true
           retention-days: 30
