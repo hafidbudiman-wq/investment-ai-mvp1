@@ -1,0 +1,1859 @@
+{
+  "artifactVersion": "INVESTAI_PHASE6B_DIVIDEND_SEGMENT_V1",
+  "source": {
+    "fileName": "Lap Keu MEDC 30 juni 2025.pdf",
+    "sha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e"
+  },
+  "periodScope": {
+    "ticker": "MEDC",
+    "issuerType": "LISTED_COMMON_EQUITY",
+    "accountingModel": "NON_FINANCIAL",
+    "consolidated": true,
+    "audited": false,
+    "periodStart": "2025-01-01",
+    "periodEnd": "2025-06-30",
+    "periodType": "H1",
+    "currency": "USD",
+    "documentScale": "1"
+  },
+  "versionIdentity": {
+    "runIdentity": "181457bde6c29b3495be0a17f0c22ca1ac921b69b59a07e18458fbd636a2f67c",
+    "manifestVersion": "INVESTAI_PHASE6B_DIVIDEND_SEGMENT_V1",
+    "extractorVersion": "phase6b-deterministic-v1",
+    "dimensionSchemaVersion": "segment-dimension-v1",
+    "p0aVersions": {
+      "contract": "investai-canonical-v1.0-final:p0-a",
+      "parser": "p0a-page-index-v2-native-ocr-compatible",
+      "router": "p0a-page-router-v11-integer-eps-compatible",
+      "applicability": "p0a-applicability-v1",
+      "planner": "p0a-fact-planner-v2-route-metadata",
+      "gapDetector": "p0a-gap-detector-v1",
+      "validation": "p0a-validation-v1",
+      "mapping": "p0a-native-financial-mapping-v5-ocr-presentation-variants",
+      "scopedPrompt": "p0a-scoped-openai-prompt-v1"
+    },
+    "p0aOutcomeFingerprint": "81836e01c739ebb0391ef4758029cfe5ac49bd9f2b91acfe9388eb6d1a19fba2"
+  },
+  "routing": {
+    "phase6bEvidencePages": [
+      220,
+      239
+    ]
+  },
+  "ocr": {
+    "pages": [],
+    "reusedPages": [],
+    "wholeDocumentOcr": false,
+    "newlyOcredForPhase6B": []
+  },
+  "dividendEvents": [
+    {
+      "eventKey": "64127a13c94cb211bd4a6dbbc5e710654243ae2a0b8453e39261dfcc143d88fe",
+      "eventType": "FINAL",
+      "status": "PAID",
+      "sourceProfitPeriod": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "dates": {
+        "declaration": "2025-06-04",
+        "approval": "2025-06-03",
+        "record": null,
+        "cum": null,
+        "ex": null,
+        "payment": "2025-07-04",
+        "paymentPrecision": "DAY",
+        "paymentRaw": "4\nJuli 2025"
+      },
+      "recipientScope": "PARENT_SHAREHOLDERS",
+      "shareClass": "ORDINARY",
+      "total": {
+        "reportedValue": "37923889",
+        "normalizedValue": "37923889",
+        "rawValue": "37.923.889",
+        "scale": "1",
+        "currency": "USD"
+      },
+      "perShare": {
+        "reportedValue": "25",
+        "normalizedValue": "25",
+        "rawValue": "25",
+        "scale": "1",
+        "currency": "IDR"
+      },
+      "fieldStates": {
+        "total": "VALUE",
+        "perShare": "VALUE",
+        "declaration": "VALUE",
+        "approval": "VALUE",
+        "record": "FIELD_NOT_DISCLOSED",
+        "cum": "FIELD_NOT_DISCLOSED",
+        "ex": "FIELD_NOT_DISCLOSED",
+        "payment": "VALUE",
+        "paymentPrecision": "VALUE",
+        "paymentRaw": "VALUE"
+      },
+      "evidence": [
+        {
+          "fieldName": "TOTAL_AMOUNT",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.TOTAL_AMOUNT",
+            "pageNumber": 220,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "TOTAL_AMOUNT",
+            "rawValue": "37.923.889",
+            "snippet": "sebesar AS$25.370.571 dari\nlaba Interim Triwulanan yang berakhir pada\ntanggal 30 September 2024 senilai Rp15,75 per\nsaham. Dividen kas interim telah dibayarkan\npada tanggal 31 Oktober 2024. On October 1, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of a US$25,370,571 interim cash\ndividend from the profit for the Quarterly Interim\nended on September 30, 2024 in the amount of\nRp15.75 per shares. The interim cash dividend\nwere paid on October 31, 2024. Pada tanggal 4 Juni 2025, Direksi dan Dewan\nKomisaris telah menyetujui pembagian dividen\nkas sesuai dengan hasil RUPST tertanggal 3\nJuni 2025 sebesar AS$37.923.889 dari laba\ntahun buku 2024 senilai Rp25 per saham.\nDividen kas ini telah dibayarkan pada tanggal 4\nJuli 2025. On June 4, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of cash dividend as per AGMS dated\nJune 3, 2025 of a US$37,923,889 from the profit\nfor the 2024 financial year in the amount of\nRp25 per shares. The cash dividends were paid\non July 4, 2025. The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTangg",
+            "snippetHash": "aecf9859a900633142f88054b182f2676c19420c6deca648663101d8b1b8ef7c",
+            "evidenceHash": "68eeec50a5eefc3c913370f000c26a88bde0494b592e79467c7dc6bada9a7cfe",
+            "locatorHash": "2192f5484414ae4118157f20cf270d4ca50628677745ded2e64937f7c0a5893e"
+          }
+        },
+        {
+          "fieldName": "PER_SHARE_AMOUNT",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.PER_SHARE_AMOUNT",
+            "pageNumber": 220,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "PER_SHARE_AMOUNT",
+            "rawValue": "25",
+            "snippet": "sebesar AS$25.370.571 dari\nlaba Interim Triwulanan yang berakhir pada\ntanggal 30 September 2024 senilai Rp15,75 per\nsaham. Dividen kas interim telah dibayarkan\npada tanggal 31 Oktober 2024. On October 1, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of a US$25,370,571 interim cash\ndividend from the profit for the Quarterly Interim\nended on September 30, 2024 in the amount of\nRp15.75 per shares. The interim cash dividend\nwere paid on October 31, 2024. Pada tanggal 4 Juni 2025, Direksi dan Dewan\nKomisaris telah menyetujui pembagian dividen\nkas sesuai dengan hasil RUPST tertanggal 3\nJuni 2025 sebesar AS$37.923.889 dari laba\ntahun buku 2024 senilai Rp25 per saham.\nDividen kas ini telah dibayarkan pada tanggal 4\nJuli 2025. On June 4, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of cash dividend as per AGMS dated\nJune 3, 2025 of a US$37,923,889 from the profit\nfor the 2024 financial year in the amount of\nRp25 per shares. The cash dividends were paid\non July 4, 2025. The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTangg",
+            "snippetHash": "aecf9859a900633142f88054b182f2676c19420c6deca648663101d8b1b8ef7c",
+            "evidenceHash": "eca48caca67f50b38c794f14d265ff79158739a870e68873c6727d28f0f7875f",
+            "locatorHash": "c588f434d46ad5dadeb9155418181a1c44a9c79c44176772770b0fb354cd79ba"
+          }
+        },
+        {
+          "fieldName": "DECLARATION_DATE",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.DECLARATION_DATE",
+            "pageNumber": 220,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "DECLARATION_DATE",
+            "rawValue": "4 Juni 2025",
+            "snippet": "sebesar AS$25.370.571 dari\nlaba Interim Triwulanan yang berakhir pada\ntanggal 30 September 2024 senilai Rp15,75 per\nsaham. Dividen kas interim telah dibayarkan\npada tanggal 31 Oktober 2024. On October 1, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of a US$25,370,571 interim cash\ndividend from the profit for the Quarterly Interim\nended on September 30, 2024 in the amount of\nRp15.75 per shares. The interim cash dividend\nwere paid on October 31, 2024. Pada tanggal 4 Juni 2025, Direksi dan Dewan\nKomisaris telah menyetujui pembagian dividen\nkas sesuai dengan hasil RUPST tertanggal 3\nJuni 2025 sebesar AS$37.923.889 dari laba\ntahun buku 2024 senilai Rp25 per saham.\nDividen kas ini telah dibayarkan pada tanggal 4\nJuli 2025. On June 4, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of cash dividend as per AGMS dated\nJune 3, 2025 of a US$37,923,889 from the profit\nfor the 2024 financial year in the amount of\nRp25 per shares. The cash dividends were paid\non July 4, 2025. The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTangg",
+            "snippetHash": "aecf9859a900633142f88054b182f2676c19420c6deca648663101d8b1b8ef7c",
+            "evidenceHash": "45dce85f7b8ee8dbe184d6891c11d967f61e96b4c00b0fc5530e803dfbafae72",
+            "locatorHash": "fa495468729b0d924ba10324d8e0d6466b89674c08d830250bb6b749a2d02510"
+          }
+        },
+        {
+          "fieldName": "APPROVAL_DATE",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.APPROVAL_DATE",
+            "pageNumber": 220,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "APPROVAL_DATE",
+            "rawValue": "3\nJuni 2025",
+            "snippet": "sebesar AS$25.370.571 dari\nlaba Interim Triwulanan yang berakhir pada\ntanggal 30 September 2024 senilai Rp15,75 per\nsaham. Dividen kas interim telah dibayarkan\npada tanggal 31 Oktober 2024. On October 1, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of a US$25,370,571 interim cash\ndividend from the profit for the Quarterly Interim\nended on September 30, 2024 in the amount of\nRp15.75 per shares. The interim cash dividend\nwere paid on October 31, 2024. Pada tanggal 4 Juni 2025, Direksi dan Dewan\nKomisaris telah menyetujui pembagian dividen\nkas sesuai dengan hasil RUPST tertanggal 3\nJuni 2025 sebesar AS$37.923.889 dari laba\ntahun buku 2024 senilai Rp25 per saham.\nDividen kas ini telah dibayarkan pada tanggal 4\nJuli 2025. On June 4, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of cash dividend as per AGMS dated\nJune 3, 2025 of a US$37,923,889 from the profit\nfor the 2024 financial year in the amount of\nRp25 per shares. The cash dividends were paid\non July 4, 2025. The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTangg",
+            "snippetHash": "aecf9859a900633142f88054b182f2676c19420c6deca648663101d8b1b8ef7c",
+            "evidenceHash": "4719072b314cac58486dd2c10fe338e61f31d71f53b283b91242a8b51d5263b2",
+            "locatorHash": "ff81738aa589afbdd3edb5987d2296f6d42075d3743b51f940cc5644d3301029"
+          }
+        },
+        {
+          "fieldName": "PAYMENT_DATE",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.PAYMENT_DATE",
+            "pageNumber": 220,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "PAYMENT_DATE",
+            "rawValue": "4\nJuli 2025",
+            "snippet": "sebesar AS$25.370.571 dari\nlaba Interim Triwulanan yang berakhir pada\ntanggal 30 September 2024 senilai Rp15,75 per\nsaham. Dividen kas interim telah dibayarkan\npada tanggal 31 Oktober 2024. On October 1, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of a US$25,370,571 interim cash\ndividend from the profit for the Quarterly Interim\nended on September 30, 2024 in the amount of\nRp15.75 per shares. The interim cash dividend\nwere paid on October 31, 2024. Pada tanggal 4 Juni 2025, Direksi dan Dewan\nKomisaris telah menyetujui pembagian dividen\nkas sesuai dengan hasil RUPST tertanggal 3\nJuni 2025 sebesar AS$37.923.889 dari laba\ntahun buku 2024 senilai Rp25 per saham.\nDividen kas ini telah dibayarkan pada tanggal 4\nJuli 2025. On June 4, 2024, The Board of Directors and\nthe Board of Commissioners have approved the\ndistribution of cash dividend as per AGMS dated\nJune 3, 2025 of a US$37,923,889 from the profit\nfor the 2024 financial year in the amount of\nRp25 per shares. The cash dividends were paid\non July 4, 2025. The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTangg",
+            "snippetHash": "aecf9859a900633142f88054b182f2676c19420c6deca648663101d8b1b8ef7c",
+            "evidenceHash": "e7fa012d73bf363481256f9de37822f2f3635d8885d08aefd65d77b12b89ed44",
+            "locatorHash": "3fe2eefc857e798e2920c3a613f0f2b5d71986f6907854cffc94fff8401a3d71"
+          }
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validation": {
+        "status": "VALIDATED",
+        "controls": []
+      }
+    }
+  ],
+  "segmentIdentities": [
+    {
+      "identityKey": "ad09757df60ec5cf08bea13c1d935c7f7c03c6a1544001a671c0111391499143",
+      "sourceLabel": "Exploration and production of oil and gas",
+      "normalizedLabel": "EXPLORATION_PRODUCTION_OIL_GAS",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "Exploration and production of oil and gas",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "40401c9ce14fa0f303a71cd7f80591669d6df4545080fd6cc510387a7b5573e9",
+          "locatorHash": "638766ec2025d47c4b86164fdc11aa50ea6aed8649fc885e9b0b339dcac56e22"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "Exploration and production of oil and gas",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "1907a4ee3f5fcc0e02525b6f814adbef428e1d5dfcc3d32978e3a0c25ae8811f",
+          "locatorHash": "638766ec2025d47c4b86164fdc11aa50ea6aed8649fc885e9b0b339dcac56e22"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "Exploration and production of oil and gas",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "646a2b6da5aadc871e6f0f7724bee87944fbf2df57f9c657fa4f2398bf6e722f",
+          "locatorHash": "638766ec2025d47c4b86164fdc11aa50ea6aed8649fc885e9b0b339dcac56e22"
+        }
+      ]
+    },
+    {
+      "identityKey": "21a75757dc5f554a82ba45603861fae39eac5e6eaf0602454e79241cfc850ddf",
+      "sourceLabel": "Service",
+      "normalizedLabel": "SERVICES",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Service",
+          "rawValue": "Service",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "deb7d54abe071bd03c2cf9ba522bcb3f96c539572c6e5c976d4836673a8b5ab7",
+          "locatorHash": "18f33a48bfa9fbc3de30c77ebccd03bdec00ec33563cdbf3900656cce617851e"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Service",
+          "rawValue": "Service",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "952c6d129650c2255bf6c502d25dd2e049fa5caf21dea0b36f17c19a72aa9625",
+          "locatorHash": "18f33a48bfa9fbc3de30c77ebccd03bdec00ec33563cdbf3900656cce617851e"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Service",
+          "rawValue": "Service",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "79c93d71b3b1a07e3d7839fba797a5e53c968781c6199db928e7d0aec3da0a67",
+          "locatorHash": "18f33a48bfa9fbc3de30c77ebccd03bdec00ec33563cdbf3900656cce617851e"
+        }
+      ]
+    },
+    {
+      "identityKey": "93e91d2122f1f225e5da46f18aedbf3eb7050a77780246246af54a2a1287a199",
+      "sourceLabel": "Power",
+      "normalizedLabel": "POWER",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Power",
+          "rawValue": "Power",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "0156476532205929728f48f2be9e28f0630fb7400d4bb525fe86b09a99758e0c",
+          "locatorHash": "696f4ea7cf964242a41f248ce780b0234e58743d4aa84351c7f8109cbd1a1fae"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Power",
+          "rawValue": "Power",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "b4b17f75a7328e3da35efb4a5e7af6f2d629c5ef7e2a5fca1ad37cf6bd18bce5",
+          "locatorHash": "696f4ea7cf964242a41f248ce780b0234e58743d4aa84351c7f8109cbd1a1fae"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Power",
+          "rawValue": "Power",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "e451dd9f7f3810d8fbcbf89c8ba544252d4bd574e1d8ce026e815f79eca3d2b2",
+          "locatorHash": "696f4ea7cf964242a41f248ce780b0234e58743d4aa84351c7f8109cbd1a1fae"
+        }
+      ]
+    },
+    {
+      "identityKey": "6f9d867b9c59cfc79e8bec0924b117fe1b5b6199b65234b22efc05f62a5d75ac",
+      "sourceLabel": "Trading",
+      "normalizedLabel": "TRADING",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Trading",
+          "rawValue": "Trading",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "d5bac8e052a234e2c68406e45f558bb88776144300db0b2e4e648dc91c552fd8",
+          "locatorHash": "82c12628d3bf5937b71a6488be89be54dfb10798d80728786a5037023370aa14"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Trading",
+          "rawValue": "Trading",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "1d407e6aabfe92810ec128c58f5c8a6461d80d3a2456f68f9a021b3ccd2f18c9",
+          "locatorHash": "82c12628d3bf5937b71a6488be89be54dfb10798d80728786a5037023370aa14"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Trading",
+          "rawValue": "Trading",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "2da1c820f0f84b9f487165ee5365896cac461aef4bbf0038b862a6b6d41346b3",
+          "locatorHash": "82c12628d3bf5937b71a6488be89be54dfb10798d80728786a5037023370aa14"
+        }
+      ]
+    },
+    {
+      "identityKey": "9fa5b18be4061a9cfb14a809cd73921a69bded861a891fc5e1d9d5dfc8882092",
+      "sourceLabel": "Holding and related operations",
+      "normalizedLabel": "HOLDING_RELATED_OPERATIONS",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "Holding and related operations",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "9e5aa4245864884b0266211ef4092a8e3f1a013861daed05e99e5778c83832fc",
+          "locatorHash": "f932e4023b5aed6d8b98b1311efb92e37b2e13d124c3302d1c3a59d86f880894"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "Holding and related operations",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "1366e78327572df3c81c7c38a9b46b29381e04649e3f99e42a5cb7a3cd616633",
+          "locatorHash": "f932e4023b5aed6d8b98b1311efb92e37b2e13d124c3302d1c3a59d86f880894"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "Holding and related operations",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "dada9dcfaa784a4154fe06bbb0bce2d868483bf625cecb105cd41d4971ca6260",
+          "locatorHash": "f932e4023b5aed6d8b98b1311efb92e37b2e13d124c3302d1c3a59d86f880894"
+        }
+      ]
+    },
+    {
+      "identityKey": "6bf96fe33d6cd30562c75102d071c6df0c007029dfb9d7a6ff83cec56432037c",
+      "sourceLabel": "Discontinued operations",
+      "normalizedLabel": "DISCONTINUED_OPERATIONS",
+      "segmentType": "RECONCILIATION",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "Discontinued operations",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "dab0dcf68ac67631c0afc79c67b980ebf016fd0c208684c79e1d36d1e6574341",
+          "locatorHash": "62503e8ff5af36ecf5403b7803a8b940905eaeba83b999e33553e427453bcb21"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "Discontinued operations",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "af280a07cbdaea07f1686570292b5268faf54d0e1d7e4ea42ca83be05cdb1c59",
+          "locatorHash": "62503e8ff5af36ecf5403b7803a8b940905eaeba83b999e33553e427453bcb21"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "Discontinued operations",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "e311b6ab3553410821bf7184a5f3605d164c804dab0fc486439f54b9bf655840",
+          "locatorHash": "62503e8ff5af36ecf5403b7803a8b940905eaeba83b999e33553e427453bcb21"
+        }
+      ]
+    },
+    {
+      "identityKey": "76ebb5b9b17e5ea729b2fc03dfcaff54826dada1191b7b6c92d4c272c7757c21",
+      "sourceLabel": "Elimination",
+      "normalizedLabel": "ELIMINATION",
+      "segmentType": "RECONCILIATION",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Elimination",
+          "rawValue": "Elimination",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "7bc23039902687d09e0f74602a069520306ac7117cb827388d986d9cf38f3113",
+          "locatorHash": "20cb9e57ef5775927e61961f12a6a73e4b2ea23210dbf60987067fa1aca391ff"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Elimination",
+          "rawValue": "Elimination",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "20a821ac243549b0f48712f28cd9aa8295f8dc2322acf5c60e199ddf1f5e2952",
+          "locatorHash": "20cb9e57ef5775927e61961f12a6a73e4b2ea23210dbf60987067fa1aca391ff"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Elimination",
+          "rawValue": "Elimination",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "31043fbd39bc91ec24d4abd210b427f0c04b8dba9f358de62d99ca6f37fa648e",
+          "locatorHash": "20cb9e57ef5775927e61961f12a6a73e4b2ea23210dbf60987067fa1aca391ff"
+        }
+      ]
+    },
+    {
+      "identityKey": "3aa2bb67d71cb7e62c0c209e7d6acd5d25324db3031083070295caa8e2e8e240",
+      "sourceLabel": "Consolidation",
+      "normalizedLabel": "CONSOLIDATED_TOTAL",
+      "segmentType": "RECONCILIATION",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-06-30",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Consolidation",
+          "rawValue": "Consolidation",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "e27eb6f70f0555dba556f8bc5e2760ac8c0c5e25cbfbde28258f5ebdf781cded",
+          "locatorHash": "63d488b1fbce502aeed9de23e982bb3bd669653821752bd0350b96c5feaff5d5"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Consolidation",
+          "rawValue": "Consolidation",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "b9beb603b4d4b898c1d0ebe28c73c4db72de95da82399aece8ee9737fa8eb001",
+          "locatorHash": "63d488b1fbce502aeed9de23e982bb3bd669653821752bd0350b96c5feaff5d5"
+        },
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Consolidation",
+          "rawValue": "Consolidation",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "45f2628379698577359f34bc6d7b7bb73879c249847314d7b1917d588792d929",
+          "locatorHash": "63d488b1fbce502aeed9de23e982bb3bd669653821752bd0350b96c5feaff5d5"
+        }
+      ]
+    }
+  ],
+  "segmentRevenueFacts": [
+    {
+      "factKey": "0b6dbca059ed01c0a92e288c02babc8181e78bf39c6c595c8e335519d812abbe",
+      "segmentIdentityKey": "ad09757df60ec5cf08bea13c1d935c7f7c03c6a1544001a671c0111391499143",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "706169282",
+      "normalizedValue": "706169282",
+      "rawValue": "706.169.282",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "2ab256d66d77923a7a3c7821d3dacf6854db04d4a00c9db4fe162bc105e7949d",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "706.169.282",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "210f825b3833b252435ea44c7db14f42a2589eab65063c072b182d3639e97ace",
+          "locatorHash": "5350e5b56a8c29f1db7abea225e7b4a88e76f7cee72bf6e3ecbfa736c857378e"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "82e932ed9cd01d27c9bf3f0c47bd44b09d4e25f904d5ce59dfd5da5b3ef42222",
+      "segmentIdentityKey": "21a75757dc5f554a82ba45603861fae39eac5e6eaf0602454e79241cfc850ddf",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "12212653",
+      "normalizedValue": "12212653",
+      "rawValue": "12.212.653",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "4dc95dbd74ee5f6470372472a48d5242585d03f1f543afda8cd15efa45351d1a",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Service",
+          "rawValue": "12.212.653",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "d311aeb5498bad185b9bbf27708d1142824b0038de0ca349e7b25728bb9f7a17",
+          "locatorHash": "bcf5baf1c37d57bde8b025624be78e2de116eb0bde2c80de2c9fd19a4dbecf9f"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "7ca7ed944a37b43bf91026ace91a97035b01689fa3a8eead75e08c61d8ea91cf",
+      "segmentIdentityKey": "93e91d2122f1f225e5da46f18aedbf3eb7050a77780246246af54a2a1287a199",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "90642051",
+      "normalizedValue": "90642051",
+      "rawValue": "90.642.051",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "5afd5e967d9410006803a262e7e8d2eeb676a1b8b5d2a53875aafba931602cb1",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Power",
+          "rawValue": "90.642.051",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "b88d22938bf78bc8116a0a78520fbc44318b787b6d3605d7d08068a0a0982af9",
+          "locatorHash": "2eac499e361e9e12e71d1ff4f4d380b8c0e48316161a642f55b5bb98c6d254e9"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "2304f1b05d231cc829ad02828b2a8aa860cc2263294384aead0cf543597986b1",
+      "segmentIdentityKey": "6f9d867b9c59cfc79e8bec0924b117fe1b5b6199b65234b22efc05f62a5d75ac",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "329366041",
+      "normalizedValue": "329366041",
+      "rawValue": "329.366.041",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "670c824acbe28c5c0d7788569fc00d49496656883120efa97ae91ba871ebce60",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Trading",
+          "rawValue": "329.366.041",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "d3f840228b2c073e15b551d681a4cdf4490a9bd231228d2ef7dbcc1a968f2dd6",
+          "locatorHash": "4aa83fdd4e1c5ab9008f4b166784e41063f7e0c92c4d13e7ac5cbbcb53fbd976"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "bfea6c1217904861f4fb48b5079a1b7b8cd99d1e4d4cbb645c46c8328da2a30a",
+      "segmentIdentityKey": "9fa5b18be4061a9cfb14a809cd73921a69bded861a891fc5e1d9d5dfc8882092",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "cffec9c1e1a27c61c1e9f2b6eba5207f448427b13d35bafc7f7432ee47ec3226",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "–",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "38ed42bdb3367914c0b4e7eb075f9454feb7663b42d52c9e52d106ef963237ac",
+          "locatorHash": "e1ef5fa56eeb588c96ba52cea6ef5077a1c7b265825fa10d4efd05e1e91e0068"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "1128d6b7c0a5f62d39f5abc9e03c2f636ea10cd8629fcc81f4a35995087cdb01",
+      "segmentIdentityKey": "6bf96fe33d6cd30562c75102d071c6df0c007029dfb9d7a6ff83cec56432037c",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "dcd1770df6978c82f45547ce8f3683af302bf87f804155934cc782f611656626",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "–",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "6b37793cdd9cc081f2626c5f33ee4468e3065d69f99cd50ba9582d48edf7583d",
+          "locatorHash": "1db72927f31068dea7b0af44c18bc8ba7bf0dfa9de9b4c949b0882ea3b50136a"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "94d98d88f285482f915eb5c8a8a48b62f4355b9570bc00902ea650db6f566e0c",
+      "segmentIdentityKey": "76ebb5b9b17e5ea729b2fc03dfcaff54826dada1191b7b6c92d4c272c7757c21",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "5d793d3f274ee8564373158ffd4ebbf1a5361a52fd76f14b6ffb04997161defc",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Elimination",
+          "rawValue": "–",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "8ddddd2f38dbc074bdcbdea1743f1894f1c3e0efedc7e94c99921adccb655048",
+          "locatorHash": "c4ff88d10a14a964e0a4b7a0fa10fcaae3b2b4e6990c2fa993c3573a6ec7af11"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "d2bed3fd2a0c416235fb9c9951829cdb2b54271c125c49366b334d5fe7c4b1cd",
+      "segmentIdentityKey": "3aa2bb67d71cb7e62c0c209e7d6acd5d25324db3031083070295caa8e2e8e240",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "1138390027",
+      "normalizedValue": "1138390027",
+      "rawValue": "1.138.390.027",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "e76be49135883fcc9cde4f19a28cf80457e0a1c3d3a697b6a41cd3eeb1f792f6",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External sales",
+          "columnLabel": "Consolidation",
+          "rawValue": "1.138.390.027",
+          "snippet": " are as follows\n(Note 39): Entitas anak/ Subsidiaries Informasi Geografis/ Geographical Information Periode/ Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dol",
+          "snippetHash": "90b770df12574569e38621fd70060fd4cdcac59f2a30e2626aac1ef6256a6eb7",
+          "evidenceHash": "9b2524313ee10aded68628ef948688b6158207ee762634e482bd2c85bbd40809",
+          "locatorHash": "a914c716e9ab7341248db5ab77b34bf14e36e36d325ce39ef5d6c010ec7a71bd"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "e4032118bf802736cd5fdaef7c548621ef11cc2a5dda4e47fc0e03e0a05317cf",
+      "segmentIdentityKey": "ad09757df60ec5cf08bea13c1d935c7f7c03c6a1544001a671c0111391499143",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "VALUE",
+      "reportedValue": "170826832",
+      "normalizedValue": "170826832",
+      "rawValue": "170.826.832",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "ac9304efe1054f452050e282f5edd8f5553eb5a522e01e0f330ba49302e79462",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "170.826.832",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "155a37eaac2d893bd99c873a4fb96fbcf9275b11a047c1ab1dafcb195c2acf9c",
+          "locatorHash": "000f866ab3bb0d6ce59938d9f3f1b01f6fa1f5068b0878272c35466880be7245"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "1a53500ccce5cf036fe49b0e9590ca43260db8bf82543d995898c2e60521d239",
+      "segmentIdentityKey": "21a75757dc5f554a82ba45603861fae39eac5e6eaf0602454e79241cfc850ddf",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "VALUE",
+      "reportedValue": "12361416",
+      "normalizedValue": "12361416",
+      "rawValue": "12.361.416",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "4aa7b7b685f8457b945574f4130ad29ff4321e40edb05f4f66e9988406c3febd",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Service",
+          "rawValue": "12.361.416",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "9dc44685037f4b6cb28fdc5941d6b0a8fde77b9c2e89ef215467605f9e0409b0",
+          "locatorHash": "0d0930df34e866481bfdd810dc8d1b754e431e6437783294522de0fb1ae8073a"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "a5f757d3a6ae4e39f123bd2274ce1d546165f7ed8780419251df225bc24fea18",
+      "segmentIdentityKey": "93e91d2122f1f225e5da46f18aedbf3eb7050a77780246246af54a2a1287a199",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "VALUE",
+      "reportedValue": "5844",
+      "normalizedValue": "5844",
+      "rawValue": "5.844",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "129113dfc2809c777520b98c9b767a2d16ddff6dde0c563c5118beee582b3caa",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Power",
+          "rawValue": "5.844",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "4174d134f831e32331e96a54eac56aa8243361899f2fd3673b5a809efd491c56",
+          "locatorHash": "a90992a30279ba17744d59e510ac6138adfe9b9ede57a8c1800bce60d089fe3d"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "2d600d6027569787f148bfcb27f8bb8658a1b883cb025020cd7557f396047dd0",
+      "segmentIdentityKey": "6f9d867b9c59cfc79e8bec0924b117fe1b5b6199b65234b22efc05f62a5d75ac",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "e80c12ea06c6a5ad9269cc9302194d78b4f8ad0817bd3d6cb9fe2dccbba58cbf",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Trading",
+          "rawValue": "–",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "7491488715c257a46ef7e8c87d9f4fe4e5bba127d6d7d547b84b399614ee66e8",
+          "locatorHash": "94f19454c6649c7a365cd8702dbecfe93c1a30da0ab87da4850d16f648cecec4"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "3ae1f548f21192056613dfe798ad78e42f6ac42f08f00939fa58a1a0d240e4e3",
+      "segmentIdentityKey": "9fa5b18be4061a9cfb14a809cd73921a69bded861a891fc5e1d9d5dfc8882092",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "9ba930b486bc5c938f7d7b6df6ed415f4327a004ac189c1a4d45b3d712be2274",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "–",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "4d41caa1f9de722484180bdfe3fe67ae10a1172042e03fe023cf030840c57962",
+          "locatorHash": "fc23326c64528c8ff0145ba92d5ac2275ee4739da333af456c7031717f50f2c5"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "4ee0f527aca55ca63a093d76a008f1214b4ea35473a2b74bdbc060fc74ff6f31",
+      "segmentIdentityKey": "6bf96fe33d6cd30562c75102d071c6df0c007029dfb9d7a6ff83cec56432037c",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "e024584b2f4925bf8ff0154dda83238d4004905be401df6caad8b17ea3cb591d",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "–",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "0618821f93fa463513c2810ab18f58cebf2ba218c4b9995e8ad11508b8628f7a",
+          "locatorHash": "3f9f1d0b97e6efd247f41f9c35b9685ba441a9e898453299e1565f381ebe9f6c"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "06cb8e9ecd094f773228441b03f12ddb04ba58b9bc9f3268dad91c1fd03994ec",
+      "segmentIdentityKey": "76ebb5b9b17e5ea729b2fc03dfcaff54826dada1191b7b6c92d4c272c7757c21",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "VALUE",
+      "reportedValue": "-183194092",
+      "normalizedValue": "-183194092",
+      "rawValue": "(183.194.092)",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "ffa607abc19b12372aac7874653d6910dddf0c2b99f28f67c2b911eac81f25e9",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Elimination",
+          "rawValue": "(183.194.092)",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "d0bd347b2c99c8d790f1a06c1d3409c452fbc6dd05db83496561292de4007323",
+          "locatorHash": "366acb3018f17e0a71a0fdbd53931426d23d987729557862f879f9849f94971d"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "6d2ed9f575b7613b077f141d232a2f901a80addc4bf6698f434f96d97c2636fb",
+      "segmentIdentityKey": "3aa2bb67d71cb7e62c0c209e7d6acd5d25324db3031083070295caa8e2e8e240",
+      "metricCode": "REVENUE",
+      "metricLabel": "Inter-segment Sales",
+      "sourceMetricLabel": "Intersegment sales",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "INTERSEGMENT",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "69965c89a49f96d4a97089bbb5bf4bce579132a693044ea0348b039ef804cf00",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Intersegment sales",
+          "columnLabel": "Consolidation",
+          "rawValue": "–",
+          "snippet": "Period Medco Energi US LLC Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Medco Energi USA Inc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO ",
+          "snippetHash": "39e1e178ee096a160c47516df018ba8baa206057168f90643a809b323eece13b",
+          "evidenceHash": "93843678813678395107d88530f848633467565e815982885198bd6ad0c97f7b",
+          "locatorHash": "43e977f5570859f309e6e4d2fbb705d55f298c39a6e91511ee10c394c371cea2"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "ce9c1ecf21068d5316ba63155dfecc91d50bb9194f614fc74fbea62712bd377a",
+      "segmentIdentityKey": "ad09757df60ec5cf08bea13c1d935c7f7c03c6a1544001a671c0111391499143",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "876996114",
+      "normalizedValue": "876996114",
+      "rawValue": "876.996.114",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "133b5857773e15cf525dbb7c57abd4fe81ecc5c665f32d38d17cbdd9e23a7668",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Exploration and production of oil and gas",
+          "rawValue": "876.996.114",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "1ab8f2ad4488ce82302102327f3f2951537f2c9738736d06d53d8ee6e39def34",
+          "locatorHash": "af18106fd25014856eb81fb65127eb042e7502760d81c229807181881310a691"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "0f8211f2a11fd3e7710793ad241c547835f73f7cbe85430d2b0665fda5e6ae96",
+      "segmentIdentityKey": "21a75757dc5f554a82ba45603861fae39eac5e6eaf0602454e79241cfc850ddf",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "24574069",
+      "normalizedValue": "24574069",
+      "rawValue": "24.574.069",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "66894b048dc3ae3716dbcc1be57fb0600155a1a12b6714a6b9dfc2c68b77a7aa",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Service",
+          "rawValue": "24.574.069",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "5cd699c8f2a7100b1070c254ca96d4d8e37382db2a0dada9aac4e8919cf7c7c8",
+          "locatorHash": "c75f5b37c9da18a6f597001a1e77e22645becd0fc4915ba273402d1d2c4842f5"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "716ba08db01d6dceee4bf2e40ec649d956e3df39cc255a4253c609e9485efaff",
+      "segmentIdentityKey": "93e91d2122f1f225e5da46f18aedbf3eb7050a77780246246af54a2a1287a199",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "90647895",
+      "normalizedValue": "90647895",
+      "rawValue": "90.647.895",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "4707a6331903bf4bb85d88e4c7e3e6606cee631ee4afbee36315e4d133a7d148",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Power",
+          "rawValue": "90.647.895",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "e06baa9522bb9f12755d3d2729342708b95fa201271beb8894e158913b5dd694",
+          "locatorHash": "562988f7638d284557529d5be1f3597e52c144894155c0cfab7aad11e3060d8b"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "7c69b44d6ad26581f817ff09b081992bda1926c27d5d15dfecc59e832f75a34c",
+      "segmentIdentityKey": "6f9d867b9c59cfc79e8bec0924b117fe1b5b6199b65234b22efc05f62a5d75ac",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "329366041",
+      "normalizedValue": "329366041",
+      "rawValue": "329.366.041",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "5c86703c99e6b6042799b35b2e4f83af51c341c8b55bdbda7f339e58c15d113d",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Trading",
+          "rawValue": "329.366.041",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "d49cea284da50be1aeac71bfac95494dda26a7a6ef2153dc0ba94f5ddd6ceb41",
+          "locatorHash": "a6d4dfde2382481c992f7f965ab9d30aa17a26154faaf926e98ccca0fa48c635"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "1c419c280627475079a9bf1e057ba37cf7b08845aee10bcb0ef11683cc1acaa1",
+      "segmentIdentityKey": "9fa5b18be4061a9cfb14a809cd73921a69bded861a891fc5e1d9d5dfc8882092",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "65808af2bd81808304b952b41297d59bcf3069b2009a0e3bc083e36c61ddc3f4",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Holding and related operations",
+          "rawValue": "–",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "508cf51e626cb4ebe76522b30ed652770832be728cec221071af083ef6eb3c87",
+          "locatorHash": "4388bcde3aed8ac9c82cdc24cce6621c94ec15df63d9b08073be6e780b734382"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "a7e2536818f629971746957d385c4dce3b34653cfdf730551dbb3b397f19d001",
+      "segmentIdentityKey": "6bf96fe33d6cd30562c75102d071c6df0c007029dfb9d7a6ff83cec56432037c",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "ZERO",
+      "reportedValue": "0",
+      "normalizedValue": "0",
+      "rawValue": "–",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "0e43bb081a983a34a2acf002c6dddad16d86cbfa2bc693f477010a26f569686f",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Discontinued operations",
+          "rawValue": "–",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "b8375064170d72e13cae1acc1b459bbadbfab0e56ce404976242eaa170420e16",
+          "locatorHash": "3bd74f6e8895aa2696719f760bb15a71e3ed58031cca038e1887414a86b918b6"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "48f066853031418e4fc0cd1640c2399d8135d4367ec620ba0a537f5da3c7deff",
+      "segmentIdentityKey": "76ebb5b9b17e5ea729b2fc03dfcaff54826dada1191b7b6c92d4c272c7757c21",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "-183194092",
+      "normalizedValue": "-183194092",
+      "rawValue": "(183.194.092)",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "5b1fcab717d7564fa7c13f9693d04675eae87232294f12196e23add8463f9868",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Elimination",
+          "rawValue": "(183.194.092)",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "c2008987a7e4a8335e859b318a8f9565b9ae00467e4ea9c6b5e676fba0302608",
+          "locatorHash": "3d59ee6ea2ae657d2f889e44b878c71f4b2abae5283fceb6e02a3f17ea769ab0"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "c8f5e9cd126ec94388f3d9785bf6c6f2241c0f4c304f78a8bcabbd4312411945",
+      "segmentIdentityKey": "3aa2bb67d71cb7e62c0c209e7d6acd5d25324db3031083070295caa8e2e8e240",
+      "metricCode": "REVENUE",
+      "metricLabel": "Total Segment Revenue",
+      "sourceMetricLabel": "Total sales and other operating revenues",
+      "periodColumn": "30 Juni 2025/ June 30, 2025",
+      "salesScope": "TOTAL",
+      "state": "VALUE",
+      "reportedValue": "1138390027",
+      "normalizedValue": "1138390027",
+      "rawValue": "1.138.390.027",
+      "currency": "USD",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-06-30",
+        "type": "H1"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "9bc8a75580b192b4edd56266d68675e6be1bce60d400e6e2873c78001b0fc649",
+      "sourceDocumentSha256": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 239,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Total sales and other operating revenues",
+          "columnLabel": "Consolidation",
+          "rawValue": "1.138.390.027",
+          "snippet": "nc Amerika Serikat/ United\nStates of America (USA) 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 Ophir Vietnam Block 12W B.V Vietnam 30 Juni 2024/ June 30, 2024 Medco International Ventures Ltd Afrika dan Timur Tengah/ Africa and Middle East 30 Juni 2025 dan 2024/ June 30, 2025 and 2024 30 Juni 2025/ June 30, 2025 Eksplorasi\ndan produksi\nminyak dan\ngas bumi/ Exploration\nand\nproduction\nof oil and gas Jasa/ Service Listrik/ Power Perdagangan/ Trading Holding\ndan\noperasional\nterkait/ Holding\nand related\noperations Operasi\nyang\ndihentikan/ Discontinued\noperations Eliminasi/ Elimination\nKonsolidasi/\nConsolidation Penjualan eksternal/ External sales 706.169.282 12.212.653 90.642.051 329.366.041 – – – 1.138.390.027\nPenjualan antar segmen/ Intersegment sales 170.826.832 12.361.416 5.844 – – – (183.194.092) –\nJumlah penjualan dan\npendapatan usaha\nlainnya/ Total sales and other\noperating revenues 876.996.114 24.574.069 90.647.895 329.366.041 – – (183.194.092) 1.138.390.027\nLaba kotor/ Gross profit 387.355.495 4.926.182 42.938.144 4.539.314 – – (3.969.207) 435.789.928\nBeban penjualan, umum dan\nadministrasi/ Selling, general and\nadministrative expenses (55.004.523) (2.385.117) (20.627.579) (2.522.070) (30.908.968) – 13.471.971 (97.976.286) The original interim consolidated financial statements included\nherein are in the Indonesian language. PT MEDCO ENERGI INTERNASIONAL Tbk\nDAN ENTITAS ANAKNYA\nCATATAN ATAS LAPORAN\nKEUANGAN KONSOLIDASIAN INTERIM\nTanggal 30 Juni 2025 dan\nuntuk Periode Enam Bulan yang Berakhir\npada Tanggal Tersebut\n(Disajikan dalam Dolar Amerika Serikat,\nkecuali dinyatakan lain) PT MEDCO ENERGI INTERNASIONAL Tbk\nAND ITS SUBSIDIARIES\nNOTES TO THE INTERIM CONSOLIDATED\nFINANCIAL STATEMENTS\nAs of June 30, 2025 and\nfor the Six-Month Period\nThen Ended\n(Expressed in United States Dolla",
+          "snippetHash": "a71b23987ca7700916021dc65a7607f9f0c3b1b0b60a6fa64d02cb9b54d6471d",
+          "evidenceHash": "6f9885566bab4a6ecf412dbe5ec9465c0b2504ae97863cbe136c2ad6d2dda4ae",
+          "locatorHash": "7f67ebaa927ada4dc6d57380f69f0530be9558a913a99ab778a9689fd66e8c8f"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    }
+  ],
+  "segmentOperatingProfitFacts": [],
+  "states": [
+    {
+      "requirementId": "DIVIDEND_EVENT",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "factCount": 1,
+      "attemptedPages": [
+        8,
+        12,
+        13,
+        14,
+        51,
+        52,
+        98,
+        99,
+        103,
+        104,
+        106,
+        108,
+        126,
+        127,
+        128,
+        154,
+        177,
+        185,
+        186,
+        188,
+        208,
+        210,
+        220,
+        221,
+        240,
+        242
+      ],
+      "reason": "Source-disclosed dividend lifecycle event retained with field-level evidence and true dates."
+    },
+    {
+      "requirementId": "SEGMENT_REVENUE",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "factCount": 24,
+      "attemptedPages": [
+        69,
+        70,
+        199,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244
+      ],
+      "reason": "Source-disclosed segment revenue retained with segment and sales-scope dimensions."
+    },
+    {
+      "requirementId": "SEGMENT_OPERATING_PROFIT",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "factCount": 0,
+      "attemptedPages": [
+        69,
+        70,
+        199,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244
+      ],
+      "reason": "Issuer disclosed another segment performance measure (for example gross profit, segment result, or profit before tax); it was not relabeled as canonical operating profit."
+    }
+  ],
+  "reconciliationControls": [
+    {
+      "controlId": "SEGMENT_REVENUE_EXTERNAL_RECONCILIATION",
+      "applicable": true,
+      "passed": true,
+      "reportedValue": "1138390027",
+      "comparedValue": "1138390027",
+      "difference": "0",
+      "reason": "Business and explicit elimination/unallocated members compared with the disclosed consolidated/total member."
+    },
+    {
+      "controlId": "SEGMENT_REVENUE_TOTAL_RECONCILIATION",
+      "applicable": true,
+      "passed": true,
+      "reportedValue": "1138390027",
+      "comparedValue": "1138390027",
+      "difference": "0",
+      "reason": "Business and explicit elimination/unallocated members compared with the disclosed consolidated/total member."
+    },
+    {
+      "controlId": "SEGMENT_OPERATING_PROFIT_RECONCILIATION",
+      "applicable": false,
+      "passed": null,
+      "reportedValue": null,
+      "comparedValue": null,
+      "difference": null,
+      "reason": "Canonical segment operating profit was not explicitly disclosed."
+    },
+    {
+      "controlId": "DIVIDEND_DPS_ELIGIBLE_SHARE_CONTROL",
+      "applicable": false,
+      "passed": null,
+      "reportedValue": "37923889",
+      "comparedValue": null,
+      "difference": null,
+      "reason": "Control not run because currencies differ or no directly comparable reported share count exists."
+    }
+  ],
+  "evidenceAndLineage": {
+    "allEventsFieldLinked": true,
+    "allSegmentIdentitiesLinked": true,
+    "allFactsLinked": true,
+    "sourceRevisionHash": "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e"
+  },
+  "idempotency": {
+    "runs": 2,
+    "runIdentityStable": true,
+    "logicalObjectsStable": true,
+    "duplicateEvents": 0,
+    "duplicateSegmentIdentities": 0,
+    "duplicateSegmentFacts": 0
+  },
+  "providerUsage": {
+    "providerCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "costUsd": "0.00000000"
+  },
+  "productionSafety": {
+    "legacyMutation": false,
+    "p0aMutation": false,
+    "phase6aMutation": false,
+    "railwayMutation": false,
+    "deployment": false
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "artifactVersion": "INVESTAI_PHASE6B_CROSS_ISSUER_MATRIX_V1",
+  "issuers": [
+    {
+      "issuer": "ICBP",
+      "dividendEventCount": 1,
+      "dividendCoverage": "VALUE",
+      "segmentCount": 8,
+      "segmentRevenueCoverage": "VALUE",
+      "segmentOperatingProfitCoverage": "VALUE",
+      "reconciliationResult": "PASS",
+      "evidenceCompleteness": "COMPLETE",
+      "ocrUsage": {
+        "pages": [],
+        "expectedPages": [],
+        "phase6bAdditionalPages": []
+      }
+    },
+    {
+      "issuer": "MEDC",
+      "dividendEventCount": 1,
+      "dividendCoverage": "VALUE",
+      "segmentCount": 8,
+      "segmentRevenueCoverage": "VALUE",
+      "segmentOperatingProfitCoverage": "NOT_DISCLOSED",
+      "reconciliationResult": "PASS",
+      "evidenceCompleteness": "COMPLETE",
+      "ocrUsage": {
+        "pages": [],
+        "expectedPages": [],
+        "phase6bAdditionalPages": []
+      }
+    },
+    {
+      "issuer": "DRMA",
+      "dividendEventCount": 1,
+      "dividendCoverage": "VALUE",
+      "segmentCount": 4,
+      "segmentRevenueCoverage": "VALUE",
+      "segmentOperatingProfitCoverage": "NOT_DISCLOSED",
+      "reconciliationResult": "PASS",
+      "evidenceCompleteness": "COMPLETE",
+      "ocrUsage": {
+        "pages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "expectedPages": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "phase6bAdditionalPages": []
+      }
+    }
+  ],
+  "providerUsage": {
+    "providerCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "costUsd": "0.00000000"
+  }
+}

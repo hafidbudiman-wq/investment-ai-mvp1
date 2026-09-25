@@ -97,6 +97,10 @@ model Company {
   p0aReportRevisions   P0AReportRevision[]
   p0aFactAssertions    P0AFactAssertion[]
   p0bExtractionRuns    P0BExtractionRun[]
+  phase6bExtractionRuns Phase6BExtractionRun[]
+  dividendEvents        DividendEvent[]
+  segmentDimensions     SegmentDimension[]
+  segmentFacts          SegmentFact[]
   derivedMetricResults DerivedMetricResult[]
   createdAt            DateTime                @default(now())
   updatedAt            DateTime                @updatedAt
@@ -491,6 +495,9 @@ model FinancialDocument {
   p0aReportRevisions P0AReportRevision[]
   p0aEvidence        P0AFactEvidence[]
   p0bExtractionRuns  P0BExtractionRun[]
+  phase6bExtractionRuns Phase6BExtractionRun[]
+  dividendEvents        DividendEvent[]
+  segmentFacts          SegmentFact[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
@@ -728,6 +735,9 @@ model P0AReportRevision {
   status            String             @default("SHADOW")
   factAssertions    P0AFactAssertion[]
   p0bExtractionRuns P0BExtractionRun[]
+  phase6bExtractionRuns Phase6BExtractionRun[]
+  dividendEvents        DividendEvent[]
+  segmentFacts          SegmentFact[]
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
@@ -756,6 +766,9 @@ model P0AFactEvidence {
   rowIndex         Int?
   columnIndex      Int?
   assertions       P0AFactAssertionEvidence[]
+  dividendLinks        DividendEventEvidence[]
+  segmentIdentityLinks SegmentIdentityEvidence[]
+  segmentFactLinks     SegmentFactEvidence[]
   createdAt        DateTime                   @default(now())
 
   @@index([documentId, pageNumber])
@@ -924,4 +937,210 @@ model DerivedMetricInput {
   @@index([inputAssertionId])
   @@index([inputResultId])
   @@index([inputIdentity])
+}
+
+model Phase6BExtractionRun {
+  id                     String                      @id @default(cuid())
+  companyId              String
+  company                Company                     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId             String
+  document               FinancialDocument           @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportRevisionId       String
+  reportRevision         P0AReportRevision           @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  manifestVersion        String
+  extractorVersion       String
+  dimensionSchemaVersion String
+  completeIdentityHash   String                      @unique
+  status                 String
+  selectedPages          Json
+  providerCalls          Int                         @default(0)
+  inputTokens            Int                         @default(0)
+  outputTokens           Int                         @default(0)
+  estimatedCostUsd       Decimal                     @default(0) @db.Decimal(18, 8)
+  outcomes               Phase6BRequirementOutcome[]
+  dividendEvents         DividendEvent[]
+  segmentFacts           SegmentFact[]
+  completedAt            DateTime?
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+
+  @@index([documentId, status])
+  @@index([reportRevisionId])
+}
+
+model Phase6BRequirementOutcome {
+  id             String               @id @default(cuid())
+  runId          String
+  run            Phase6BExtractionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  requirementId  String
+  applicability  String
+  state          String
+  factCount      Int                  @default(0)
+  reason         String
+  attemptedPages Json
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([runId, requirementId])
+  @@index([runId, state])
+}
+
+model DividendEvent {
+  id                      String                  @id @default(cuid())
+  runId                   String
+  run                     Phase6BExtractionRun    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  companyId               String
+  company                 Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId              String
+  document                FinancialDocument       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportRevisionId        String
+  reportRevision          P0AReportRevision       @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  eventKey                String                  @unique
+  eventType               String
+  status                  String
+  sourceProfitPeriodStart DateTime?
+  sourceProfitPeriodEnd   DateTime?
+  declarationDate         DateTime?
+  approvalDate            DateTime?
+  recordDate              DateTime?
+  cumDate                 DateTime?
+  exDate                  DateTime?
+  paymentDate             DateTime?
+  paymentDatePrecision    String?
+  paymentDateRaw          String?
+  recipientScope          String
+  shareClass              String?
+  totalReportedValue      Decimal?                @db.Decimal(38, 6)
+  totalAmount             Decimal?                @db.Decimal(38, 6)
+  totalRawValue           String?
+  totalCurrency           String?
+  totalScale              Decimal?                @db.Decimal(38, 6)
+  perShareReportedValue   Decimal?                @db.Decimal(38, 6)
+  perShareAmount          Decimal?                @db.Decimal(38, 6)
+  perShareRawValue        String?
+  perShareCurrency        String?
+  perShareScale           Decimal?                @db.Decimal(38, 6)
+  fieldStates             Json
+  definitionVersion       String
+  sourceRevisionHash      String
+  extractionOrigin        String
+  readConfidence          Decimal?                @db.Decimal(5, 4)
+  mappingConfidence       Decimal?                @db.Decimal(5, 4)
+  validationStatus        String
+  validationControls      Json
+  evidence                DividendEventEvidence[]
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  @@index([companyId, approvalDate])
+  @@index([reportRevisionId])
+  @@index([runId])
+}
+
+model DividendEventEvidence {
+  eventId    String
+  event      DividendEvent   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  evidenceId String
+  evidence   P0AFactEvidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  fieldName  String
+  ordinal    Int
+  createdAt  DateTime        @default(now())
+
+  @@id([eventId, evidenceId, fieldName])
+  @@unique([eventId, fieldName, ordinal])
+  @@index([evidenceId])
+}
+
+model SegmentDimension {
+  id                String                    @id @default(cuid())
+  companyId         String
+  company           Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  identityKey       String                    @unique
+  sourceLabel       String
+  normalizedLabel   String
+  segmentType       String
+  validFrom         DateTime
+  validTo           DateTime?
+  definitionVersion String
+  facts             SegmentFact[]
+  evidence          SegmentIdentityEvidence[]
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([companyId, normalizedLabel])
+  @@index([companyId, validFrom, validTo])
+}
+
+model SegmentIdentityEvidence {
+  segmentId  String
+  segment    SegmentDimension @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  evidenceId String
+  evidence   P0AFactEvidence  @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  ordinal    Int
+  createdAt  DateTime         @default(now())
+
+  @@id([segmentId, evidenceId])
+  @@unique([segmentId, ordinal])
+  @@index([evidenceId])
+}
+
+model SegmentFact {
+  id                     String                @id @default(cuid())
+  runId                  String
+  run                    Phase6BExtractionRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  companyId              String
+  company                Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId             String
+  document               FinancialDocument     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportRevisionId       String
+  reportRevision         P0AReportRevision     @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  segmentId              String
+  segment                SegmentDimension      @relation(fields: [segmentId], references: [id], onDelete: Restrict)
+  factKey                String                @unique
+  metricCode             String
+  metricLabel            String
+  sourceMetricLabel      String
+  periodColumn           String
+  salesScope             String?
+  valueState             String
+  reportedValue          Decimal               @db.Decimal(38, 6)
+  normalizedValue        Decimal               @db.Decimal(38, 6)
+  rawValue               String
+  currency               String
+  unitType               String
+  scale                  Decimal               @db.Decimal(38, 6)
+  periodStart            DateTime
+  periodEnd              DateTime
+  periodType             String
+  consolidationScope     String
+  dimensionSchemaVersion String
+  dimensionHash          String
+  definitionVersion      String
+  sourceRevisionHash     String
+  origin                 String                @default("REPORTED")
+  extractionOrigin       String
+  readConfidence         Decimal?              @db.Decimal(5, 4)
+  mappingConfidence      Decimal?              @db.Decimal(5, 4)
+  validationStatus       String
+  evidence               SegmentFactEvidence[]
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@unique([runId, segmentId, metricCode, salesScope])
+  @@index([companyId, metricCode, periodEnd])
+  @@index([reportRevisionId])
+  @@index([segmentId])
+}
+
+model SegmentFactEvidence {
+  factId     String
+  fact       SegmentFact     @relation(fields: [factId], references: [id], onDelete: Cascade)
+  evidenceId String
+  evidence   P0AFactEvidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  ordinal    Int
+  createdAt  DateTime        @default(now())
+
+  @@id([factId, evidenceId])
+  @@unique([factId, ordinal])
+  @@index([evidenceId])
 }

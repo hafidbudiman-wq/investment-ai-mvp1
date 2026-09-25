@@ -1,0 +1,183 @@
+name: Phase 6B Disposable PostgreSQL Acceptance
+
+on:
+  push:
+    branches:
+      - agent/investai-phase6b-dividend-segment
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase6b-database-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    services:
+      postgres:
+        image: postgres:16.4-alpine3.20
+        env:
+          POSTGRES_USER: phase6b
+          POSTGRES_PASSWORD: phase6b
+          POSTGRES_DB: investai_phase6b_acceptance
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U phase6b -d investai_phase6b_acceptance"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DATABASE_URL: postgresql://phase6b:phase6b@127.0.0.1:5432/investai_phase6b_acceptance?schema=public
+      PGPASSWORD: phase6b
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase6b-source/ICBP_billingual_30Jun25.pdf
+      P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase6b-source/MEDC_1H25.pdf
+      P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase6b-source/DRMA_Q4_2025.pdf
+      PHASE6B_OUTPUT_DIR: ${{ github.workspace }}/.phase6b-qa/full-artifacts
+
+    steps:
+      - name: Checkout exact Phase 6B commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact checkout identity and ancestry
+        run: |
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          git merge-base --is-ancestor ab6bf12d452a1ed90d4e982d77d16f294a6a338e HEAD
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install deterministic OCR and PostgreSQL clients
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind postgresql-client
+          tesseract --version
+          pdftoppm -v
+          psql --version
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Wait for disposable PostgreSQL readiness
+        run: |
+          for attempt in $(seq 1 30); do
+            pg_isready -h 127.0.0.1 -U phase6b -d investai_phase6b_acceptance && exit 0
+            sleep 1
+          done
+          exit 1
+
+      - name: Prisma validate, generate, migrate deploy and status
+        run: |
+          npx prisma validate
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma migrate status
+
+      - name: Capture before and seed twice
+        run: |
+          mkdir -p .phase6b-qa
+          node --import tsx scripts/phase6b-db-acceptance.ts snapshot .phase6b-qa/00-after-migrate.json
+          npm run db:seed
+          node --import tsx scripts/phase6b-db-acceptance.ts snapshot .phase6b-qa/01-after-seed-first.json
+          npm run db:seed
+          node --import tsx scripts/phase6b-db-acceptance.ts snapshot .phase6b-qa/02-after-seed-second.json
+
+      - name: Download and checksum-lock the frozen issuer sources
+        run: |
+          mkdir -p .phase6b-source
+          curl --insecure --http1.1 --fail --location --retry 3 --output "$P0A_ICBP_PDF_PATH" 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  $P0A_ICBP_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_MEDC_PDF_PATH" 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  $P0A_MEDC_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_DRMA_PDF_PATH" 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
+          echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  $P0A_DRMA_PDF_PATH" | sha256sum --check --strict
+
+      - name: Persist frozen P0-A and Phase 6A baselines
+        run: node --import tsx scripts/phase6b-db-acceptance.ts prepare .phase6b-qa/03-frozen-baseline.json
+
+      - name: Persist Phase 6B first run for all issuers
+        run: |
+          node --import tsx scripts/phase6b-db-acceptance.ts persist ICBP first .phase6b-qa/04-icbp-first.json
+          node --import tsx scripts/phase6b-db-acceptance.ts persist MEDC first .phase6b-qa/05-medc-first.json
+          node --import tsx scripts/phase6b-db-acceptance.ts persist DRMA first .phase6b-qa/06-drma-first.json
+          node --import tsx scripts/phase6b-db-acceptance.ts snapshot .phase6b-qa/07-after-first-persistence.json
+
+      - name: Persist Phase 6B second identical run for all issuers
+        run: |
+          node --import tsx scripts/phase6b-db-acceptance.ts persist ICBP second .phase6b-qa/08-icbp-second.json
+          node --import tsx scripts/phase6b-db-acceptance.ts persist MEDC second .phase6b-qa/09-medc-second.json
+          node --import tsx scripts/phase6b-db-acceptance.ts persist DRMA second .phase6b-qa/10-drma-second.json
+          node --import tsx scripts/phase6b-db-acceptance.ts snapshot .phase6b-qa/11-after-second-persistence.json
+
+      - name: Prove idempotency, lineage and frozen semantic safety
+        run: |
+          node --import tsx scripts/phase6b-db-acceptance.ts verify \
+            .phase6b-qa/03-frozen-baseline.json \
+            .phase6b-qa/01-after-seed-first.json \
+            .phase6b-qa/02-after-seed-second.json \
+            .phase6b-qa/07-after-first-persistence.json \
+            .phase6b-qa/11-after-second-persistence.json \
+            .phase6b-qa/PHASE6B-DATABASE-ACCEPTANCE.json
+
+      - name: Generate and checksum full Phase 6B artifacts
+        run: |
+          node --import tsx scripts/p0b-phase6b-three-issuer.ts
+          cd .phase6b-qa/full-artifacts
+          sha256sum --check --strict SHA256SUMS.txt
+
+      - name: Verify repository Phase 6B artifact SHA-256
+        working-directory: artifacts/phase6b
+        run: sha256sum --check --strict SHA256SUMS.txt
+
+      - name: Prove frozen implementation sources are unchanged
+        run: |
+          git diff --exit-code ab6bf12d452a1ed90d4e982d77d16f294a6a338e -- \
+            lib/financial/p0a \
+            lib/financial/p0b/phase6a-pipeline.ts \
+            lib/financial/p0b/phase6a-registry.ts \
+            lib/financial/p0b/persistence.ts \
+            scripts/p0b-phase6a-three-issuer.ts \
+            scripts/phase6a-db-acceptance.ts \
+            tests/p0b/phase6a-core.test.ts
+
+      - name: Run standard full regression suite
+        env:
+          P0A_ICBP_PDF_PATH: ""
+          P0A_MEDC_PDF_PATH: ""
+          P0A_DRMA_PDF_PATH: ""
+        run: npm test
+
+      - name: Run source-backed P0-A, OCR, Phase 6A and Phase 6B regressions
+        run: |
+          node --import tsx scripts/p0a-phase5c-native-regression.ts
+          node --import tsx scripts/p0a-phase5-icbp-regression.ts
+          node --import tsx scripts/p0a-phase5c-drma-diagnostic.ts
+          node --import tsx --test tests/p0b/phase6a-core.test.ts
+          node --import tsx --test tests/p0b/phase6b-core.test.ts
+
+      - name: TypeScript, ESLint and production build
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run build
+
+      - name: Upload evidence and database acceptance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHASE6B-FINAL-DATABASE-ACCEPTANCE-${{ github.sha }}
+          path: |
+            .phase6b-qa/*.json
+            .phase6b-qa/full-artifacts/*.json
+            .phase6b-qa/full-artifacts/SHA256SUMS.txt
+            artifacts/phase6b/*.json
+            artifacts/phase6b/SHA256SUMS.txt
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30

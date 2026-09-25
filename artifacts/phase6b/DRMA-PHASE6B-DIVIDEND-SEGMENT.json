@@ -1,0 +1,607 @@
+{
+  "artifactVersion": "INVESTAI_PHASE6B_DIVIDEND_SEGMENT_V1",
+  "source": {
+    "fileName": "DRMA_2025.pdf",
+    "sha256": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb"
+  },
+  "periodScope": {
+    "ticker": "DRMA",
+    "issuerType": "LISTED_COMMON_EQUITY",
+    "accountingModel": "NON_FINANCIAL",
+    "consolidated": true,
+    "audited": true,
+    "periodStart": "2025-01-01",
+    "periodEnd": "2025-12-31",
+    "periodType": "FY",
+    "currency": "IDR",
+    "documentScale": "1"
+  },
+  "versionIdentity": {
+    "runIdentity": "6e5e6e1baa9a37958570739631413b58a03b54d57a5b2284b002be40a7b4aebc",
+    "manifestVersion": "INVESTAI_PHASE6B_DIVIDEND_SEGMENT_V1",
+    "extractorVersion": "phase6b-deterministic-v1",
+    "dimensionSchemaVersion": "segment-dimension-v1",
+    "p0aVersions": {
+      "contract": "investai-canonical-v1.0-final:p0-a",
+      "parser": "p0a-page-index-v2-native-ocr-compatible",
+      "router": "p0a-page-router-v11-integer-eps-compatible",
+      "applicability": "p0a-applicability-v1",
+      "planner": "p0a-fact-planner-v2-route-metadata",
+      "gapDetector": "p0a-gap-detector-v1",
+      "validation": "p0a-validation-v1",
+      "mapping": "p0a-native-financial-mapping-v5-ocr-presentation-variants",
+      "scopedPrompt": "p0a-scoped-openai-prompt-v1"
+    },
+    "p0aOutcomeFingerprint": "e117938c1fcc9475436e6864183a199896a34431596e7e2cdf7939ac243bce20"
+  },
+  "routing": {
+    "phase6bEvidencePages": [
+      11,
+      71,
+      91
+    ]
+  },
+  "ocr": {
+    "pages": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "reusedPages": [],
+    "wholeDocumentOcr": false,
+    "newlyOcredForPhase6B": []
+  },
+  "dividendEvents": [
+    {
+      "eventKey": "6584c1e5c664d52cc3a3a2e2aa82ab2f7131c8e011defd8fb6a3bf20e602cb7f",
+      "eventType": "FINAL",
+      "status": "PAID",
+      "sourceProfitPeriod": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "dates": {
+        "declaration": null,
+        "approval": "2025-04-22",
+        "record": "2025-05-09",
+        "cum": null,
+        "ex": null,
+        "payment": null,
+        "paymentPrecision": "PERIOD",
+        "paymentRaw": "FY period ended 2025-12-31"
+      },
+      "recipientScope": "PARENT_SHAREHOLDERS",
+      "shareClass": "ORDINARY",
+      "total": {
+        "reportedValue": "202352938000",
+        "normalizedValue": "202352938000",
+        "rawValue": "202,352,938,000",
+        "scale": "1",
+        "currency": "IDR"
+      },
+      "perShare": {
+        "reportedValue": "43",
+        "normalizedValue": "43",
+        "rawValue": "43",
+        "scale": "1",
+        "currency": "IDR"
+      },
+      "fieldStates": {
+        "total": "VALUE",
+        "perShare": "VALUE",
+        "declaration": "FIELD_NOT_DISCLOSED",
+        "approval": "VALUE",
+        "record": "VALUE",
+        "cum": "FIELD_NOT_DISCLOSED",
+        "ex": "FIELD_NOT_DISCLOSED",
+        "payment": "FIELD_NOT_DISCLOSED",
+        "paymentPrecision": "VALUE",
+        "paymentRaw": "VALUE"
+      },
+      "evidence": [
+        {
+          "fieldName": "TOTAL_AMOUNT",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.TOTAL_AMOUNT",
+            "pageNumber": 71,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "TOTAL_AMOUNT",
+            "rawValue": "202,352,938,000",
+            "snippet": "lic (each below 5%) T o t a l 4.705.882.300 100,00 470.588.230.000 T o t a l Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 45 oleh Ambiati, S.H., tanggal 22 April 2025,\nPerusahaan membagikan dividen tunai atas tahun buku 2024\nsebesar Rp 202.352.938.000 atau sebesar Rp 43 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 9 Mei 2025 dan menyetujui sebesar\nRp 1.000.000.000 dari laba tahun 2024 akan dimasukkan\nsebagai dana cadangan. Based on Minutes of Annual General Meeting of Shareholders No. 45 by Ambiati, S.H., dated 22 April 2025, the Company\ndistributed cash dividends of 2024 amounting to\nRp 202,352,938,000 or Rp 43 per share whose names were\nrecorded in the Company's register of shareholders on 9 May\n2025 dan approve Rp 1,000,000,000 of 2024 profit will be\nincluded as reserve fund. Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 22 oleh Leny, S.H., M.Kn., tanggal 25 April 2024,\nPerusahaan membagikan dividen tunai atas tahun buku 2023\nsebesar Rp 171.290.505.006 atau sebesar Rp 36,40 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 8 Mei 2024 dan menyetujui sebesar Rp 1.000.000.000 dari laba tahun 2023 akan dimasukkan\nsebagai dana cadangan. Based",
+            "snippetHash": "64bb4040f420d4024a42b65129a9856ec09763cfff21fea966461c4e10ab9aae",
+            "evidenceHash": "6132ce7f0d1516c83961153d41177163b8b26fa20a2d4283e109c942c1e716da",
+            "locatorHash": "c2eb15ddd91371fe9a5e75f9441bae2cfdeb70ccbb038e12f4b63f8d226c4eda"
+          }
+        },
+        {
+          "fieldName": "PER_SHARE_AMOUNT",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.PER_SHARE_AMOUNT",
+            "pageNumber": 71,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "PER_SHARE_AMOUNT",
+            "rawValue": "43",
+            "snippet": "lic (each below 5%) T o t a l 4.705.882.300 100,00 470.588.230.000 T o t a l Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 45 oleh Ambiati, S.H., tanggal 22 April 2025,\nPerusahaan membagikan dividen tunai atas tahun buku 2024\nsebesar Rp 202.352.938.000 atau sebesar Rp 43 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 9 Mei 2025 dan menyetujui sebesar\nRp 1.000.000.000 dari laba tahun 2024 akan dimasukkan\nsebagai dana cadangan. Based on Minutes of Annual General Meeting of Shareholders No. 45 by Ambiati, S.H., dated 22 April 2025, the Company\ndistributed cash dividends of 2024 amounting to\nRp 202,352,938,000 or Rp 43 per share whose names were\nrecorded in the Company's register of shareholders on 9 May\n2025 dan approve Rp 1,000,000,000 of 2024 profit will be\nincluded as reserve fund. Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 22 oleh Leny, S.H., M.Kn., tanggal 25 April 2024,\nPerusahaan membagikan dividen tunai atas tahun buku 2023\nsebesar Rp 171.290.505.006 atau sebesar Rp 36,40 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 8 Mei 2024 dan menyetujui sebesar Rp 1.000.000.000 dari laba tahun 2023 akan dimasukkan\nsebagai dana cadangan. Based",
+            "snippetHash": "64bb4040f420d4024a42b65129a9856ec09763cfff21fea966461c4e10ab9aae",
+            "evidenceHash": "ebda40e31f80664ee7fef0cb322d6f469a5696e55eb6ae14c903ec205806e32f",
+            "locatorHash": "e9a3af3dbb4eec384a5c04aef0d25be2a447d5de43fad11e62a4abfb52617d22"
+          }
+        },
+        {
+          "fieldName": "APPROVAL_DATE",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.APPROVAL_DATE",
+            "pageNumber": 71,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "APPROVAL_DATE",
+            "rawValue": "22 April 2025",
+            "snippet": "lic (each below 5%) T o t a l 4.705.882.300 100,00 470.588.230.000 T o t a l Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 45 oleh Ambiati, S.H., tanggal 22 April 2025,\nPerusahaan membagikan dividen tunai atas tahun buku 2024\nsebesar Rp 202.352.938.000 atau sebesar Rp 43 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 9 Mei 2025 dan menyetujui sebesar\nRp 1.000.000.000 dari laba tahun 2024 akan dimasukkan\nsebagai dana cadangan. Based on Minutes of Annual General Meeting of Shareholders No. 45 by Ambiati, S.H., dated 22 April 2025, the Company\ndistributed cash dividends of 2024 amounting to\nRp 202,352,938,000 or Rp 43 per share whose names were\nrecorded in the Company's register of shareholders on 9 May\n2025 dan approve Rp 1,000,000,000 of 2024 profit will be\nincluded as reserve fund. Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 22 oleh Leny, S.H., M.Kn., tanggal 25 April 2024,\nPerusahaan membagikan dividen tunai atas tahun buku 2023\nsebesar Rp 171.290.505.006 atau sebesar Rp 36,40 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 8 Mei 2024 dan menyetujui sebesar Rp 1.000.000.000 dari laba tahun 2023 akan dimasukkan\nsebagai dana cadangan. Based",
+            "snippetHash": "64bb4040f420d4024a42b65129a9856ec09763cfff21fea966461c4e10ab9aae",
+            "evidenceHash": "c9daf3565cc3492254a4f75b9c90621c4949660a34fb32022b7d2cfec1c68e60",
+            "locatorHash": "77901a56293f0f57a278ee72632cfd342a850d182534368d808cc44c1aeaaf37"
+          }
+        },
+        {
+          "fieldName": "RECORD_DATE",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.RECORD_DATE",
+            "pageNumber": 71,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "RECORD_DATE",
+            "rawValue": "9 May\n2025",
+            "snippet": "lic (each below 5%) T o t a l 4.705.882.300 100,00 470.588.230.000 T o t a l Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 45 oleh Ambiati, S.H., tanggal 22 April 2025,\nPerusahaan membagikan dividen tunai atas tahun buku 2024\nsebesar Rp 202.352.938.000 atau sebesar Rp 43 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 9 Mei 2025 dan menyetujui sebesar\nRp 1.000.000.000 dari laba tahun 2024 akan dimasukkan\nsebagai dana cadangan. Based on Minutes of Annual General Meeting of Shareholders No. 45 by Ambiati, S.H., dated 22 April 2025, the Company\ndistributed cash dividends of 2024 amounting to\nRp 202,352,938,000 or Rp 43 per share whose names were\nrecorded in the Company's register of shareholders on 9 May\n2025 dan approve Rp 1,000,000,000 of 2024 profit will be\nincluded as reserve fund. Berdasarkan Berita Acara Rapat Umum Pemegang Saham\nTahunan No. 22 oleh Leny, S.H., M.Kn., tanggal 25 April 2024,\nPerusahaan membagikan dividen tunai atas tahun buku 2023\nsebesar Rp 171.290.505.006 atau sebesar Rp 36,40 per lembar\nsaham yang namanya tercatat dalam daftar pemegang saham\nPerusahaan pada tanggal 8 Mei 2024 dan menyetujui sebesar Rp 1.000.000.000 dari laba tahun 2023 akan dimasukkan\nsebagai dana cadangan. Based",
+            "snippetHash": "64bb4040f420d4024a42b65129a9856ec09763cfff21fea966461c4e10ab9aae",
+            "evidenceHash": "cb2f6c72590ae32dd7ebf9cf1e13e1193ec963c7d8488f4859e9bc26c2fb554a",
+            "locatorHash": "8c151f72d362a970be5b5177c80caa0c6f3881fa5b4a0f592b526dd0ad7653bc"
+          }
+        },
+        {
+          "fieldName": "PAYMENT_STATUS",
+          "evidence": {
+            "requirementId": "DIVIDEND_EVENT.PAYMENT_STATUS",
+            "pageNumber": 11,
+            "printedPageLabel": null,
+            "statement": "NOTE",
+            "table": "Dividend disclosure",
+            "rowLabel": "Dividend event",
+            "columnLabel": "PAYMENT_STATUS",
+            "rawValue": "202,352,938,000",
+            "snippet": "nk jangka\npanjang 18 ( 223.313.845.133 ) ( 101.048.714.835 ) Payments of long-term bank loans Penerimaan (pembayaran) utang bank\njangka pendek 12 2.724.381.636 ( 21.657.047.508 ) Proceeds from (payments of) short-term bank loans Penerimaan (pembayaran) utang\nsewa dan pembiayaan konsumen 127.218.604 ( 2.032.973.696 ) Proceeds from (payments of) obligation under lease payable and consumer financing Pembayaran dividen kas 20, 31 ( 202.352.938.000 ) ( 171.290.505.006 ) Payments of cash dividend Pembayaran dividen kas oleh entitas\nanak kepada kepentingan\nnon-pengendali ( 13.121.600.000 ) ( 8.934.933.480 ) Payment of cash dividends by subsidiaries to non-controlling interests Kas neto digunakan untuk aktivitas\npendanaan ( 411.930.981.008 ) ( 216.375.206.050 ) Net cash used in financing activities Dampak perubahan sel",
+            "snippetHash": "3dd8d15315f23463f9c2c5dfae3779611f203b82a8fd19953d59687095d89487",
+            "evidenceHash": "9a6ee6c8f54cf7ab54c46eac87daac6845dd71eee5ee7cbe597dac122811bc86",
+            "locatorHash": "cf00b1ab4f4a57b46b6a6245f6e748ff74f6c9497c6c0718030cc18cdb0920bf"
+          }
+        }
+      ],
+      "extractionOrigin": "NATIVE",
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validation": {
+        "status": "VALIDATED",
+        "controls": [
+          "DPS_X_ISSUED_SHARES_DIFFERENCE=900; within_1ppm=true"
+        ]
+      }
+    }
+  ],
+  "segmentIdentities": [
+    {
+      "identityKey": "704f3f6057cf7972c2c760d6a942f66ae6ef0cbb19a90857bb465df3bdc5fa81",
+      "sourceLabel": "Two Wheels Segment",
+      "normalizedLabel": "TWO_WHEELS",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-12-31",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Two Wheels Segment",
+          "rawValue": "Two Wheels Segment",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "ec4ad07f7c7cda53a8c1165ec9b02f18be465c759ce4be163cc42ae9aa5a80fc",
+          "locatorHash": "ca565c998fa15f752e2f63cef648edd01155b86c05cf8a6d2cff428826d79284"
+        }
+      ]
+    },
+    {
+      "identityKey": "97c01c35d560997ec0982c65e9bc85d829d138eb03475dd1127d859ef1a9a244",
+      "sourceLabel": "Segmen Roda Empat",
+      "normalizedLabel": "FOUR_WHEELS",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-12-31",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Segmen Roda Empat",
+          "rawValue": "Segmen Roda Empat",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "78e2b4374744390be27aaca603a2ceedcd8adeca3bf5bc87746ed4d63e9198bd",
+          "locatorHash": "142d2137e1a59cc72ee5c4983989502edf57c5543daea09291947c52cecdc079"
+        }
+      ]
+    },
+    {
+      "identityKey": "93cff26ee0e014c37d2abfbd531ef61b1ded180b6659de8277c8b2ddc5d3c609",
+      "sourceLabel": "Other Segments",
+      "normalizedLabel": "OTHER_SEGMENTS",
+      "segmentType": "BUSINESS",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-12-31",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Other Segments",
+          "rawValue": "Other Segments",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "c1f997db6dbe5bdf4f4116601dbb342cf91620215f2c4eef554ec283b04f9286",
+          "locatorHash": "9428ce02ca787279548a4c084f24b2a78e796975045820492616cbf301e3ce5d"
+        }
+      ]
+    },
+    {
+      "identityKey": "bc5b33d2acb2b2a2b424a250036e1ee7b2196aed09031ca7b3c987bbb232fbca",
+      "sourceLabel": "Total Segments",
+      "normalizedLabel": "CONSOLIDATED_TOTAL",
+      "segmentType": "RECONCILIATION",
+      "validFrom": "2025-01-01",
+      "validTo": "2025-12-31",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_IDENTITY",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "Segment header",
+          "columnLabel": "Total Segments",
+          "rawValue": "Total Segments",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "7abb5ab68a3e9809e877edac344abc15f7cd5f7c5995b8169f4cbae534ddc6ea",
+          "locatorHash": "ae2c2e903ac392298207172d3afcf19d59f091b2b6b68aa36a10e5d8800061f7"
+        }
+      ]
+    }
+  ],
+  "segmentRevenueFacts": [
+    {
+      "factKey": "3238956df68d483f65459aec20c244f4fab1220721c613406adeb1d754da3245",
+      "segmentIdentityKey": "704f3f6057cf7972c2c760d6a942f66ae6ef0cbb19a90857bb465df3bdc5fa81",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External revenue",
+      "periodColumn": "31 Desember 2025 Segment Wheels Segment Other Segments Total Segments 31 December 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "3660754579206",
+      "normalizedValue": "3660754579206",
+      "rawValue": "3.660.754.579.206",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-12-31",
+        "type": "FY"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "96a7a8c41dd66ceb0151cac13507834fe77da36db75d8ef4d75aac9c2e78b4d6",
+      "sourceDocumentSha256": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External revenue",
+          "columnLabel": "Two Wheels Segment",
+          "rawValue": "3.660.754.579.206",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "b2cd389267ae9d0129cc085ea3ef52684bc0e91c0c1f9efcc782cfb7c72e2ee4",
+          "locatorHash": "c5e399326cf48cb359b3819c52968826d7a1f778b5959e832a64ac1cfe6aa870"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "15a3c0fe8c6ddc59caeb7eb83e22bccf97dd5fe489985ffca7f067dff0720a35",
+      "segmentIdentityKey": "97c01c35d560997ec0982c65e9bc85d829d138eb03475dd1127d859ef1a9a244",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External revenue",
+      "periodColumn": "31 Desember 2025 Segment Wheels Segment Other Segments Total Segments 31 December 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "1341795940224",
+      "normalizedValue": "1341795940224",
+      "rawValue": "1.341.795.940.224",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-12-31",
+        "type": "FY"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "226920122d482dac7c610626dbe034f8199b2174198f6ad93c72cba7f069212e",
+      "sourceDocumentSha256": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External revenue",
+          "columnLabel": "Segmen Roda Empat",
+          "rawValue": "1.341.795.940.224",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "d417bdf8506135d15db243235fd0abe0974ba3b40251aff0ed0d4a0011d847c9",
+          "locatorHash": "39df75b0ac1212fa1ce1687ac1c8974b8781326b605f00674295e80a1a6f0c60"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "4e33ccb1c05f82c29b68b21a39595180e8c492707be491eaf5aec025abe6952b",
+      "segmentIdentityKey": "93cff26ee0e014c37d2abfbd531ef61b1ded180b6659de8277c8b2ddc5d3c609",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External revenue",
+      "periodColumn": "31 Desember 2025 Segment Wheels Segment Other Segments Total Segments 31 December 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "937125522073",
+      "normalizedValue": "937125522073",
+      "rawValue": "937.125.522.073",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-12-31",
+        "type": "FY"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "13e41b5a0157960e723b5231883c22aeb50fa0b43ecb7361a7051d7bdf89df60",
+      "sourceDocumentSha256": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External revenue",
+          "columnLabel": "Other Segments",
+          "rawValue": "937.125.522.073",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "708155fdefcfcb6bd5e3a7148f0a29e5d9a87bca1d71d80a5b78b890d3167f9a",
+          "locatorHash": "4ce436bb870a662e44d40640e95bfefc4357a080ffb06ee4254cbc8237c3ad31"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    },
+    {
+      "factKey": "618219a2f39fe11da5e84ab5238af8bb8c040925efc26807aff0bfb1723a3f27",
+      "segmentIdentityKey": "bc5b33d2acb2b2a2b424a250036e1ee7b2196aed09031ca7b3c987bbb232fbca",
+      "metricCode": "REVENUE",
+      "metricLabel": "External Revenue",
+      "sourceMetricLabel": "External revenue",
+      "periodColumn": "31 Desember 2025 Segment Wheels Segment Other Segments Total Segments 31 December 2025",
+      "salesScope": "EXTERNAL",
+      "state": "VALUE",
+      "reportedValue": "5939676041503",
+      "normalizedValue": "5939676041503",
+      "rawValue": "5.939.676.041.503",
+      "currency": "IDR",
+      "unitType": "DOCUMENT_CURRENCY",
+      "scale": "1",
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-12-31",
+        "type": "FY"
+      },
+      "consolidationScope": "CONSOLIDATED",
+      "dimensionHash": "e76be49135883fcc9cde4f19a28cf80457e0a1c3d3a697b6a41cd3eeb1f792f6",
+      "sourceDocumentSha256": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb",
+      "extractionOrigin": "NATIVE",
+      "evidence": [
+        {
+          "requirementId": "SEGMENT_REVENUE",
+          "pageNumber": 91,
+          "printedPageLabel": null,
+          "statement": "NOTE",
+          "table": "Segment Information",
+          "rowLabel": "External revenue",
+          "columnLabel": "Total Segments",
+          "rawValue": "5.939.676.041.503",
+          "snippet": "These Consolidated Financial Statements are original issued in the Indonesian language Ekshibit E/80 Exhibit E/80 PT DHARMA POLIMETAL Tbk DAN ENTITAS ANAK PT DHARMA POLIMETAL Tbk AND SUBSIDIARIES CATATAN ATAS LAPORAN KEUANGAN KONSOLIDASIAN NOTES TO CONSOLIDATED FINANCIAL STATEMENTS UNTUK TAHUN YANG BERAKHIR PADA FOR THE YEAR ENDED 31 DESEMBER 2025 31 DECEMBER 2025 (Disajikan dalam Rupiah, kecuali dinyatakan lain) (Expressed in Rupiah, unless otherwise stated) 36. SEGMEN OPERASI 36. OPERATION SEGMENT 31 Desember 2025 Segmen Roda Dua/ Two Wheels\nSegment Segmen Roda\nEmpat/ Four Wheels Segment Segmen Lain-lain / Other Segments Jumlah Segmen/ Total Segments 31 December 2025 Segmen Primer : Primary Segment : Pendapatan ekstern 3.660.754.579.206 1.341.795.940.224 937.125.522.073 5.939.676.041.503 External revenue Beban pokok penjualan ( 2.877.122.921.336 ) ( 1.154.241.313.288 ) ( 837.847.060.588 ) ( 4.869.211.295.212 ) Cost of goods sold Hasil segmen 783.631.657.870 187.554.626.936 99.278.461.485 1.070.464.746.291 Segment results Beban usaha ( 380.303.352.125 ) Operating expenses Bagian atas laba bersih entitas\nasosiasi, setelah pajak 46.389.911.688 Share of net profit of associates, net of tax Pendapatan operasi lain-lain, Bersih 107.007.537.182 Other operating income, Net Beban keuangan, Bersih ( 12.534.718.382 ) Finance expense, Net Laba sebelum beban pajak Penghasilan 831.024.124.654 Profit before income tax expense Total beban pajak penghasilan ( 166.609.994.386 ) Total income tax expense Laba neto tahun berjalan 664.414.130.268 Net profit for the year Rugi komprehensif lain ( 1.592.457.184 ) Other comprehensive loss Total",
+          "snippetHash": "c20be9a482b84bfb882debf21806490b800d465e1c8acd5b86d04e2cc44a1b44",
+          "evidenceHash": "5d750c01aa30995ede57b75fc4821d6b99d52dc72dec134d9c7fff8063d5f20c",
+          "locatorHash": "15a07a748dd89a36310001bb18abc5349ad4bd67118ad4db6a4a76d8a83575f8"
+        }
+      ],
+      "confidence": {
+        "read": 1,
+        "mapping": 0.995
+      },
+      "validationStatus": "VALIDATED"
+    }
+  ],
+  "segmentOperatingProfitFacts": [],
+  "states": [
+    {
+      "requirementId": "DIVIDEND_EVENT",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "factCount": 1,
+      "attemptedPages": [
+        8,
+        9,
+        10,
+        11,
+        25,
+        30,
+        37,
+        45,
+        46,
+        52,
+        53,
+        55,
+        56,
+        57,
+        61,
+        71,
+        77,
+        89,
+        97,
+        98
+      ],
+      "reason": "Source-disclosed dividend lifecycle event retained with field-level evidence and true dates."
+    },
+    {
+      "requirementId": "SEGMENT_REVENUE",
+      "applicability": "EXPECTED",
+      "state": "VALUE",
+      "factCount": 4,
+      "attemptedPages": [
+        38,
+        91,
+        92
+      ],
+      "reason": "Source-disclosed segment revenue retained with segment and sales-scope dimensions."
+    },
+    {
+      "requirementId": "SEGMENT_OPERATING_PROFIT",
+      "applicability": "OPTIONAL",
+      "state": "NOT_DISCLOSED",
+      "factCount": 0,
+      "attemptedPages": [
+        38,
+        91,
+        92
+      ],
+      "reason": "Issuer disclosed another segment performance measure (for example gross profit, segment result, or profit before tax); it was not relabeled as canonical operating profit."
+    }
+  ],
+  "reconciliationControls": [
+    {
+      "controlId": "SEGMENT_REVENUE_EXTERNAL_RECONCILIATION",
+      "applicable": true,
+      "passed": true,
+      "reportedValue": "5939676041503",
+      "comparedValue": "5939676041503",
+      "difference": "0",
+      "reason": "Business and explicit elimination/unallocated members compared with the disclosed consolidated/total member."
+    },
+    {
+      "controlId": "SEGMENT_REVENUE_TOTAL_RECONCILIATION",
+      "applicable": false,
+      "passed": null,
+      "reportedValue": null,
+      "comparedValue": null,
+      "difference": null,
+      "reason": "No explicit comparable total member was disclosed."
+    },
+    {
+      "controlId": "SEGMENT_OPERATING_PROFIT_RECONCILIATION",
+      "applicable": false,
+      "passed": null,
+      "reportedValue": null,
+      "comparedValue": null,
+      "difference": null,
+      "reason": "Canonical segment operating profit was not explicitly disclosed."
+    },
+    {
+      "controlId": "DIVIDEND_DPS_ELIGIBLE_SHARE_CONTROL",
+      "applicable": true,
+      "passed": true,
+      "reportedValue": "202352938000",
+      "comparedValue": "202352938900",
+      "difference": "-900",
+      "reason": "DPS multiplied by reported issued shares is an approximate control only; treasury/eligible-share timing can differ."
+    }
+  ],
+  "evidenceAndLineage": {
+    "allEventsFieldLinked": true,
+    "allSegmentIdentitiesLinked": true,
+    "allFactsLinked": true,
+    "sourceRevisionHash": "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb"
+  },
+  "idempotency": {
+    "runs": 2,
+    "runIdentityStable": true,
+    "logicalObjectsStable": true,
+    "duplicateEvents": 0,
+    "duplicateSegmentIdentities": 0,
+    "duplicateSegmentFacts": 0
+  },
+  "providerUsage": {
+    "providerCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "costUsd": "0.00000000"
+  },
+  "productionSafety": {
+    "legacyMutation": false,
+    "p0aMutation": false,
+    "phase6aMutation": false,
+    "railwayMutation": false,
+    "deployment": false
+  }
+}
