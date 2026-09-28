@@ -106,7 +106,7 @@ function comparativeFact(args:{
     const duration=priorDuration(args.context,page); if(!duration) return null;
     start=duration.start; end=duration.end; role="COMPARATIVE_PERIOD"; label=end.slice(0,4);
   }
-  const snippet=clean(lines(page).filter(l=>Math.abs(l.y-sibling.line.y)<110).map(l=>l.text).join(" ")).slice(0,1800);
+  const snippet=ev.snippet;
   const evidence=createEvidence({requirementId:args.requirementId,page,statement:ev.statement,table:ev.table,rowLabel:ev.rowLabel,columnLabel:label,rawValue:sibling.raw,snippet});
   const state=new Prisma.Decimal(sibling.decimal).isZero()?"ZERO":"VALUE";
   const temporalIdentityKey=sha([args.context.ticker,args.requirementId,start,end,args.context.periodType,args.periodNature,scope(args.context),args.currency,args.scale,args.documentSha256,role].join("|"));
@@ -168,7 +168,8 @@ function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,docu
      for(let col=0;col<Math.min(numeric.length,ids.length);col++){
        const seg=ids[col]!; const currentFact=current.find(f=>f.metricCode===rm.spec.metricCode&&f.salesScope===rm.spec.salesScope&&normalizedByIdentity.get(f.segmentIdentityKey)===seg.normalizedLabel);
        if(!currentFact) continue;
-       const n=numeric[col]; const snippet=clean(ls.slice(Math.max(0,i-4),Math.min(ls.length,i+5)).map(x=>x.text).join(" ")).slice(0,1800);
+       const n=numeric[col]; const anchor=n.token.text; const at=page.text.indexOf(anchor); if(at<0) continue;
+       const snippet=page.text.slice(Math.max(0,at-700),Math.min(page.text.length,at+anchor.length+900));
        const evidence=createEvidence({requirementId:rm.spec.metricCode==="REVENUE"?"SEGMENT_REVENUE":"SEGMENT_OPERATING_PROFIT",page,statement:"NOTE",table:"Segment Information",rowLabel:rm.sourceLabel,columnLabel:seg.sourceLabel,rawValue:n.raw,snippet});
        const continuityKey=sha([context.ticker,seg.normalizedLabel,seg.segmentType,PHASE7A_MANIFEST_VERSION].join("|"));
        const factKey=sha([documentSha256,duration.start,duration.end,continuityKey,rm.spec.metricCode,rm.spec.salesScope??"",n.decimal,n.raw,page.textHash].join("|"));
