@@ -22,7 +22,7 @@ export async function persistPhase6A(client: PrismaClient, input: { documentId: 
     for (const outcome of input.result.outcomes.filter((item) => item.family === "REPORTED" && ["VALUE", "ZERO"].includes(item.state))) {
       if (!outcome.factIdentity || outcome.value === null || outcome.currency === null || outcome.scale === null) throw new Error(`Incomplete reported identity for ${outcome.requirementId}`);
       const assertion = await tx.p0AFactAssertion.upsert({
-        where: { reportRevisionId_requirementId: { reportRevisionId: input.reportRevisionId, requirementId: outcome.requirementId } },
+        where: { assertionKey: outcome.factIdentity.slice(5) },
         create: { companyId: input.companyId, reportRevisionId: input.reportRevisionId, requirementId: outcome.requirementId, definitionVersion: input.result.manifestVersion, assertionKey: outcome.factIdentity.slice(5), origin: "REPORTED", rawLabel: outcome.evidence[0]?.rowLabel, statement: outcome.evidence[0]?.statement, readConfidence: outcome.confidence.read, mappingConfidence: outcome.confidence.mapping, valueState: outcome.state, decimalValue: new Prisma.Decimal(outcome.value), rawValue: outcome.rawValue ?? outcome.value, currency: outcome.currency, unitType: outcome.unitType, scale: new Prisma.Decimal(outcome.scale), lineageStatus: "COMPLETE", status: "SHADOW" },
         update: {},
       });
@@ -44,7 +44,7 @@ export async function persistPhase6A(client: PrismaClient, input: { documentId: 
       const firstEvidence = metricInput.evidence[0];
       if (!firstEvidence) throw new Error(`Evidence-free calculation input ${metricInput.inputId}`);
       const assertion = await tx.p0AFactAssertion.upsert({
-        where: { reportRevisionId_requirementId: { reportRevisionId: input.reportRevisionId, requirementId: metricInput.requirementId } },
+        where: { assertionKey: metricInput.inputId.slice(5) },
         create: { companyId: input.companyId, reportRevisionId: input.reportRevisionId, requirementId: metricInput.requirementId, definitionVersion: input.result.manifestVersion, assertionKey: metricInput.inputId.slice(5), origin: "REPORTED", rawLabel: firstEvidence.rowLabel, statement: firstEvidence.statement, readConfidence: metricInput.extractionOrigin === "OCR" ? null : 1, mappingConfidence: 0.995, valueState: new Prisma.Decimal(metricInput.value).isZero() ? "ZERO" : "VALUE", decimalValue: new Prisma.Decimal(metricInput.value), rawValue: firstEvidence.rawValue, currency: metricInput.currency, unitType: metricInput.requirementId === "SHARES_OUTSTANDING_REPORTED" ? "SHARES" : "DOCUMENT_CURRENCY", scale: new Prisma.Decimal(metricInput.scale), lineageStatus: "COMPLETE", status: "SHADOW" },
         update: {},
       });
