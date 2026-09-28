@@ -921,13 +921,15 @@ model DerivedMetricResult {
   engine                 String
   engineVersion          String
   validationStatus       String
+  presentationRole       String?
+  sourceRevisionHash     String?
   resultHash             String                  @unique
   inputs                 DerivedMetricInput[]    @relation("ResultInputs")
   downstreamInputs       DerivedMetricInput[]    @relation("UpstreamDerivedResult")
   outcome                P0BRequirementOutcome?
   createdAt              DateTime                @default(now())
 
-  @@unique([runId, definitionId])
+  @@unique([runId, definitionId, periodStart, periodEnd])
   @@index([companyId, periodEnd])
 }
 
@@ -1148,7 +1150,7 @@ model SegmentFact {
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
 
-  @@unique([runId, segmentId, metricCode, salesScope])
+  @@unique([runId, segmentId, metricCode, salesScope, periodStart, periodEnd])
   @@index([companyId, metricCode, periodEnd])
   @@index([reportRevisionId])
   @@index([segmentId])
