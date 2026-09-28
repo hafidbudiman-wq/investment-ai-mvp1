@@ -98,6 +98,7 @@ model Company {
   p0aFactAssertions    P0AFactAssertion[]
   p0bExtractionRuns    P0BExtractionRun[]
   phase6bExtractionRuns Phase6BExtractionRun[]
+  phase7aExtractionRuns Phase7AExtractionRun[]
   dividendEvents        DividendEvent[]
   segmentDimensions     SegmentDimension[]
   segmentFacts          SegmentFact[]
@@ -496,6 +497,7 @@ model FinancialDocument {
   p0aEvidence        P0AFactEvidence[]
   p0bExtractionRuns  P0BExtractionRun[]
   phase6bExtractionRuns Phase6BExtractionRun[]
+  phase7aExtractionRuns Phase7AExtractionRun[]
   dividendEvents        DividendEvent[]
   segmentFacts          SegmentFact[]
   createdAt          DateTime             @default(now())
@@ -736,6 +738,7 @@ model P0AReportRevision {
   factAssertions    P0AFactAssertion[]
   p0bExtractionRuns P0BExtractionRun[]
   phase6bExtractionRuns Phase6BExtractionRun[]
+  phase7aExtractionRuns Phase7AExtractionRun[]
   dividendEvents        DividendEvent[]
   segmentFacts          SegmentFact[]
   createdAt         DateTime           @default(now())
@@ -784,6 +787,16 @@ model P0AFactAssertion {
   requirementId     String
   definitionVersion String
   assertionKey      String                     @unique
+  temporalIdentityKey String?                   @unique
+  periodStart        DateTime?
+  periodEnd          DateTime?
+  periodType         String?
+  periodNature       String?
+  consolidationScope String?
+  presentationRole   String?
+  presentationMetadata Json?
+  sourceRevisionHash String?
+  extractionOrigin   String?
   origin            String                     @default("REPORTED")
   rawLabel          String?
   statement         String?
@@ -804,8 +817,9 @@ model P0AFactAssertion {
   createdAt         DateTime                   @default(now())
   updatedAt         DateTime                   @updatedAt
 
-  @@unique([reportRevisionId, requirementId])
   @@index([companyId, requirementId])
+  @@index([companyId, requirementId, periodEnd])
+  @@index([reportRevisionId, periodEnd])
 }
 
 model P0AFactAssertionEvidence {
@@ -996,6 +1010,7 @@ model DividendEvent {
   reportRevisionId        String
   reportRevision          P0AReportRevision       @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
   eventKey                String                  @unique
+  intraDocumentEventKey   String?                 @unique
   eventType               String
   status                  String
   sourceProfitPeriodStart DateTime?
@@ -1062,12 +1077,17 @@ model SegmentDimension {
   validFrom         DateTime
   validTo           DateTime?
   definitionVersion String
+  continuityKey     String?
+  continuityValidFrom DateTime?
+  continuityValidTo DateTime?
+  presentationMetadata Json?
   facts             SegmentFact[]
   evidence          SegmentIdentityEvidence[]
   createdAt         DateTime                  @default(now())
   updatedAt         DateTime                  @updatedAt
 
   @@index([companyId, normalizedLabel])
+  @@index([companyId, continuityKey])
   @@index([companyId, validFrom, validTo])
 }
 
@@ -1122,6 +1142,8 @@ model SegmentFact {
   readConfidence         Decimal?              @db.Decimal(5, 4)
   mappingConfidence      Decimal?              @db.Decimal(5, 4)
   validationStatus       String
+  presentationRole       String?
+  presentationMetadata   Json?
   evidence               SegmentFactEvidence[]
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
@@ -1144,3 +1166,50 @@ model SegmentFactEvidence {
   @@unique([factId, ordinal])
   @@index([evidenceId])
 }
+
+model Phase7AExtractionRun {
+  id                   String             @id @default(cuid())
+  companyId            String
+  company              Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentId           String
+  document             FinancialDocument  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reportRevisionId     String
+  reportRevision       P0AReportRevision  @relation(fields: [reportRevisionId], references: [id], onDelete: Cascade)
+  manifestVersion      String
+  extractorVersion     String
+  completeIdentityHash String             @unique
+  sourceRevisionHash   String
+  currentPeriod        Json
+  comparativePeriods   Json
+  selectedPages        Json
+  validationSummary    Json
+  status               String
+  providerCalls        Int                @default(0)
+  inputTokens          Int                @default(0)
+  outputTokens         Int                @default(0)
+  estimatedCostUsd     Decimal            @default(0) @db.Decimal(18, 8)
+  outcomes             Phase7AOutcome[]
+  completedAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([documentId, status])
+  @@index([reportRevisionId])
+  @@index([companyId, sourceRevisionHash])
+}
+
+model Phase7AOutcome {
+  id        String                 @id @default(cuid())
+  runId     String
+  run       Phase7AExtractionRun   @relation(fields: [runId], references: [id], onDelete: Cascade)
+  code      String
+  state     String
+  reason    String
+  details   Json?
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+
+  @@unique([runId, code])
+  @@index([runId, state])
+}
+
