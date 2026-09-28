@@ -6,7 +6,7 @@ import type { Phase7AResult } from "@/lib/financial/p0b/phase7a-types";
 
 const sha=(value:string):string=>createHash("sha256").update(value).digest("hex");
 const json=(value:unknown):Prisma.InputJsonValue=>value as Prisma.InputJsonValue;
-const date=(v:string)=>new Date(\`\${v}T00:00:00.000Z\`);
+const date=(v:string)=>new Date(`${v}T00:00:00.000Z`);
 
 export async function persistPhase7A(client:PrismaClient,input:{documentId:string;companyId:string;reportRevisionId:string;result:Phase7AResult}){
  return client.$transaction(async tx=>{
@@ -42,7 +42,7 @@ export async function persistPhase7A(client:PrismaClient,input:{documentId:strin
   for(const derived of input.result.derivedFacts){
    if(derived.state==="INPUT_PERIOD_MISMATCH"||derived.value===null) continue;
    const formula=PHASE6A_FORMULA_BY_CODE.get(derived.canonicalCode);
-   if(!formula) throw new Error(\`Missing frozen formula definition for \${derived.canonicalCode}\`);
+   if(!formula) throw new Error(`Missing frozen formula definition for ${derived.canonicalCode}`);
    const definition=await tx.derivedMetricDefinition.upsert({where:{code_formulaVersion:{code:formula.code,formulaVersion:formula.formulaVersion}},create:{code:formula.code,formulaVersion:formula.formulaVersion,expression:formula.expression,namedInputs:json(formula.inputRoles),inclusionRules:json(formula.inclusionRules),exclusionRules:json(formula.exclusionRules),compatibilityRules:json(["same company","same period","same scope","same currency","same scale"]),outputUnit:derived.unitType},update:{}});
    const stored=await tx.derivedMetricResult.upsert({
     where:{resultHash:derived.resultHash},
@@ -53,14 +53,14 @@ export async function persistPhase7A(client:PrismaClient,input:{documentId:strin
    for(const [ordinal,metricInput] of derived.inputs.entries()){
     const assertionId=assertionIds.get(metricInput.inputIdentity);
     const inputResultId=resultIds.get(metricInput.inputIdentity);
-    if(!assertionId&&!inputResultId) throw new Error(\`Unpersisted Phase 7A derived input \${metricInput.inputIdentity}\`);
+    if(!assertionId&&!inputResultId) throw new Error(`Unpersisted Phase 7A derived input ${metricInput.inputIdentity}`);
     await tx.derivedMetricInput.upsert({where:{resultId_ordinal:{resultId:stored.id,ordinal}},create:{resultId:stored.id,ordinal,inputRole:metricInput.inputRole,inputIdentity:metricInput.inputIdentity,inputAssertionId:assertionId,inputResultId,inputValue:new Prisma.Decimal(metricInput.value),inputExtractionOrigin:null,inputEvidenceHashes:json([]),revisionContextHash:input.result.runIdentity},update:{}});
    }
   }
   const phase6bRun=await tx.phase6BExtractionRun.findUniqueOrThrow({where:{completeIdentityHash:input.result.phase6b.currentRunIdentity}});
   for(const fact of input.result.segmentFacts){
    const segment=await tx.segmentDimension.findFirst({where:{companyId:input.companyId,normalizedLabel:fact.normalizedLabel,segmentType:fact.segmentType},orderBy:{createdAt:"asc"}});
-   if(!segment) throw new Error(\`Missing current segment identity for comparative continuity: \${fact.normalizedLabel}\`);
+   if(!segment) throw new Error(`Missing current segment identity for comparative continuity: ${fact.normalizedLabel}`);
    const currentFrom=segment.validFrom.toISOString().slice(0,10), currentTo=segment.validTo?.toISOString().slice(0,10)??input.result.context.periodEnd;
    await tx.segmentDimension.update({where:{id:segment.id},data:{continuityKey:fact.continuityKey,continuityValidFrom:date(fact.period.start<currentFrom?fact.period.start:currentFrom),continuityValidTo:date(fact.period.end>currentTo?fact.period.end:currentTo),presentationMetadata:json({sourceRevisionHash:fact.sourceRevisionHash,intraDocumentComparative:true})}});
    const stored=await tx.segmentFact.upsert({
