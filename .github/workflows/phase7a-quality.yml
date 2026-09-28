@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
+      DATABASE_URL: postgresql://phase7a:phase7a@127.0.0.1:5432/investai_phase7a_preflight?schema=public
       P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase7a-source/ICBP_billingual_30Jun25.pdf
       P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase7a-source/MEDC_1H25.pdf
       P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase7a-source/DRMA_Q4_2025.pdf
