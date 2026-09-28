@@ -1,0 +1,143 @@
+name: Phase 7A Disposable PostgreSQL Acceptance
+on:
+  push:
+    branches:
+      - agent/investai-phase7a-multiperiod-intradoc
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  phase7a-database-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:16.4-alpine3.20
+        env:
+          POSTGRES_USER: phase7a
+          POSTGRES_PASSWORD: phase7a
+          POSTGRES_DB: investai_phase7a_acceptance
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U phase7a -d investai_phase7a_acceptance"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DATABASE_URL: postgresql://phase7a:phase7a@127.0.0.1:5432/investai_phase7a_acceptance?schema=public
+      PGPASSWORD: phase7a
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase7a-source/ICBP_billingual_30Jun25.pdf
+      P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase7a-source/MEDC_1H25.pdf
+      P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase7a-source/DRMA_Q4_2025.pdf
+      PHASE7A_OUTPUT_DIR: ${{ github.workspace }}/.phase7a-qa/full-artifacts
+    steps:
+      - name: Checkout exact Phase 7A commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Verify exact checkout and frozen ancestry
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 80c780703954f1b74bddcd6c6bb78de6a7c67233 HEAD
+          test "$(git merge-base 80c780703954f1b74bddcd6c6bb78de6a7c67233 HEAD)" = "80c780703954f1b74bddcd6c6bb78de6a7c67233"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install deterministic OCR and PostgreSQL clients
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind postgresql-client
+          tesseract --version
+          pdftoppm -v
+          psql --version
+      - run: npm ci --no-audit --no-fund
+      - name: Wait for disposable PostgreSQL
+        run: |
+          for attempt in $(seq 1 30); do
+            pg_isready -h 127.0.0.1 -U phase7a -d investai_phase7a_acceptance && exit 0
+            sleep 1
+          done
+          exit 1
+      - name: Prisma validate, generate, migrate deploy and status
+        run: |
+          npx prisma validate
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma migrate status
+      - name: Capture post-migrate and seed twice
+        run: |
+          mkdir -p .phase7a-qa
+          node --import tsx scripts/phase7a-db-acceptance.ts snapshot .phase7a-qa/00-after-migrate.json
+          npm run db:seed
+          node --import tsx scripts/phase7a-db-acceptance.ts snapshot .phase7a-qa/01-after-seed-first.json
+          npm run db:seed
+          node --import tsx scripts/phase7a-db-acceptance.ts snapshot .phase7a-qa/02-after-seed-second.json
+      - name: Download and checksum-lock frozen sources only
+        run: |
+          mkdir -p .phase7a-source
+          curl --insecure --http1.1 --fail --location --retry 3 --output "$P0A_ICBP_PDF_PATH" 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  $P0A_ICBP_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_MEDC_PDF_PATH" 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  $P0A_MEDC_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_DRMA_PDF_PATH" 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
+          echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  $P0A_DRMA_PDF_PATH" | sha256sum --check --strict
+      - name: Persist frozen P0-A, Phase 6A and Phase 6B baseline
+        run: node --import tsx scripts/phase7a-db-acceptance.ts prepare .phase7a-qa/03-frozen-baseline.json
+      - name: Persist Phase 7A first run
+        run: |
+          node --import tsx scripts/phase7a-db-acceptance.ts persist ICBP first .phase7a-qa/04-icbp-first.json
+          node --import tsx scripts/phase7a-db-acceptance.ts persist MEDC first .phase7a-qa/05-medc-first.json
+          node --import tsx scripts/phase7a-db-acceptance.ts persist DRMA first .phase7a-qa/06-drma-first.json
+          node --import tsx scripts/phase7a-db-acceptance.ts snapshot .phase7a-qa/07-after-first.json
+      - name: Persist identical Phase 7A second run
+        run: |
+          node --import tsx scripts/phase7a-db-acceptance.ts persist ICBP second .phase7a-qa/08-icbp-second.json
+          node --import tsx scripts/phase7a-db-acceptance.ts persist MEDC second .phase7a-qa/09-medc-second.json
+          node --import tsx scripts/phase7a-db-acceptance.ts persist DRMA second .phase7a-qa/10-drma-second.json
+          node --import tsx scripts/phase7a-db-acceptance.ts snapshot .phase7a-qa/11-after-second.json
+      - name: Verify database idempotency, temporal identity and frozen truth
+        run: |
+          node --import tsx scripts/phase7a-db-acceptance.ts verify             .phase7a-qa/03-frozen-baseline.json             .phase7a-qa/01-after-seed-first.json             .phase7a-qa/02-after-seed-second.json             .phase7a-qa/07-after-first.json             .phase7a-qa/11-after-second.json             .phase7a-qa/PHASE7A-DATABASE-ACCEPTANCE.json
+      - name: Generate Phase 7A artifacts and verify SHA-256
+        run: |
+          node --import tsx scripts/p0b-phase7a-three-issuer.ts
+          cp .phase7a-qa/PHASE7A-DATABASE-ACCEPTANCE.json .phase7a-qa/full-artifacts/PHASE7A-DATABASE-ACCEPTANCE.json
+          cd .phase7a-qa/full-artifacts
+          sha256sum --check --strict SHA256SUMS.txt
+      - name: Prove frozen Phase 6B implementation remains unchanged
+        run: |
+          git diff --exit-code 80c780703954f1b74bddcd6c6bb78de6a7c67233 --             lib/financial/p0a/pipeline.ts             lib/financial/p0a/requirements.ts             lib/financial/p0b/phase6a-pipeline.ts             lib/financial/p0b/phase6a-registry.ts             lib/financial/p0b/phase6b-pipeline.ts             lib/financial/p0b/phase6b-types.ts             lib/financial/p0b/phase6b-persistence.ts
+      - name: Standard full regression suite
+        env:
+          P0A_ICBP_PDF_PATH: ""
+          P0A_MEDC_PDF_PATH: ""
+          P0A_DRMA_PDF_PATH: ""
+        run: npm test
+      - name: Source-backed P0-A OCR Phase 6A Phase 6B and Phase 7A regressions
+        run: |
+          node --import tsx scripts/p0a-phase5c-native-regression.ts
+          node --import tsx scripts/p0a-phase5-icbp-regression.ts
+          node --import tsx scripts/p0a-phase5c-drma-diagnostic.ts
+          node --import tsx --test tests/p0b/phase6a-core.test.ts
+          node --import tsx --test tests/p0b/phase6b-core.test.ts
+          node --import tsx --test tests/p0b/phase7a-core.test.ts
+      - name: TypeScript ESLint and production build
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run build
+      - name: Upload Phase 7A acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHASE7A-FINAL-DATABASE-ACCEPTANCE-${{ github.sha }}
+          path: |
+            .phase7a-qa/*.json
+            .phase7a-qa/full-artifacts/*.json
+            .phase7a-qa/full-artifacts/SHA256SUMS.txt
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
