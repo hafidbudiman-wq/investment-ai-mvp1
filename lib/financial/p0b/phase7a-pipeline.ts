@@ -179,7 +179,7 @@ function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,docu
  }
  const uniq=new Map(output.map(f=>[f.factKey,f])); return [...uniq.values()];
 }
-function phase6bNormMap(currentFacts:Phase6BSegmentFact[], phase6b:any):Map<string,string>{
+function phase6bNormMap(_currentFacts:Phase6BSegmentFact[], phase6b:{segmentIdentities:Array<{identityKey:string;normalizedLabel:string}>}):Map<string,string>{
  const m=new Map<string,string>(); for(const id of phase6b.segmentIdentities)m.set(id.identityKey,id.normalizedLabel); return m;
 }
 
