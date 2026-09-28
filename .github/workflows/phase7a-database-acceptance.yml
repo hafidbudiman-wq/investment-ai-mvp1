@@ -106,6 +106,7 @@ jobs:
           node --import tsx scripts/p0b-phase7a-three-issuer.ts
           cp .phase7a-qa/PHASE7A-DATABASE-ACCEPTANCE.json .phase7a-qa/full-artifacts/PHASE7A-DATABASE-ACCEPTANCE.json
           cd .phase7a-qa/full-artifacts
+          sha256sum             ICBP-PHASE7A-MULTIPERIOD.json             MEDC-PHASE7A-MULTIPERIOD.json             DRMA-PHASE7A-MULTIPERIOD.json             PHASE7A-CROSS-ISSUER-MATRIX.json             PHASE7A-DATABASE-ACCEPTANCE.json > SHA256SUMS.txt
           sha256sum --check --strict SHA256SUMS.txt
       - name: Prove frozen Phase 6B implementation remains unchanged
         run: |
