@@ -51,7 +51,7 @@ async function frozenCurrentFingerprints(){
  };
 }
 async function prepare(path:string){
- const issuers=[] as any[];
+ const issuers:Array<{ticker:Issuer;companyId:string;documentId:string;reportRevisionId:string;p0aFingerprint:string;phase6aRunIdentity:string;phase6bRunIdentity:string}>=[];
  for(const item of cases){
   const bytes=await source(item);
   const company=await prisma.company.upsert({where:{ticker:item.ticker},create:{ticker:item.ticker,name:item.name,currency:item.context.currency},update:{}});
