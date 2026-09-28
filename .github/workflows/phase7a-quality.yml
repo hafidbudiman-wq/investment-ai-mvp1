@@ -1,0 +1,49 @@
+name: Phase 7A Quality Preflight
+on:
+  push:
+    branches:
+      - agent/investai-phase7a-multiperiod-intradoc
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  phase7a-quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      P0A_ICBP_PDF_PATH: ${{ github.workspace }}/.phase7a-source/ICBP_billingual_30Jun25.pdf
+      P0A_MEDC_PDF_PATH: ${{ github.workspace }}/.phase7a-source/MEDC_1H25.pdf
+      P0A_DRMA_PDF_PATH: ${{ github.workspace }}/.phase7a-source/DRMA_Q4_2025.pdf
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Verify frozen ancestry
+        run: git merge-base --is-ancestor 80c780703954f1b74bddcd6c6bb78de6a7c67233 HEAD
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install deterministic OCR tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-eng tesseract-ocr-ind
+      - run: npm ci --no-audit --no-fund
+      - name: Prisma validate and generate
+        run: |
+          npx prisma validate
+          npx prisma generate
+      - name: Download checksum-locked frozen sources
+        run: |
+          mkdir -p .phase7a-source
+          curl --insecure --http1.1 --fail --location --retry 3 --output "$P0A_ICBP_PDF_PATH" 'https://www.indofoodcbp.com/uploads/statement/ICBP_billingual_30Jun25.pdf'
+          echo "eb9a435e8bd0847d538b8bc954c53d9b7724bf87fac20023e1c52234a965f089  $P0A_ICBP_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_MEDC_PDF_PATH" 'https://www.medcoenergi.com/uploads/rwocis/532/MEDC_1H25.pdf'
+          echo "438675ac79b565ca4b583745bc2b2b885cf6b6fbbed8f71dcca51ef110cf880e  $P0A_MEDC_PDF_PATH" | sha256sum --check --strict
+          curl --http1.1 --fail --location --retry 3 --output "$P0A_DRMA_PDF_PATH" 'https://www.indopremier.com/xdir/news/LAPORAN%20KEUANGAN/2025/q4/DRMA_Q4_2025.pdf'
+          echo "7eedda5609f8c9936d1d68beb149c19620ac57a34098db29716bd3fb4c1e48fb  $P0A_DRMA_PDF_PATH" | sha256sum --check --strict
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Phase 7A source-backed tests
+        run: node --import tsx --test tests/p0b/phase7a-core.test.ts
