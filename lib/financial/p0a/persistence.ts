@@ -152,7 +152,7 @@ export async function persistP0AShadowResult(
       const native = observation as Partial<P0ANativeObservation>;
       const assertionKey = sha([revision.id, observation.requirementId, observation.state, observation.decimalValue, observation.rawValue, result.versions.contract].join("|"));
       const assertion = await tx.p0AFactAssertion.upsert({
-        where: { reportRevisionId_requirementId: { reportRevisionId: revision.id, requirementId: observation.requirementId } },
+        where: { assertionKey },
         create: {
           companyId, reportRevisionId: revision.id, requirementId: observation.requirementId,
           definitionVersion: result.versions.contract, assertionKey, origin: "REPORTED",
