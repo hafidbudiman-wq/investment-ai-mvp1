@@ -3,6 +3,8 @@
 -- is relaxed so one source revision can hold distinct accounting periods.
 
 DROP INDEX IF EXISTS "P0AFactAssertion_reportRevisionId_requirementId_key";
+DROP INDEX IF EXISTS "DerivedMetricResult_runId_definitionId_key";
+DROP INDEX IF EXISTS "SegmentFact_runId_segmentId_metricCode_salesScope_key";
 
 ALTER TABLE "P0AFactAssertion"
   ADD COLUMN "temporalIdentityKey" TEXT,
@@ -34,6 +36,16 @@ CREATE INDEX "SegmentDimension_companyId_continuityKey_idx" ON "SegmentDimension
 ALTER TABLE "SegmentFact"
   ADD COLUMN "presentationRole" TEXT,
   ADD COLUMN "presentationMetadata" JSONB;
+
+ALTER TABLE "DerivedMetricResult"
+  ADD COLUMN "presentationRole" TEXT,
+  ADD COLUMN "sourceRevisionHash" TEXT;
+
+CREATE UNIQUE INDEX "DerivedMetricResult_runId_definitionId_periodStart_periodEnd_key"
+  ON "DerivedMetricResult"("runId", "definitionId", "periodStart", "periodEnd");
+
+CREATE UNIQUE INDEX "SegmentFact_runId_segmentId_metricCode_salesScope_periodStart_periodEnd_key"
+  ON "SegmentFact"("runId", "segmentId", "metricCode", "salesScope", "periodStart", "periodEnd");
 
 CREATE TABLE "Phase7AExtractionRun" (
   "id" TEXT NOT NULL,
