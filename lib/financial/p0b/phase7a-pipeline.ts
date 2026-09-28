@@ -38,7 +38,7 @@ function nums(line:Line):Num[]{
     const token=line.tokens[i]; const parsed=parseFinancialDecimal(token.text); if(!parsed) continue;
     const prev=line.tokens[i-1], next=line.tokens[i+1];
     const wrapped=prev?.text==="("&&next?.text===")"&&Math.abs(prev.x+prev.width-token.x)<3;
-    const raw=wrapped?\`(\${token.text})\`:token.text;
+    const raw=wrapped?`(${token.text})`:token.text;
     const decimal=wrapped&&!parsed.decimal.startsWith("-")?new Prisma.Decimal(parsed.decimal).negated().toFixed():parsed.decimal;
     out.push({x:token.x,raw,decimal,token});
   }
@@ -66,17 +66,17 @@ const MONTHS:Record<string,number>={januari:1,january:1,februari:2,february:2,ma
 function explicitDates(text:string):string[]{
   const out=new Set<string>();
   for(const m of text.matchAll(/\b(\d{1,2})\s+(Januari|January|Februari|February|Maret|March|April|Mei|May|Juni|June|Juli|July|Agustus|August|September|Oktober|October|November|Desember|December)\s+(20\d{2})\b/gi)){
-    out.add(\`\${m[3]}-\${String(MONTHS[m[2].toLowerCase()]).padStart(2,"0")}-\${m[1].padStart(2,"0")}\`);
+    out.add(`${m[3]}-${String(MONTHS[m[2].toLowerCase()]).padStart(2,"0")}-${m[1].padStart(2,"0")}`);
   }
   for(const m of text.matchAll(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),?\s+(20\d{2})\b/gi)){
-    out.add(\`\${m[3]}-\${String(MONTHS[m[1].toLowerCase()]).padStart(2,"0")}-\${m[2].padStart(2,"0")}\`);
+    out.add(`${m[3]}-${String(MONTHS[m[1].toLowerCase()]).padStart(2,"0")}-${m[2].padStart(2,"0")}`);
   }
   return [...out];
 }
 function priorDuration(context:P0AIssuerContext,page:P0ARoutedPage){
   const priorYear=String(Number(context.periodEnd.slice(0,4))-1);
-  if(!new RegExp(\`\\b\${priorYear}\\b\`).test(page.text)) return null;
-  const start=\`\${priorYear}\${context.periodStart.slice(4)}\`, end=\`\${priorYear}\${context.periodEnd.slice(4)}\`;
+  if(!new RegExp(`\\b${priorYear}\\b`).test(page.text)) return null;
+  const start=`${priorYear}${context.periodStart.slice(4)}`, end=`${priorYear}${context.periodEnd.slice(4)}`;
   return {start,end,type:context.periodType as P0AIssuerContext["periodType"]};
 }
 function priorInstant(context:P0AIssuerContext,page:P0ARoutedPage){
@@ -157,7 +157,7 @@ function headerGroups(page:P0ARoutedPage,header:Line,numeric:Num[]):string[]{
 function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,documentSha256:string,current:Phase6BSegmentFact[],normalizedByIdentity:Map<string,string>):Phase7ASegmentFact[]{
  const priorYear=String(Number(context.periodEnd.slice(0,4))-1);
  const output:Phase7ASegmentFact[]=[];
- for(const page of pages.filter(p=>/segment|segmen/i.test(p.text)&&new RegExp(\`\\b\${priorYear}\\b\`).test(p.text))){
+ for(const page of pages.filter(p=>/segment|segmen/i.test(p.text)&&new RegExp(`\\b${priorYear}\\b`).test(p.text))){
    const ls=lines(page);
    const header=ls.find((l,i)=>nums(l).length>=3&&yearRow(ls,i,priorYear)&&rowSpec(ls,i)); if(!header) continue;
    const headers=headerGroups(page,header,nums(header)); const ids=headers.map(identifySegment); if(ids.some(x=>!x)) continue;
@@ -222,9 +222,9 @@ export async function runPhase7A(input:{bytes:Buffer;context:P0AIssuerContext}):
  });
  validations.push({controlId:"DIVIDEND_SAME_REPORT_DEDUP",passed:dividendDedup.every(x=>x.passed),state:dividendDedup.every(x=>x.passed)?"PASS":"CONFLICT",reason:"Economic event identity excludes disclosure-page identity; multiple evidence occurrences resolve to one canonical event."});
  const currentIds=new Set(p0a.outcomes.map(o=>{const obs=o.reportedObservation as P0ANativeObservation|null;return obs?sha([o.requirementId,obs.period.start,obs.period.end].join("|")):"";}));
- const temporalConflicts=dedupFacts.filter(f=>currentIds.has(sha([f.requirementId,f.period.start,f.period.end].join("|")))).map(f=>\`CURRENT_COMPARATIVE_IDENTITY_COLLISION:\${f.requirementId}\`);
+ const temporalConflicts=dedupFacts.filter(f=>currentIds.has(sha([f.requirementId,f.period.start,f.period.end].join("|")))).map(f=>`CURRENT_COMPARATIVE_IDENTITY_COLLISION:${f.requirementId}`);
  validations.push({controlId:"CURRENT_COMPARATIVE_TEMPORAL_SEPARATION",passed:temporalConflicts.length===0,state:temporalConflicts.length?"CONFLICT":"PASS",reason:temporalConflicts.length?"A comparative fact reused a current accounting period.":"Current and comparative accounting periods are distinct by semantic identity."});
- const comparativePeriods=[...new Map([...dedupFacts.map(f=>[\`\${f.period.start}|\${f.period.end}|\${f.presentationRole}\`,{start:f.period.start,end:f.period.end,type:f.period.type,role:f.presentationRole}]),...segmentFacts.map(f=>[\`\${f.period.start}|\${f.period.end}|\${f.presentationRole}\`,{start:f.period.start,end:f.period.end,type:f.period.type,role:f.presentationRole}])]).values()];
+ const comparativePeriods=[...new Map([...dedupFacts.map(f=>[`${f.period.start}|${f.period.end}|${f.presentationRole}`,{start:f.period.start,end:f.period.end,type:f.period.type,role:f.presentationRole}]),...segmentFacts.map(f=>[`${f.period.start}|${f.period.end}|${f.presentationRole}`,{start:f.period.start,end:f.period.end,type:f.period.type,role:f.presentationRole}])]).values()];
  const selectedPages=[...new Set([...dedupFacts.flatMap(f=>f.evidence.map(e=>e.pageNumber)),...segmentFacts.flatMap(f=>f.evidence.map(e=>e.pageNumber)),...phase6b.dividendEvents.flatMap(e=>e.evidence.map(x=>x.evidence.pageNumber))])].sort((a,b)=>a-b);
  const p0aFp=sha(JSON.stringify(p0a.outcomes.map(o=>({id:o.requirementId,state:o.state,value:o.reportedObservation?.decimalValue??null,evidence:o.reportedObservation?.evidence.map(e=>e.evidenceHash)??[]}))));
  const p6aFp=sha(JSON.stringify(phase6a.outcomes.map(o=>({id:o.requirementId,state:o.state,value:o.value,fact:o.factIdentity}))));
