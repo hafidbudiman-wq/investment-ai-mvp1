@@ -49,7 +49,7 @@ function labelScore(window:string,label:string):number{
   return words.reduce((n,w)=>n+(window.toLowerCase().includes(w)?1:0),0);
 }
 function findSibling(page:P0ARoutedPage, currentValue:string, rowLabel:string):{raw:string;decimal:string;line:Line}|null{
-  const ls=lines(page); const candidates:Array<{score:number;index:number;matchIndex:number;line:Line;cells:Num[]}>=[] as never;
+  const ls=lines(page); const candidates:Array<{score:number;index:number;matchIndex:number;line:Line;cells:Num[]}>=[];
   for(let i=0;i<ls.length;i++){
     const cells=nums(ls[i]); if(cells.length<2) continue;
     const matchIndex=cells.findIndex(c=>new Prisma.Decimal(c.decimal).eq(currentValue));
@@ -154,11 +154,8 @@ function headerGroups(page:P0ARoutedPage,header:Line,numeric:Num[]):string[]{
  const candidates=page.tokens.filter(t=>t.y>header.y+4&&t.y<header.y+105&&t.x+t.width/2>=lower[0]&&t.x+t.width/2<=numeric.at(-1)!.x+75);
  return numeric.map((_c,i)=>clean(candidates.filter(t=>{const center=t.x+t.width/2;return center>=lower[i]&&center<boundaries[i]}).sort((a,b)=>b.y-a.y||a.x-b.x).map(t=>t.text).join(" ")));
 }
-function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,documentSha256:string,current:Phase6BSegmentFact[]):Phase7ASegmentFact[]{
+function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,documentSha256:string,current:Phase6BSegmentFact[],normalizedByIdentity:Map<string,string>):Phase7ASegmentFact[]{
  const priorYear=String(Number(context.periodEnd.slice(0,4))-1);
- const validCurrent=new Map(current.map(f=>[f.segmentIdentityKey,f]));
- const currentByNorm=new Map<string,Phase6BSegmentFact>();
- for(const f of current) currentByNorm.set(f.segmentIdentityKey,f);
  const output:Phase7ASegmentFact[]=[];
  for(const page of pages.filter(p=>/segment|segmen/i.test(p.text)&&new RegExp(\`\\b\${priorYear}\\b\`).test(p.text))){
    const ls=lines(page);
@@ -169,7 +166,7 @@ function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,docu
      const rm=rowSpec(ls,i); if(!rm) continue;
      const duration=priorDuration(context,page); if(!duration) continue;
      for(let col=0;col<Math.min(numeric.length,ids.length);col++){
-       const seg=ids[col]!; const currentFact=current.find(f=>f.metricCode===rm.spec.metricCode&&f.salesScope===rm.spec.salesScope&&current.some(x=>x.segmentIdentityKey===f.segmentIdentityKey)&&xMatches(f,seg.normalizedLabel));
+       const seg=ids[col]!; const currentFact=current.find(f=>f.metricCode===rm.spec.metricCode&&f.salesScope===rm.spec.salesScope&&normalizedByIdentity.get(f.segmentIdentityKey)===seg.normalizedLabel);
        if(!currentFact) continue;
        const n=numeric[col]; const snippet=clean(ls.slice(Math.max(0,i-4),Math.min(ls.length,i+5)).map(x=>x.text).join(" ")).slice(0,1800);
        const evidence=createEvidence({requirementId:rm.spec.metricCode==="REVENUE"?"SEGMENT_REVENUE":"SEGMENT_OPERATING_PROFIT",page,statement:"NOTE",table:"Segment Information",rowLabel:rm.sourceLabel,columnLabel:seg.sourceLabel,rawValue:n.raw,snippet});
@@ -180,7 +177,6 @@ function comparativeSegments(pages:P0ARoutedPage[],context:P0AIssuerContext,docu
    }
  }
  const uniq=new Map(output.map(f=>[f.factKey,f])); return [...uniq.values()];
- function xMatches(f:Phase6BSegmentFact,norm:string){const anyFact=f as Phase6BSegmentFact&{segmentNormalizedLabel?:string}; return anyFact.segmentNormalizedLabel===norm||current.some(x=>x.segmentIdentityKey===f.segmentIdentityKey&&x.evidence.some(e=>clean(e.columnLabel).toUpperCase().includes(norm.replaceAll("_"," "))));}
 }
 function phase6bNormMap(currentFacts:Phase6BSegmentFact[], phase6b:any):Map<string,string>{
  const m=new Map<string,string>(); for(const id of phase6b.segmentIdentities)m.set(id.identityKey,id.normalizedLabel); return m;
@@ -217,8 +213,8 @@ export async function runPhase7A(input:{bytes:Buffer;context:P0AIssuerContext}):
      derivedFacts.push({resultHash:fcfHash,canonicalCode:"FCF_CALCULATED",formulaVersion:"1.0.0",expression:"OCF_REPORTED + SIGNED_CAPEX_TOTAL_CASH",state:fcf.isZero()?"ZERO":"VALUE",value:fcf.toFixed(),currency:ocf.currency,unitType:"DOCUMENT_CURRENCY",scale:ocf.scale,period:ocf.period,consolidationScope:ocf.consolidationScope,presentationRole:"COMPARATIVE_PERIOD",sourceRevisionHash:documentSha256,inputs:[{inputIdentity:ocf.temporalIdentityKey,inputRole:"OCF_REPORTED",requirementId:ocf.requirementId,value:ocf.decimalValue,periodStart:ocf.period.start,periodEnd:ocf.period.end,currency:ocf.currency,scale:ocf.scale,scope:ocf.consolidationScope},{inputIdentity:capexHash,inputRole:"SIGNED_CAPEX_TOTAL_CASH",requirementId:"CAPEX_TOTAL_CASH_CALCULATED",value:totalCapex.toFixed(),periodStart:ocf.period.start,periodEnd:ocf.period.end,currency:ocf.currency,scale:ocf.scale,scope:ocf.consolidationScope}]});
    }
  }else validations.push({controlId:"DERIVED_INPUT_PERIOD_COMPATIBILITY",passed:true,state:"PASS",reason:"No comparative FCF calculation attempted because exact required comparative inputs were not all source-resolved."});
- const norm=phase6bNormMap(phase6b.segmentFacts,phase6b); const decorated=phase6b.segmentFacts.map(f=>Object.assign({},f,{segmentNormalizedLabel:norm.get(f.segmentIdentityKey)}));
- const segmentFacts=comparativeSegments(p0a.routedPages,input.context,documentSha256,decorated);
+ const norm=phase6bNormMap(phase6b.segmentFacts,phase6b);
+ const segmentFacts=comparativeSegments(p0a.routedPages,input.context,documentSha256,phase6b.segmentFacts,norm);
  const dividendDedup:Phase7ADividendDedup[]=phase6b.dividendEvents.map(event=>{
    const economicEventKey=sha([input.context.ticker,event.eventType,event.sourceProfitPeriod.start??"",event.sourceProfitPeriod.end??"",event.dates.approval??event.dates.declaration??"",event.total?.normalizedValue??"",event.total?.currency??"",event.perShare?.normalizedValue??"",event.perShare?.currency??"",event.recipientScope,event.shareClass??""].join("|"));
    const duplicateCanonicalEvents=phase6b.dividendEvents.filter(other=>sha([input.context.ticker,other.eventType,other.sourceProfitPeriod.start??"",other.sourceProfitPeriod.end??"",other.dates.approval??other.dates.declaration??"",other.total?.normalizedValue??"",other.total?.currency??"",other.perShare?.normalizedValue??"",other.perShare?.currency??"",other.recipientScope,other.shareClass??""].join("|"))===economicEventKey).length-1;
